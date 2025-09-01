@@ -1,0 +1,103 @@
+#principal{
+    width: 100vw;
+    height: 88vh;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    margin-top: 1vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+#principal img{
+    width: 100vw;
+    height: 88vh;
+    z-index: 1;
+    position: absolute;
+}
+main{
+    height: 100vh;
+    width: 100vw;
+    overflow-x:hidden;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+form{
+    font-family: Poppins-Regular;
+    width: 40vw;
+    height: 50vh;
+    background-color: rgba(0, 0, 0, 1);
+    opacity: 0.4;
+    transition: 0.2s ease-in-out;
+    z-index: 4;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    padding-top: 2vh;
+}
+form:hover{
+    background-color: rgba(0, 0, 0, 1);
+    opacity: 0.8;
+    transition: 0.2s ease-in-out;
+}
+#campo{
+    width: 39vw;
+    margin-bottom: 3.5vh;
+}
+h1{
+    font-size: 1.8vw;
+    font-family: Poppins-Bold;
+}
+label{
+    font-size: 1.1vw;
+    font-family: Poppins-Bold;
+}
+input{
+    width: 38.5vw;
+    height: 4vh;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 1vw;
+    padding-left: 0.5vw;
+}
+input:focus{
+    border: 2px solid cyan;
+    outline: none;
+}
+button{
+    width: 39vw;
+    height: 5vh;
+    font-family: Poppins-Regular;
+    font-size: 1vw;
+    background-color: white;
+    color: black;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    transition: 0.4s ease-in-out;
+}
+button:hover{
+    background-color: cyan;
+    color: white;
+    transition: 0.4s ease-in-out;
+    cursor: pointer;
+}
+#termos{
+    width: 4vw;
+    height: 2vh;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 1vw; 
+    margin-left: -1vw;
+    margin-right: -1.5vw;
+}
+#termostexto{
+    font-size: 1vw;
+    font-family: Poppins-Regular;
+}
+#termostexto a{
+    color: cyan;
+}

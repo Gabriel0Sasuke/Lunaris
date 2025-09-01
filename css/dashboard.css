@@ -1,0 +1,154 @@
+main{
+    height: 100vh;
+    width: 100vw;
+    overflow-x:hidden;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+#principal{
+    width: 100vw;
+    height: 88vh;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    margin-top: 1vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+#menulateral{
+    width: 20vw;
+    margin-top: 1vh;
+    height: 87vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    border-top: 2px solid #444444;
+    border-right: 2px solid #444444;
+}
+.blocos{
+    width: 80vw;
+    height: 87vh;
+    margin-top: 1vh;
+    border-top: 2px solid #444444;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.opcoes{
+    width: 19.5vw;
+    height: 7vh;
+    margin-bottom: 2vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    transition: 0.4s ease-in-out;
+}
+.opcoes-img{
+    width: 3vw;
+    margin-left: 1vw;
+    height: 6vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: invert(44%) sepia(6%) saturate(165%) hue-rotate(175deg) brightness(92%) contrast(88%);  
+    transition: 0.4s ease-in-out;   
+}
+.opcoes-img img{
+    width: 70%;
+    height: 70%;
+}
+#logout{
+    margin-top: auto;
+}
+#logout .opcoes-img{
+    margin-left: 0.5vw;
+}
+#recolher{
+    margin-top: 2vh;
+    margin-bottom: 5vh;
+}
+#config .opcoes-img img{
+    width: 100%;
+    height: 100%;
+}
+.opcoes-texto{
+    font-family: Poppins-Bold;
+    margin-left: 1.4vw;
+    color: #4F5153;
+    font-size: 1.2vw;
+    transition: 0.4s ease-in-out;
+}
+.opcoes:hover{
+    border-left: solid 0.3vw #77B7FD;
+    cursor: pointer;
+    transition: 0.4s ease-in-out;
+}
+.opcoes:hover  .opcoes-texto{
+    color: #77B7FD;
+    transition: 0.4s ease-in-out;
+}
+.opcoes:hover  .opcoes-img{
+    filter: invert(80%) sepia(30%) saturate(629%) hue-rotate(181deg) brightness(98%) contrast(101%);
+    transition: 0.4s ease-in-out;
+}
+
+#dash.active,
+#edit.active,
+#album.active,
+#scan.active,
+#admin.active,
+#config.active{
+    border-left: 0.3vw solid #499BFC;
+    transition: 0.4s ease-in-out;
+}
+
+#dash.active .opcoes-texto,
+#edit.active .opcoes-texto,
+#album.active .opcoes-texto,
+#scan.active .opcoes-texto,
+#admin.active .opcoes-texto,
+#config.active .opcoes-texto {
+    color: #499BFC;
+    transition: 0.4s ease-in-out;
+}
+
+#dash.active .opcoes-img,
+#edit.active .opcoes-img,
+#album.active .opcoes-img,
+#scan.active .opcoes-img,
+#admin.active .opcoes-img,
+#config.active .opcoes-img {
+    filter: invert(39%) sepia(91%) saturate(747%) hue-rotate(181deg) brightness(100%) contrast(98%);
+    transition: 0.4s ease-in-out;
+}
+#menulateral.encolhido {
+    width: 5vw;
+    transition: 0.4s ease-in-out;
+}
+
+#menulateral.encolhido .opcoes {
+    width: 5vw;
+    justify-content: center;
+}
+
+#menulateral.encolhido .opcoes-texto {
+    display: none;
+}
+
+#menulateral.encolhido .opcoes-img {
+    margin-left: 0;
+    width: 3vw;
+}
+#menulateral.encolhido #recolher .opcoes-img {
+    transform: rotate(180deg);
+}
+#logout:hover{
+    border-left: solid 0.3vw red;
+}
+#logout:hover .opcoes-texto{
+    color: red;
+}
+#logout:hover .opcoes-img{
+    filter: brightness(0) saturate(100%) invert(11%) sepia(100%) saturate(7494%) hue-rotate(0deg) brightness(101%) contrast(118%);
+}
