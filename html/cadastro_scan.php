@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     if ($senha !== $confirmesenha) {
         echo "<script>alert('As senhas não coincidem.');</script>";
     } else {
-        $sql->query("INSERT INTO usuario (user_id, user_nome, user_email, user_senha, scan_descricao, scan_generos, scan_site, scan_responsavel, scan_discord, user_cargo) VALUES (default, '$nome', '$email', '$senha', '$descricao', '$generos', '$site', '$responsavel', '$scan_discord', 'scan')");        
+        $sql->query("INSERT INTO usuario (user_id, user_nome, user_email, user_senha, scan_descricao, scan_generos, scan_site, user_usuario, scan_discord, user_cargo) VALUES (default, '$nome', '$email', '$senha', '$descricao', '$generos', '$site', '$responsavel', '$discord', 'scan')");        
             echo "<script>alert('Cadastro realizado com sucesso!');</script>";
 }}
 ?>
@@ -133,13 +133,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
                 <div id="campo">
                     <label for="site">Site ou redes sociais</label>
                     <br>
-                    <input type="url" name="site" id="site" placeholder="https://seusite.com" maxlength="200" tabindex="10">
+                    <input type="text" name="site" id="site" placeholder="https://seusite.com ou @carloshsf" maxlength="200" tabindex="10">
                 </div>
                 
                 <div id="campo">
-                    <label for="responsavel">*Nome do responsável</label>
+                    <label for="responsavel">*Usuario do responsável</label>
                     <br>
-                    <input type="text" name="responsavel" id="responsavel" placeholder="Digite o nome do responsavel pela scan" maxlength="50" required tabindex="11">
+                    <input type="text" name="responsavel" id="responsavel" placeholder="Digite o usuario do responsavel pela scan" maxlength="50" required tabindex="11">
                 </div>
                 
                 <div id="campo">

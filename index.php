@@ -43,14 +43,13 @@ session_start();
                     echo $_SESSION['nome'];
                 }; ?></div>
                 
-                <?php if(!isset($_SESSION['usuario'])){
-            echo '<div id="options"><a href="html/login.php">Entrar</a></div>';
-            echo '<div id="options"><a href="html/cadastro.php">Cadastrar</a></div>';
-                }; ?>
+            <div id="options"><a href="html/cadastro.php">Cadastrar Usuario</a></div>
+            <div id="options"><a href="html/cadastro_scan.php">Cadastrar Scan</a></div>
+            <div id="options"><a href="html/tabela_usuario.php">Tabela Usuario</a></div>
+            <div id="options"><a href="html/tabela_scan.php">Tabela Scan</a></div>
 
-                <?php if(isset($_SESSION['usuario'])){
-            echo '<div id="options"><a href="html/dashboard.php">Dashboard</a></div>';
-                }; ?>
+    
+            <div id="options"><a href="html/dashboard.php">Dashboard</a></div>
 
             <label id="generos" for="generosbotao">Gêneros</label>
             <input type="checkbox" id="generosbotao">
@@ -97,6 +96,18 @@ session_start();
     <div id="destaquetexto">Mangás em Destaque</div>
 
     <div id="destaques">
+
+    <div class="destaque">
+
+            <div id="flutuante">
+                <div id="flututitle">Para o Professor</div>
+                Pequeno Guia de Como acessar as paginas de cadastro de usuario e scan, além das tabelas para ver tais informações.
+                <div id="chap">• 1 Pagina</div>
+            </div>
+
+            <img id="destacado" src="conteudo/destaques/imagemescola.png" draggable="false" oncontextmenu="return false;">
+        </div>
+
 
         <div class="destaque">
 
