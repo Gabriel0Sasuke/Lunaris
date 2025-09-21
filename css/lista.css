@@ -1,0 +1,58 @@
+main{
+    height: 100vh;
+    overflow: visible;
+}
+#principal{
+    width: 90vw;
+    height: 86vh;
+    margin-top: 2vh;
+    overflow-y: scroll;
+}
+table{
+    width: 89vw;
+    height: auto;
+    border-collapse: collapse;
+    text-align: center;
+    color: white;
+}
+td, th{
+    border: 1px solid white;
+    padding: 10px;
+}
+th:nth-child(1){
+    width: 5vw;
+}
+th:nth-child(2){
+    width: 15vw;
+}
+th:nth-child(3){
+    width: 15vw;
+}
+th:nth-child(4){
+    width: 25vw;
+}
+th:nth-child(5){
+    width: 25vw;
+}
+button{
+    background-color: green;
+    color: white;
+    width: 10vw;
+    height: 5vh;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+#excluir{
+    background-color: red;
+}
+button:hover{
+    transform: scale(1.05);
+    transition: 0.2s ease-in-out;
+}
+h1{
+    color: white;
+    text-align: center;
+    margin-bottom: 1vh;
+}

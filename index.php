@@ -14,6 +14,7 @@ session_start();
     <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
+    
 <main onclick="fecharpopup()">
     <header>
         <img id="icon" src="img/icon.png" draggable="false" oncontextmenu="return false;">
@@ -45,8 +46,8 @@ session_start();
                 
             <div id="options"><a href="html/cadastro.php">Cadastrar Usuario</a></div>
             <div id="options"><a href="html/cadastro_scan.php">Cadastrar Scan</a></div>
-            <div id="options"><a href="html/tabela_usuario.php">Tabela Usuario</a></div>
-            <div id="options"><a href="html/tabela_scan.php">Tabela Scan</a></div>
+            <div id="options"><a href="html/lista_usuario.php">Tabela Usuario</a></div>
+            <div id="options"><a href="html/lista_scan.php">Tabela Scan</a></div>
 
     
             <div id="options"><a href="html/dashboard.php">Dashboard</a></div>

@@ -1,39 +1,17 @@
-<?php
-include "../php/connection.php";
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $nome = $_POST['nome_scan'];
-    $descricao = $_POST['descricao'];
-    $generos = isset($_POST['generos']) ? implode(', ', $_POST['generos']) : '';
-    $site = $_POST['site'];
-    $responsavel = $_POST['responsavel'];
-    $email = $_POST['email'];
-    $discord = $_POST['discord'];
-    $senha = $_POST['senha'];
-    $confirmesenha = $_POST['confirmesenha'];
-    
-    if ($senha !== $confirmesenha) {
-        echo "<script>alert('As senhas não coincidem.');</script>";
-    } else {
-        $sql->query("INSERT INTO usuario (user_id, user_nome, user_email, user_senha, scan_descricao, scan_generos, scan_site, user_usuario, scan_discord, user_cargo) VALUES (default, '$nome', '$email', '$senha', '$descricao', '$generos', '$site', '$responsavel', '$discord', 'scan')");        
-            echo "<script>alert('Cadastro realizado com sucesso!');</script>";
-}}
-?>
-
+<?php session_start(); ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lunaris - Cadastro</title>
+    <title>Lunaris - Usuarios</title>
     <link rel="stylesheet" href="../css/cab.css">
-    <link rel="stylesheet" href="../css/cadastro_scan.css">
-    <link rel="shortcut icon" href="../img/iconfull.png" type="image/x-icon">
+    <link rel="stylesheet" href="../css/lista.css">
 </head>
 <body>
     <main onclick="fecharpopup()">
 
-    <header>
+        <header>
             <img id="icon" src="../img/icon.png" draggable="false" oncontextmenu="return false;" onclick="inicio()">
     
             <div id="title" onclick="inicio()">Lunaris</div>
@@ -54,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
                 <div id="subdiv">
                     <div id="profilephoto"><img src="../img/noprofile.png"></div>
                     <div id="profileinfo">Bem Vindo, <?php if(!isset($_SESSION['usuario'])){ echo 'Guest'; } else { echo $_SESSION['nome']; } ?></div>
+
                 <div id="options"><a href="cadastro.php">Cadastrar Usuario</a></div>
                 <div id="options"><a href="cadastro_scan.php">Cadastrar Scan</a></div>
                 <div id="options"><a href="lista_usuario.php">Tabela Usuario</a></div>
@@ -105,89 +84,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         </div>
         
         <div id="principal">
-            <img src="../img/pixelartbackground.gif" draggable="false" contextmenu="false">
-
-            <form action="cadastro_scan.php" method="post">
-                <h1>Cadastre sua Scan</h1>
-                
-                <div id="campo">
-                    <label for="nome_scan">*Nome da Scan</label>
-                    <br>
-                    <input type="text" name="nome_scan" id="nome_scan" placeholder="Digite o nome da sua scan" maxlength="50" required tabindex="1">
-                </div>
-                
-                <div id="campo">
-                    <label for="descricao">*Descrição</label>
-                    <br>
-                    <textarea name="descricao" id="descricao" placeholder="Fale um pouco sobre a sua scan" maxlength="500" tabindex="2" required></textarea>
-                </div>
-                
-                <div id="campo">
-                    <label for="generos">Gêneros que traduzem</label>
-                    <br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="acao" tabindex="3">
-                        <label for="genero-acao">Ação</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="romance" tabindex="4">
-                        <label for="genero-romance">Romance</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="isekai" tabindex="5">
-                        <label for="genero-isekai">Isekai</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="drama" tabindex="6">
-                        <label for="genero-drama">Drama</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="comedia" tabindex="7">
-                        <label for="genero-comedia">Comédia</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="fantasia" tabindex="8">
-                        <label for="genero-fantasia">Fantasia</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="outros" tabindex="9">
-                        <label for="genero-fantasia">Outros</label>
-                </div>
-                
-                <div id="campo">
-                    <label for="site">Site ou redes sociais</label>
-                    <br>
-                    <input type="text" name="site" id="site" placeholder="https://seusite.com ou @carloshsf" maxlength="200" tabindex="10">
-                </div>
-                
-                <div id="campo">
-                    <label for="responsavel">*Usuario do responsável</label>
-                    <br>
-                    <input type="text" name="responsavel" id="responsavel" placeholder="Digite o usuario do responsavel pela scan" maxlength="50" required tabindex="11">
-                </div>
-                
-                <div id="campo">
-                    <label for="email">*E-mail</label>
-                    <br>
-                    <input type="email" name="email" id="email" placeholder="example@domain.com" maxlength="320" required tabindex="12">
-                </div>
-                
-                <div id="campo">
-                    <label for="discord">*Discord</label>
-                    <br>
-                    <input type="text" name="discord" id="discord" placeholder="Digite seu @ do Discord para Entrarmos em Contato" maxlength="32" required tabindex="13">
-                </div>
-
-               
-                <div id="campo">
-                    <label for="senha">*Senha</label>
-                    <br>
-                    <input type="password" name="senha" id="senha" placeholder="Digite sua senha" required 
-                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$" 
-                    title="A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um caractere especial." maxlength="50" tabindex="14">
-                </div>
-                
-                <div id="campo">
-                    <label for="confirmesenha">*Confirme sua Senha</label>
-                    <br>
-                    <input type="password" name="confirmesenha" id="confirmesenha" placeholder="Confirme sua senha" required tabindex="15">
-                </div>
-                
-                <div id="campo">
-                    <input type="checkbox" required name="termos" id="termos" tabindex="16">
-                    <label id="termostexto" for="termos">Eu concordo com os <a href="#" target="_blank">Termos de Serviço</a> e a <a href="#" target="_blank">Política de Privacidade</a>.</label>
-                </div>
-                
-                <button type="submit" tabindex="17">Cadastrar</button>
-            </form>
-            
+            <h1>Lista de Usuários</h1>
+            <?php
+            include "../php/connection.php";
+            $dados = $sql->query("SELECT user_id, user_nome, user_usuario, user_email, user_senha FROM usuario WHERE user_cargo = 'usuario'");
+            if ($dados->num_rows > 0) {
+            ?>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Senha</th>
+                    <th colspan="2">Ações</th>
+                </tr>
+                <?php while ($row = $dados->fetch_assoc()) { ?>
+                <tr>
+                    <td><?php echo $row['user_id']; ?></td>
+                    <td><?php echo $row['user_nome']; ?></td>
+                    <td><?php echo $row['user_usuario']; ?></td>
+                    <td><?php echo $row['user_email']; ?></td>
+                    <td><?php echo $row['user_senha']; ?></td>
+                    <td><button id="editar" onclick="window.location.href='../php/editar_usuario.php?id=<?php echo $row['user_id']; ?>'">Editar</button></td>
+                <td><button id="excluir" onclick="window.location.href='../php/excluir_usuario.php?id=<?php echo $row['user_id']; ?>'">Excluir</button></td>
+                </tr>
+                <?php } ?>
+            </table>
+            <?php
+            } else {
+                echo "<div id='aviso'>Nenhum usuário encontrado.</div>";
+            } ?>
         </div>
 
         </main>
@@ -230,7 +157,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
                 <p>Este site foi desenvolvido por mim como parte dos meus estudos, com o objetivo de reunir em um só lugar tudo que eu e muitos outros fãs adoramos: animes, mangás, manhwas, manhuas e novels. Tudo de forma gratuita, simples e acessível.</p>
                 <p>Espero que você aproveite o conteúdo e que esse espaço ajude mais pessoas a se conectarem com histórias incríveis, assim como eu me conectei.</p>
             </div>
-
-        <script src="../javascript/funcoes.js"></script>
 </body>
 </html>

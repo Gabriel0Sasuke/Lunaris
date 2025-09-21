@@ -1,23 +1,28 @@
 <?php
-include "../php/connection.php";
+include "connection.php";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $nome = $_POST['nome_scan'];
-    $descricao = $_POST['descricao'];
-    $generos = isset($_POST['generos']) ? implode(', ', $_POST['generos']) : '';
-    $site = $_POST['site'];
-    $responsavel = $_POST['responsavel'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = $_POST['id'];
+    $nome = $_POST['nome'];
+    $usuario = $_POST['usuario'];
     $email = $_POST['email'];
-    $discord = $_POST['discord'];
     $senha = $_POST['senha'];
     $confirmesenha = $_POST['confirmesenha'];
-    
+
     if ($senha !== $confirmesenha) {
         echo "<script>alert('As senhas não coincidem.');</script>";
     } else {
-        $sql->query("INSERT INTO usuario (user_id, user_nome, user_email, user_senha, scan_descricao, scan_generos, scan_site, user_usuario, scan_discord, user_cargo) VALUES (default, '$nome', '$email', '$senha', '$descricao', '$generos', '$site', '$responsavel', '$discord', 'scan')");        
-            echo "<script>alert('Cadastro realizado com sucesso!');</script>";
-}}
+        $sql->query("UPDATE usuario SET user_nome = '$nome', user_usuario = '$usuario', user_email = '$email', user_senha = '$senha' WHERE user_id = $id");
+        header("Location: ../html/lista_usuario.php");
+        exit();
+    }
+}
+
+if (!isset($id)) {
+    $id = $_GET['id'];
+    $dados = $sql->query("SELECT user_nome, user_usuario, user_email, user_senha FROM usuario WHERE user_id = $id");
+    $row = $dados->fetch_assoc();
+}
 ?>
 
 <!DOCTYPE html>
@@ -27,13 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lunaris - Cadastro</title>
     <link rel="stylesheet" href="../css/cab.css">
-    <link rel="stylesheet" href="../css/cadastro_scan.css">
+    <link rel="stylesheet" href="../css/cadastro.css">
     <link rel="shortcut icon" href="../img/iconfull.png" type="image/x-icon">
 </head>
 <body>
     <main onclick="fecharpopup()">
 
-    <header>
+        <header>
             <img id="icon" src="../img/icon.png" draggable="false" oncontextmenu="return false;" onclick="inicio()">
     
             <div id="title" onclick="inicio()">Lunaris</div>
@@ -53,14 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
             <div id="menubar">
                 <div id="subdiv">
                     <div id="profilephoto"><img src="../img/noprofile.png"></div>
-                    <div id="profileinfo">Bem Vindo, <?php if(!isset($_SESSION['usuario'])){ echo 'Guest'; } else { echo $_SESSION['nome']; } ?></div>
-                <div id="options"><a href="cadastro.php">Cadastrar Usuario</a></div>
-                <div id="options"><a href="cadastro_scan.php">Cadastrar Scan</a></div>
-                <div id="options"><a href="lista_usuario.php">Tabela Usuario</a></div>
-                <div id="options"><a href="lista_scan.php">Tabela Scan</a></div>
-
-                <div id="options"><a href="dashboard.php">Dashboard</a></div>
-
+                    <div id="profileinfo">Bem Vindo, Guest</div>
+                <div id="options"><a href="login.php">Entrar</a></div>
+                <div id="options"><a href="#">Cadastrar</a></div>
                 <label id="generos" for="generosbotao">Gêneros</label>
                 <input type="checkbox" id="generosbotao">
                      <div id="generoslista">
@@ -76,19 +76,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
                 <div id="options"><a href="#">Calendario de Animes</a></div>
                 <div id="options"><a href="https://discord.gg/Yy7UHtVUH2">Discord</a></div>
                 <div id="options"><a href="#">Contato</div></a>
-
+    
                 <div id="option2"> 
                 <input type="checkbox" id="nsfw">
                 <label for="nsfw" id="switch"><div id="botaonsfw"></div></label>
                 <div>NSFW</div>
                 </div>
-
-                <?php if(isset($_SESSION['usuario'])){
-                echo '<form id="desconnect" action="../index.php" method="post">
-                <button id="options" id="desconnect" type="submit" name="sair" id="options">Desconectar Conta</button>
-                </form>';
-                    }; ?>
-
+    
                 </div>
             </div>
         </header>
@@ -107,87 +101,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         <div id="principal">
             <img src="../img/pixelartbackground.gif" draggable="false" contextmenu="false">
 
-            <form action="cadastro_scan.php" method="post">
-                <h1>Cadastre sua Scan</h1>
-                
+            <form action="editar_usuario.php" method="post">
+                <h1>Editar</h1>
+                <input type="hidden" name="id" value="<?php echo htmlspecialchars($id); ?>">
                 <div id="campo">
-                    <label for="nome_scan">*Nome da Scan</label>
+                    <label for="nome">*Nome</label>
                     <br>
-                    <input type="text" name="nome_scan" id="nome_scan" placeholder="Digite o nome da sua scan" maxlength="50" required tabindex="1">
+                    <input type="text" name="nome" id="nome" placeholder="Digite seu Nome" maxlength="200" required tabindex="1" value="<?php echo htmlspecialchars($row['user_nome']); ?>">
                 </div>
-                
+
                 <div id="campo">
-                    <label for="descricao">*Descrição</label>
+                    <label for="usuario">Usuário</label>
                     <br>
-                    <textarea name="descricao" id="descricao" placeholder="Fale um pouco sobre a sua scan" maxlength="500" tabindex="2" required></textarea>
+                    <input type="text" name="usuario" id="usuario" placeholder="Digite um Apelido legal aqui" max="50" tabindex="2" value="<?php echo htmlspecialchars($row['user_usuario']); ?>">
                 </div>
-                
-                <div id="campo">
-                    <label for="generos">Gêneros que traduzem</label>
-                    <br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="acao" tabindex="3">
-                        <label for="genero-acao">Ação</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="romance" tabindex="4">
-                        <label for="genero-romance">Romance</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="isekai" tabindex="5">
-                        <label for="genero-isekai">Isekai</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="drama" tabindex="6">
-                        <label for="genero-drama">Drama</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="comedia" tabindex="7">
-                        <label for="genero-comedia">Comédia</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="fantasia" tabindex="8">
-                        <label for="genero-fantasia">Fantasia</label><br>
-                        <input type="checkbox" name="generos[]" id="generoption" value="outros" tabindex="9">
-                        <label for="genero-fantasia">Outros</label>
-                </div>
-                
-                <div id="campo">
-                    <label for="site">Site ou redes sociais</label>
-                    <br>
-                    <input type="text" name="site" id="site" placeholder="https://seusite.com ou @carloshsf" maxlength="200" tabindex="10">
-                </div>
-                
-                <div id="campo">
-                    <label for="responsavel">*Usuario do responsável</label>
-                    <br>
-                    <input type="text" name="responsavel" id="responsavel" placeholder="Digite o usuario do responsavel pela scan" maxlength="50" required tabindex="11">
-                </div>
-                
+
                 <div id="campo">
                     <label for="email">*E-mail</label>
                     <br>
-                    <input type="email" name="email" id="email" placeholder="example@domain.com" maxlength="320" required tabindex="12">
-                </div>
-                
-                <div id="campo">
-                    <label for="discord">*Discord</label>
-                    <br>
-                    <input type="text" name="discord" id="discord" placeholder="Digite seu @ do Discord para Entrarmos em Contato" maxlength="32" required tabindex="13">
+                    <input type="email" name="email" id="email" placeholder="example@domain.com" maxlength="200" required tabindex="3" value="<?php echo htmlspecialchars($row['user_email']); ?>">
                 </div>
 
-               
                 <div id="campo">
                     <label for="senha">*Senha</label>
                     <br>
-                    <input type="password" name="senha" id="senha" placeholder="Digite sua senha" required 
+                    <input type="password" name="senha" id="senha" placeholder="Digite aqui a sua melhor senha" required
                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$" 
-                    title="A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um caractere especial." maxlength="50" tabindex="14">
+                    title="A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um caractere especial." maxlength="50" tabindex="4" value="<?php echo htmlspecialchars($row['user_senha']); ?>">
                 </div>
-                
+
                 <div id="campo">
                     <label for="confirmesenha">*Confirme sua Senha</label>
                     <br>
-                    <input type="password" name="confirmesenha" id="confirmesenha" placeholder="Confirme sua senha" required tabindex="15">
+                    <input type="password" name="confirmesenha" id="confirmesenha" placeholder="Confirme sua senha" required tabindex="5" value="<?php echo htmlspecialchars($row['user_senha']); ?>">
                 </div>
-                
+
                 <div id="campo">
-                    <input type="checkbox" required name="termos" id="termos" tabindex="16">
+                    <input type="checkbox" required name="termos" id="termos" checked>
                     <label id="termostexto" for="termos">Eu concordo com os <a href="#" target="_blank">Termos de Serviço</a> e a <a href="#" target="_blank">Política de Privacidade</a>.</label>
                 </div>
-                
-                <button type="submit" tabindex="17">Cadastrar</button>
+
+                <button type="submit" tabindex="6">Editar</button>
             </form>
-            
         </div>
 
         </main>

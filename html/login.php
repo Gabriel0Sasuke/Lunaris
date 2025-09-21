@@ -41,9 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div id="menubar">
                 <div id="subdiv">
                     <div id="profilephoto"><img src="../img/noprofile.png"></div>
-                    <div id="profileinfo">Bem Vindo, Guest</div>
-                <div id="options"><a href="#">Entrar</a></div>
-                <div id="options"><a href="cadastro.php">Cadastrar</a></div>
+                    <div id="profileinfo">Bem Vindo, <?php if(!isset($_SESSION['usuario'])){ echo 'Guest'; } else { echo $_SESSION['nome']; } ?></div>
+                <div id="options"><a href="cadastro.php">Cadastrar Usuario</a></div>
+                <div id="options"><a href="cadastro_scan.php">Cadastrar Scan</a></div>
+                <div id="options"><a href="lista_usuario.php">Tabela Usuario</a></div>
+                <div id="options"><a href="lista_scan.php">Tabela Scan</a></div>
+
+                <div id="options"><a href="dashboard.php">Dashboard</a></div>
+
                 <label id="generos" for="generosbotao">Gêneros</label>
                 <input type="checkbox" id="generosbotao">
                      <div id="generoslista">
@@ -59,13 +64,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div id="options"><a href="#">Calendario de Animes</a></div>
                 <div id="options"><a href="https://discord.gg/Yy7UHtVUH2">Discord</a></div>
                 <div id="options"><a href="#">Contato</div></a>
-    
+
                 <div id="option2"> 
                 <input type="checkbox" id="nsfw">
                 <label for="nsfw" id="switch"><div id="botaonsfw"></div></label>
                 <div>NSFW</div>
                 </div>
-    
+
+                <?php if(isset($_SESSION['usuario'])){
+                echo '<form id="desconnect" action="../index.php" method="post">
+                <button id="options" id="desconnect" type="submit" name="sair" id="options">Desconectar Conta</button>
+                </form>';
+                    }; ?>
+
                 </div>
             </div>
         </header>
