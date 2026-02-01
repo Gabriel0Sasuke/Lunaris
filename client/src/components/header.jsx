@@ -1,3 +1,7 @@
+//React
+import { useNavigate } from 'react-router-dom';
+
+// CSS
 import '../assets/styles/header.css';
 
 // Imagens e ícones
@@ -8,6 +12,12 @@ import notification from '../assets/ui/notifications.svg';
 import notificationUnread from '../assets/ui/notifications_unread.svg';
 
 export function Header( { setIsSidebarOpen } ) {
+    const navigate = useNavigate();
+    
+    function link(path) {
+        navigate(path);
+    }
+
     return (
         <header className="header">
 
@@ -15,7 +25,7 @@ export function Header( { setIsSidebarOpen } ) {
             <h2>Lunaris</h2>
 
             <div className='navBtn'>
-            <button className='Btn'>Home</button>
+            <button className='Btn' onClick={() => link('/')}>Home</button>
             <button className='Btn'>Browse</button>
             </div>
 

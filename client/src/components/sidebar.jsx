@@ -1,4 +1,10 @@
+// React
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+// CSS
 import '../assets/styles/sidebar.css';
+
+// Ícones
 import close from '../assets/ui/close.svg';
 import person from '../assets/ui/person.svg';
 import settings from '../assets/ui/settings.svg';
@@ -9,6 +15,13 @@ import logout from '../assets/ui/logout.svg';
 import profileIcon from '../assets/icons/profile.svg';
 
 function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate();
+    
+    function link(path) {
+        navigate(path);
+        setIsSidebarOpen(false);
+    }
     return (
         <div className={`sidebar ${isSidebarOpen ? 'active' : ''}`}>
 
@@ -26,7 +39,11 @@ function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
             </div>
                 <div className='linha'></div>
             <div className='buttons'>
-                <button className='SideButton'><img src={person} alt="Meu Perfil" /> Meu Perfil</button>
+                {isLoggedIn ? (
+                    <button className='SideButton'><img src={person} alt="Meu Perfil" /> Meu Perfil</button>
+                ) : (
+                    <button className='SideButton' onClick={() => link('/login')}><img src={person} alt="Faça Login ou Cadastre-se" /> Login/Cadastro</button>
+                )}
                 <button className='SideButton'><img src={library} alt="Minha Biblioteca" /> Minha Biblioteca</button>
                 <button className='SideButton'><img src={history} alt="Histórico" /> Histórico</button>
                 <button className='SideButton'><img src={settings} alt="Configurações" /> Configurações</button>
