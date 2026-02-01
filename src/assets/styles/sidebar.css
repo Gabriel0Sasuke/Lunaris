@@ -1,0 +1,288 @@
+.sidebar{
+    position: fixed;
+    top: 0;
+    right: -350px;
+    width: 350px;
+    height: 100vh;
+    background: linear-gradient(180deg,  #0f1c35, #131313, #131313);
+    z-index: 2000;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    padding-top: 5vh;
+    transition: right 0.3s ease-in-out;
+    border-left: 3px solid rgba(255, 255, 255, 0.1);
+    
+    /* Scroll para quando a altura reduzir */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Scrollbar estilizada */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+.blankScreen{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.sidebar.active .blankScreen {
+    opacity: 1;
+    pointer-events: auto;
+}
+.profile_info{
+    width: 280px;
+    height: 18vh;
+    margin-left: 35px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+}
+.profileZoom {
+    height: 70px;
+    width: 70px;
+    min-width: 70px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: #ffffffbb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+    margin-bottom: 0.6rem;
+}
+.profileZoom img {
+    height: auto;
+    width: auto;
+    max-height: 90%;
+    max-width: 90%;
+}
+.exit {
+    height: 50px;
+    width: 50px;
+    min-width: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+.exit:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+.exit img {
+    height: 80%;
+    width: 80%;
+    max-height: 100%;
+    max-width: 100%;
+}
+h3{
+    font-family: 'Inter-Bold', sans-serif;
+    font-size: 1.2rem;
+    color: #ffffff;
+    margin-bottom: 0.3rem;
+}
+h4{
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: #9d9d9d;
+}
+.open{
+    right: 0;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+}
+.linha{
+    width: 350px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 1.5rem auto;
+}
+.card{
+    width: 50px;
+    height: 35px;
+    margin-left: auto;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.7rem;
+}
+.section{
+    display: flex;
+    flex-direction: row;
+}
+.buttons{
+    width: 300px;
+    height: auto;
+    margin-left: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+}
+.SideButton{
+    min-width: 300px;
+    height: 50px;
+    padding: 0 1.2rem;
+    filter: backdrop-blur(40px);
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.85rem;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+.SideButton:hover {
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+    transform: translateY(-2px);
+    background-color: #0f1c35;
+    border: 1px solid rgba(37, 99, 235, 0.4);
+}
+.SideButton:hover img{
+    filter: brightness(0) saturate(100%) invert(29%) sepia(100%) saturate(1448%) hue-rotate(208deg) brightness(94%) contrast(96%);
+}
+.ExitButton{
+    margin-left: 25px;
+    width: 300px;
+    height: 50px;
+    padding: 0 1.2rem;
+    filter: backdrop-blur(40px);
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: rgb(255, 71, 71);
+    /* margin-top: auto; removido para ficar colado na linha acima (que tem margin-top: auto) */
+    margin-bottom: 2rem; /* Alterado de 7vh para fixo 2rem para evitar muito espaço em telas baixas */
+    flex-shrink: 0; /* Impede que o botão seja esmagado */
+}
+
+.ExitButton:hover {
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 71, 71, 0.2);
+    transform: translateY(-2px);
+    background-color: #33000095;
+    border: 1px solid rgba(255, 71, 71, 0.4);
+}
+.ExitButton img {
+    filter: brightness(0) saturate(100%) invert(42%) sepia(82%) saturate(3233%) hue-rotate(335deg) brightness(107%) contrast(114%);
+}
+#exitLinha {
+    margin-top: auto; /* Empurra para baixo */
+    margin-bottom: 2rem; /* Espaço entre a linha e o botão exit */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .sidebar {
+        width: 100%;
+        right: -100%;
+        border-left: none;
+    }
+
+    .sidebar.active {
+        right: 0;
+    }
+
+    .profile_info {
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        height: auto;
+        margin-top: 1rem;
+    }
+
+    .section {
+        width: 100%;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .profileZoom {
+        margin: 0;
+    }
+
+    .card {
+        margin-left: auto; /* Joga o card para a direita */
+    }
+
+    .linha {
+        width: 90%;
+        margin: 0.8rem auto; /* Margem reduzida para mobile */
+    }
+
+    .buttons {
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .SideButton {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .ExitButton {
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        min-width: unset;
+        margin-bottom: 2rem;
+    }
+    
+    .exit {
+        margin-right: 1.5rem;
+        margin-top: 1rem;
+    }
+}

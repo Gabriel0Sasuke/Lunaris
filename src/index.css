@@ -1,0 +1,52 @@
+/*Fontes importadas*/
+@font-face {
+  font-family: 'Inter'; /*Fonte Padrão*/
+  src: url('/fonts/Inter/Inter-VariableFont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face{
+  font-family: 'Inter-Bold'; /*Fonte Negrito*/
+  src: url('/fonts/Inter/Inter-VariableFont.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face{
+  font-family: 'Inter-ExtraBold'; /*Fonte Extra Negrito*/
+  src: url('/fonts/Inter/Inter-VariableFont.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body{
+  font-family: 'Inter', sans-serif;
+  
+  /* Gradiente animado entre #09090B e o azul escuro (tom de #2563eb) */
+  background: linear-gradient(125deg, #09090B, #0f1c35, #09090B);
+  background-size: 400% 400%;
+  animation: bgAnimation 30s ease infinite;
+
+  color: #ffffff;
+  width: 100vw;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes bgAnimation {
+  0% {
+      background-position: 0% 50%;
+  }
+  50% {
+      background-position: 100% 50%;
+  }
+  100% {
+      background-position: 0% 50%;
+  }
+}
