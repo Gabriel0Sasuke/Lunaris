@@ -1,10 +1,9 @@
 
 function Home() {
     return (
-        <div className="HomePage">
-            <Sidebar />
-            <MainContent />
-        </div>
+        <main>
+            <h1>Welcome to the Home Page</h1>
+        </main>
     );
 }
 export default Home;
