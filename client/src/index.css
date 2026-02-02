@@ -17,40 +17,73 @@
   font-weight: 800;
   font-style: normal;
 }
+
 *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
+:root {
+  --primary: #1337ec;
+  --background-dark: #0b0c15;
+}
+
 body{
   font-family: 'Inter', sans-serif;
   
-  /* Gradiente animado entre #09090B e o azul escuro (tom de #2563eb) */
-  background: linear-gradient(125deg, #09090B, #0f1c35, #09090B);
-  background-size: 400% 400%;
-  animation: bgAnimation 30s ease infinite;
-
+  /* NEW Background Theme */
+  background-color: var(--background-dark);
   color: #ffffff;
+  
   width: 100vw;
   overflow-x: hidden;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative; /* Needed for blobs */
 }
+
+/* Background Blobs (New) */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Blob 1: Top Left Purple */
+body::before {
+  width: 600px;
+  height: 600px;
+  top: -10%;
+  left: -10%;
+  background: rgba(147, 51, 234, 0.2);
+  animation: float 15s infinite ease-in-out;
+}
+
+/* Blob 2: Bottom Right Primary/Blue */
+body::after {
+  width: 700px;
+  height: 700px;
+  bottom: -10%;
+  right: -10%;
+  background: rgba(19, 55, 236, 0.2);
+  animation: float 20s infinite ease-in-out reverse;
+}
+
+@keyframes float {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
 main{
   width: 100vw;
   margin-top: 100px;
   min-height: calc(100vh - 100px);
-}
-@keyframes bgAnimation {
-  0% {
-      background-position: 0% 50%;
-  }
-  50% {
-      background-position: 100% 50%;
-  }
-  100% {
-      background-position: 0% 50%;
-  }
 }

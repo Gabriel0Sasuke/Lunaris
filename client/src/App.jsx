@@ -7,6 +7,7 @@ import Sidebar from './components/sidebar.jsx'
 // Páginas
 import Home from './pages/home.jsx'
 import Login from './pages/login.jsx'
+import Cadastro from './pages/cadastro.jsx'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -18,6 +19,7 @@ function App() {
 
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
+        <Route path='/cadastro' element={<Cadastro />} />
         
       </Routes>
     </BrowserRouter>

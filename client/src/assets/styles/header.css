@@ -14,7 +14,7 @@ header {
     box-sizing: border-box;
 }
 
-h2 {
+#pageTitle {
     font-family: 'Inter-ExtraBold', sans-serif;
     font-size: 1.6rem;
     color: #ffffff;
@@ -122,7 +122,7 @@ h2 {
     max-width: 70%;
 }
 
-input {
+#search {
     background-color: #18181b61;
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -140,7 +140,7 @@ input {
     outline: none;
 }
 
-input:focus {
+#search:focus {
     width: 300px;
     border: 2px solid;
     border-color: rgba(37, 99, 235, 0.4);
@@ -148,10 +148,10 @@ input:focus {
 
 /* Responsividade */
 @media (max-width: 900px) {
-    input {
+    #search {
         width: 180px;
     }
-    input:focus {
+    #search:focus {
         width: 220px;
     }
     .navBtn {
@@ -166,7 +166,7 @@ input:focus {
         height: 70px;
     }
 
-    h2 {
+    #pageTitle {
         display: none;
     }
 
@@ -185,7 +185,7 @@ input:focus {
         margin-left: 0.5rem;
     }
 
-    input {
+    #search {
         display: none;
     }
 }

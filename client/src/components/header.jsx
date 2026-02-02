@@ -22,7 +22,7 @@ export function Header( { setIsSidebarOpen } ) {
         <header className="header">
 
             <img src={logo} className='logo' onContextMenu={(e) => e.preventDefault()} />
-            <h2>Lunaris</h2>
+            <h2 id='pageTitle'>Lunaris</h2>
 
             <div className='navBtn'>
             <button className='Btn' onClick={() => link('/')}>Home</button>
