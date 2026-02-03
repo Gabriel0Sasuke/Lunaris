@@ -7,9 +7,17 @@ const cors = require('cors');
 
 // Configurações do servidor
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+// CORS - aceita qualquer origem se FRONTEND_URL for "*"
+const corsOrigin = process.env.FRONTEND_URL === '*' 
+  ? true 
+  : [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174'];
+
+app.use(cors({ 
+  origin: corsOrigin, 
+  credentials: true 
+}));
 app.use(express.json());
 
 //Funções
