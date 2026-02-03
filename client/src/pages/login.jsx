@@ -2,52 +2,94 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
+// Serviços
+import { notify } from '../services/notify';
+import { API_URL } from '../services/api';
+
 //CSS
-import '../assets/styles/login.css';
+import '../assets/styles/auth.css';
 
 //Icons
 import lunaris from '../assets/icons/logo.svg';
+import loading from '../assets/ui/loading.svg';
 
 function Login() {
+    // Navegação
     const navigate = useNavigate();
-
+    function link(link){
+        navigate(link);
+    }
+    const [loadingState, setLoadingState] = useState(false);
     // Dados
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     
-    //Funções
-    function link(link){
-        navigate(link);
-    }
-    const handleSubmit = (e) => {
-  // 1. Impede o navegador de recarregar a página
-  e.preventDefault();
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const senhaForte = password.length > 0;
 
-  // 2. Criação do pacote JSON
-  const loginData = {
-    email: email,
-    password: password
-  };
+    // O formulário só é liberado se ambos forem true
+    const Valido = emailValido && senhaForte;
 
-  console.log("Dados prontos para o envio:", loginData);
+    // Envio do Formulário
+    const handleSubmit = async (e) => {
+        // 1. Impede o navegador de recarregar a página
+     e.preventDefault();
+     setLoadingState(true);
+
+    // 2. Criação do pacote JSON
+    const loginData = {
+        email: email,
+        password: password
+    };
+         console.log("Dados prontos para o envio:", loginData);
   
-  // O próximo passo é enviar para o servidor...
-};
+        // Envio para o servidor
+        try{
+            const resposta = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                credentials: 'include',
+                headers:{
+                    'Content-Type' : 'application/json'
+                },body: JSON.stringify(loginData)});
+            if(resposta.ok){
+                const data = await resposta.json()
+                notify.success(data.message);
+                console.log(data.message);
+            }else{
+                //O Servidor respondeu mas algo deu errado.
+                const data = await resposta.json();
+                notify.error('Erro ao fazer login: ' + data.message);
+            }
+
+        }catch(error){
+            console.log("Erro:", error)
+            notify.error('Erro ao fazer login, Erro: "'+ error.message + '"');
+        }finally{
+            setLoadingState(false);
+        }
+        };
     return (
         <main>
             <form onSubmit={handleSubmit}>
-                <div className='loginIcon'><img src={lunaris} alt="Lunaris Logo" /></div>
-                <h2 id='loginTitle'>Bem-vindo de Volta!</h2>
-                <h3 id='loginSubTitle'>Insira seus dados para continuar</h3>
+                <div className='authIcon'><img src={lunaris} alt="Lunaris Logo" /></div>
+                <h2 id='authTitle'>Bem-vindo de Volta!</h2>
+                <h3 id='authSubTitle'>Insira seus dados para continuar</h3>
                 <div id='inputContainer'>
-                    <input className="Logininput" type="email" name="email" id="email" placeholder='Digite seu Email' required onChange={(e) => setEmail(e.target.value)} value={email}/>
-                    <input className="Logininput" type="password" name="password" id="password" placeholder='Digite sua Senha' required onChange={(e) => setPassword(e.target.value)} value={password}/>
+                    <div className='Input'>
+                    {!emailValido && email ? <span className='authTextoInvalido'>Email inválido</span> : ""}
+                    <input className={`authInput ${!emailValido && email ? 'authInvalido' : ''}`} type="email" name="email" id="email" placeholder='Digite seu Email' onChange={(e) => setEmail(e.target.value)} value={email}/>
+                    </div>
+
+                    <div className='Input'>
+                    {!senhaForte && password ? <span className='authTextoInvalido'>Senha inválida</span> : ""}
+                    <input className={`authInput ${!senhaForte && password ? 'authInvalido' : ''}`} type="password" name="password" id="password" placeholder='Digite sua Senha' onChange={(e) => setPassword(e.target.value)} value={password}/>
+                    </div>
                     
                     <div className="forgot-pass">
                         <a href="#">Esqueci minha senha</a>
                     </div>
 
-                    <button type="submit" className='Submitlogin'>Entrar</button>
+                    <button type="submit" className='authSubmit' disabled={!Valido || loadingState}>{loadingState ? <img src={loading} /> : "Entrar"}</button>
                         <div id='OR'>
                             <div className="line"></div>
                             <span>OU</span>
@@ -57,7 +99,7 @@ function Login() {
                 </div>
             </form>
 
-            <div className="cadastro">
+            <div className="authToggle">
                 <span>Novo no Lunaris?</span>
                 <button onClick={() => link('/cadastro')}>Cadastre-se</button>
             </div>

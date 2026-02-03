@@ -1,5 +1,7 @@
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import { useState } from 'react'
+import { ToastContainer } from 'react-toastify';
+import { toastConfig } from './services/notify';
 
 // Componentes
 import Header from './components/header.jsx'
@@ -22,6 +24,7 @@ function App() {
         <Route path='/cadastro' element={<Cadastro />} />
         
       </Routes>
+      <ToastContainer {...toastConfig} />
     </BrowserRouter>
   )
 }
