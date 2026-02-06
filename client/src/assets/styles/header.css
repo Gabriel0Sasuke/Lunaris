@@ -133,11 +133,15 @@ header {
     font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
     transition: all 0.3s ease;
+    outline: none;
     background-image: url('/icon/search.svg');
     background-repeat: no-repeat;
-    background-position: center left 1rem;
+    background-position: 1rem center;
     background-size: 1.2rem;
-    outline: none;
+}
+
+#search::placeholder {
+    color: rgba(255, 255, 255, 0.5);
 }
 
 #search:focus {

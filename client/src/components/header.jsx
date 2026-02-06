@@ -10,8 +10,9 @@ import logo from '../assets/icons/logo.svg';
 import profileIcon from '../assets/icons/profile.svg';
 import notification from '../assets/ui/notifications.svg';
 import notificationUnread from '../assets/ui/notifications_unread.svg';
+import notificationFull from '../assets/ui/notifications_full.svg';
 
-export function Header( { setIsSidebarOpen } ) {
+export function Header( { setIsSidebarOpen, setIsNotificationsOpen, isNotificationsOpen } ) {
     const navigate = useNavigate();
     
     function link(path) {
@@ -31,7 +32,7 @@ export function Header( { setIsSidebarOpen } ) {
 
             <div className='navActions'>
                 <input type="text" name="search" id="search" placeholder='Pesquise seu Mangá' />
-                <div className='notification'><img src={notification} onContextMenu={(e) => e.preventDefault()} /></div>
+                <div className='notification'><img src={isNotificationsOpen ? notificationFull : notification} onContextMenu={(e) => e.preventDefault()} onClick={() => setIsNotificationsOpen(prev => !prev)} /></div>
                 <div className='profile'><img  src={profileIcon} onContextMenu={(e) => e.preventDefault()} onClick={() => setIsSidebarOpen(true)}/></div>
             </div>
 

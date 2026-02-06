@@ -1,91 +1,26 @@
 // Importações
 const express = require('express');
 const dotenv = require('dotenv').config();
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 // Configurações do servidor
 const app = express();
 const port = process.env.PORT || 3000;
 
 // CORS - aceita qualquer origem se FRONTEND_URL for "*"
-const corsOrigin = process.env.FRONTEND_URL === '*' 
-  ? true 
-  : [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174'];
+const corsOrigin = process.env.FRONTEND_URL === '*' ? true : [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174'];
 
-app.use(cors({ 
-  origin: corsOrigin, 
-  credentials: true 
-}));
+app.use(cors({ origin: corsOrigin, credentials: true }));
+app.use(cookieParser());
 app.use(express.json());
-//teste
-//Funções
-const pool = require('./sql');
+
+// Rotas
+// Autenticação (cadastro e login, etc.)
+const authRouter = require('./src/routes/auth.route');
+app.use('/auth', authRouter);
 
 
-//Rota de Cadastro
-app.post('/cadastro', async (req, res) => {
-  const query = "INSERT INTO usuario (email, password, username) VALUES (?, ?, ?)";
-  const { email, password, username } = req.body;
-  
-  if (email && password && username) {
-    const passwordHash = await bcrypt.hash(password, 10);
-    const values = [email, passwordHash, username];
-    
-    try {
-      const [result] = await pool.query(query, values);
-      return res.status(201).json({ message: 'Usuário cadastrado com sucesso' });
-    } catch (error) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        const msg = error.sqlMessage || '';
-        
-        if (msg.includes('email')) {
-          return res.status(409).json({ message: 'Este e-mail já está cadastrado.' });
-        } else if (msg.includes('username')) {
-          return res.status(409).json({ message: 'Este nome de usuário já está em uso.' });
-        }
-
-      } else {
-        return res.status(500).json({ message: 'Erro ao cadastrar usuário' + error.message });
-      }
-    }
-  } else {
-    return res.status(400).json({ message: 'Dados incompletos' });
-  }
-});
-
-//Rota de Login
-app.post('/login', async (req, res) => {
-  const query = "SELECT * FROM usuario WHERE email = ?";
-  const { email, password } = req.body;
-  if (email && password) {
-    try {
-      const [rows] = await pool.query(query, [email]);
-      if (rows.length === 0) {
-        return res.status(401).json({ message: 'Credenciais inválidas' });
-      }else{
-        const user = rows[0];
-        if(user.password === null){
-          return res.status(401).json({ message: 'Credenciais inválidas' });
-        }else{
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if (passwordMatch) {
-          const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '28d' });
-          res.cookie('token', token, { httpOnly: true, maxAge: 28 * 24 * 60 * 60 * 1000, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
-          return res.status(200).json({ message: 'Login realizado com sucesso' });
-        } else {
-          return res.status(401).json({ message: 'Credenciais inválidas' });
-        }
-        }
-      }
-    } catch (error) {
-      return res.status(500).json({ message: 'Erro ao fazer login' + error.message });
-    }
-  } else {
-    return res.status(400).json({ message: 'Dados incompletos' });
-  }
-});
 
 // Servidor
 app.listen(port, () => {

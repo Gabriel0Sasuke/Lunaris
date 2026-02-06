@@ -43,6 +43,7 @@ body{
   flex-direction: column;
   align-items: center;
   position: relative; /* Needed for blobs */
+  scroll-behavior: smooth;
 }
 
 /* Background Blobs (New) */
@@ -87,3 +88,44 @@ main{
   margin-top: 100px;
   min-height: calc(100vh - 100px);
 }
+
+/* ===== FIX AUTOFILL GLOBAL ===== */
+/* Apenas atrasa a mudança de cor do fundo para manter o estilo original (incluindo imagens) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 50000s ease-in-out 0s, color 50000s ease-in-out 0s;
+  -webkit-text-fill-color: white !important;
+  caret-color: white !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.1) inset !important;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.1) inset !important;
+}
+
+/* Fix autofill para o search do header */
+#search:-webkit-autofill,
+#search:-webkit-autofill:hover,
+#search:-webkit-autofill:focus {
+  transition: background-color 50000s ease-in-out 0s, color 50000s ease-in-out 0s;
+  -webkit-text-fill-color: white !important;
+  -webkit-box-shadow: 0 0 0 1000px #18181b inset !important;
+  box-shadow: 0 0 0 1000px #18181b inset !important;
+}
+
+/* Scrollbar Customizada */
+/* Chrome, Edge, Opera */
+::-webkit-scrollbar {
+  width: 0.3vw;
+  height: 2vh;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(37, 99, 235, 0.6);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(37, 99, 235, 0.8);
+}
+

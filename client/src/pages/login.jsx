@@ -1,6 +1,7 @@
 //React
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 // Serviços
 import { notify } from '../services/notify';
@@ -30,6 +31,8 @@ function Login() {
     // O formulário só é liberado se ambos forem true
     const Valido = emailValido && senhaForte;
 
+    const { verificarUsuario } = useAuth();
+
     // Envio do Formulário
     const handleSubmit = async (e) => {
         // 1. Impede o navegador de recarregar a página
@@ -45,7 +48,7 @@ function Login() {
   
         // Envio para o servidor
         try{
-            const resposta = await fetch(`${API_URL}/login`, {
+            const resposta = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 credentials: 'include',
                 headers:{
@@ -54,7 +57,8 @@ function Login() {
             if(resposta.ok){
                 const data = await resposta.json()
                 notify.success(data.message);
-                console.log(data.message);
+                await verificarUsuario(); // Atualiza o estado global
+                link('/');
             }else{
                 //O Servidor respondeu mas algo deu errado.
                 const data = await resposta.json();

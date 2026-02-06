@@ -32,7 +32,7 @@ function Cadastro() {
     const senhasIguais = password === confirmPassword;
     const termosAceitos = termsAccepted;
     const usernameValido = username.trim().length >= 3 && username.trim().length <= 25;
-    // O formulário só é liberado se ambos forem true
+    // O formulário só é liberado se todos forem true
     const Valido = emailValido && senhaForte && senhasIguais && termosAceitos && usernameValido;
 
     // Envio do Formulário
@@ -51,7 +51,7 @@ function Cadastro() {
   
         // Envio para o servidor
         try{
-            const resposta = await fetch(`${API_URL}/cadastro`, {
+            const resposta = await fetch(`${API_URL}/auth/cadastro`, {
                 method: 'POST',
                 headers:{
                     'Content-Type' : 'application/json'

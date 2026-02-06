@@ -108,7 +108,6 @@ form {
     gap: 1.25rem;
 }
 .Input{
-    position: relative;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -132,39 +131,25 @@ form {
     transition: all 0.3s ease;
 }
 
+/* Ícones dos inputs */
+#email {
+    background: url(/icon/email.svg) no-repeat 1rem center / 1.25rem;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+#password, #confirmPassword {
+    background: url(/icon/lock.svg) no-repeat 1rem center / 1.25rem;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+#username {
+    background: url(/icon/user.svg) no-repeat 1rem center / 1.25rem;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 .authInput:focus {
     outline: none;
     background: rgba(255, 255, 255, 0.15); /* Slightly lighter on focus */
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
     border-color: rgba(37, 99, 235, 0.6);
-}
-
-#email {
-    background-image: url(/icon/email.svg);
-    background-repeat: no-repeat;
-    background-position: 1rem center;
-    background-size: 1.25rem;
-}
-
-#password {
-    background-image: url(/icon/lock.svg);
-    background-repeat: no-repeat;
-    background-position: 1rem center;
-    background-size: 1.25rem;
-}
-
-#username {
-    background-image: url(/icon/user.svg);
-    background-repeat: no-repeat;
-    background-position: 1rem center;
-    background-size: 1.25rem;
-}
-
-#confirmPassword {
-    background-image: url(/icon/lock.svg);
-    background-repeat: no-repeat;
-    background-position: 1rem center;
-    background-size: 1.25rem;
 }
 
 .terms-container {
