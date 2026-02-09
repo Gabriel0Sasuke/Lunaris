@@ -52,7 +52,12 @@ const login = async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (passwordMatch) {
               const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '28d' });
-              res.cookie('token', token, { httpOnly: true, maxAge: 28 * 24 * 60 * 60 * 1000, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+              res.cookie('token', token, { 
+                httpOnly: true, 
+                maxAge: 28 * 24 * 60 * 60 * 1000, 
+                secure: process.env.NODE_ENV === 'production', 
+                sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax' 
+              });
               return res.status(200).json({ message: 'Login realizado com sucesso' });
             } else {
               return res.status(401).json({ message: 'Credenciais inválidas' });
@@ -85,7 +90,11 @@ const verificacao = async (req, res) => {
 // Logout
 const logout = async (req, res) => {
   try{
-    res.clearCookie('token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+    res.clearCookie('token', { 
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax' 
+    });
   return res.status(200).json({ message: 'Logout realizado com sucesso' });
   }catch (error) {    
     return res.status(500).json({ message: 'Erro ao fazer logout' + error.message });

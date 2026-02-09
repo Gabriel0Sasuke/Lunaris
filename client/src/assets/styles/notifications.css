@@ -7,7 +7,7 @@
     width: 360px;
     height: 450px;
     
-    z-index: 500;
+    z-index: 1500;
     background: rgba(8, 9, 15, 0.9); /* Sutilmente mais opaco para leitura */
     border: 1px solid rgba(255, 255, 255, 0.1);
     
@@ -24,7 +24,7 @@
 }
 
 #notifications.show {
-    top: 10vh; /* Altura original */
+    top: 12vh; /* Altura original */
     opacity: 1;
     visibility: visible;
 }

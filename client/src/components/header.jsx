@@ -27,7 +27,7 @@ export function Header( { setIsSidebarOpen, setIsNotificationsOpen, isNotificati
 
             <div className='navBtn'>
             <button className='Btn' onClick={() => link('/')}>Home</button>
-            <button className='Btn'>Browse</button>
+            <button className='Btn' onClick={() => link('/browser')}>Browse</button>
             </div>
 
             <div className='navActions'>

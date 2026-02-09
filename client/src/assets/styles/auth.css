@@ -1,4 +1,4 @@
-main {
+.auth-page {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -293,7 +293,7 @@ form {
 }
 
 @media (max-width: 768px) {
-    main {
+    .auth-page {
         padding: 1rem;
         justify-content: center; /* Center vertically on smaller screens too */
     }
@@ -315,7 +315,7 @@ form {
 
 /* Mobile Devices */
 @media (max-width: 480px) {
-    main {
+    .auth-page {
         gap: 1rem;
         padding: 1rem 0.5rem;
     }

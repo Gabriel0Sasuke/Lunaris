@@ -35,15 +35,16 @@ body{
   /* NEW Background Theme */
   background-color: var(--background-dark);
   color: #ffffff;
-  
-  width: 100vw;
+  width: 100%;
   overflow-x: hidden;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   position: relative; /* Needed for blobs */
   scroll-behavior: smooth;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
 }
 
 /* Background Blobs (New) */
@@ -84,11 +85,17 @@ body::after {
 }
 
 main{
-  width: 100vw;
-  margin-top: 100px;
+  width: 95vw !important;
+  margin-top: 80px;
   min-height: calc(100vh - 100px);
+  margin-left: auto;
+  margin-right: auto;
 }
-
+.no-select {
+  -webkit-user-select: none; /* Chrome, Safari */
+  -ms-user-select: none;     /* Edge antigo */
+  user-select: none;
+}
 /* ===== FIX AUTOFILL GLOBAL ===== */
 /* Apenas atrasa a mudança de cor do fundo para manter o estilo original (incluindo imagens) */
 input:-webkit-autofill,

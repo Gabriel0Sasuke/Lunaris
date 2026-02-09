@@ -8,10 +8,11 @@ header {
     flex-direction: row;
     align-items: center;
     padding: 0 1.5rem;
-    filter: backdrop-blur(40px);
-    background-color: rgba(255, 255, 255, 0.009);
+    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.1);
     z-index: 1000;
     box-sizing: border-box;
+    border-radius: 0 0 12px 12px;
 }
 
 #pageTitle {
@@ -32,7 +33,7 @@ header {
     min-width: 60px;
     height: 40px;
     padding: 0 1.2rem;
-    filter: backdrop-blur(40px);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     background-color: #18181b61;
     color: #ffffff;

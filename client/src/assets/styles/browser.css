@@ -1,0 +1,10 @@
+.browser-content {
+    display: flex;
+    flex-direction: column;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-top: 100px; /* Compensa a altura do Header fixo no Desktop */
+    min-height: 100vh;
+    box-sizing: border-box;
+}

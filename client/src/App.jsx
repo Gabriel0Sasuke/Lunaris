@@ -9,11 +9,12 @@ import Header from './components/header.jsx'
 import Sidebar from './components/sidebar.jsx'
 import Footer from './components/footer.jsx'
 import Notifications from './components/notifications.jsx'
+import { useAuth } from './context/AuthContext.jsx'; // Importe o hook
 // Páginas
 import Home from './pages/home.jsx'
 import Login from './pages/login.jsx'
 import Cadastro from './pages/cadastro.jsx'
-import { useAuth } from './context/AuthContext.jsx'; // Importe o hook
+import Browser from './pages/browser.jsx'
 
 function App() {
   // Controlar Abertura do Sidebar
@@ -34,7 +35,7 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
         <Route path='/cadastro' element={<Cadastro />} />
-        
+        <Route path='/browser' element={<Browser />} />
       </Routes>
       <Footer />
       <ToastContainer {...toastConfig} />

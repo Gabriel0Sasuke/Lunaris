@@ -73,7 +73,7 @@ function Login() {
         }
         };
     return (
-        <main>
+        <main className="auth-page">
             <form onSubmit={handleSubmit}>
                 <div className='authIcon'><img src={lunaris} alt="Lunaris Logo" /></div>
                 <h2 id='authTitle'>Bem-vindo de Volta!</h2>
