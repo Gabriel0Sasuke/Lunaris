@@ -28,7 +28,7 @@ import { useState, useEffect, useRef } from 'react';
 
 function Home() {
     const [activeIndex, setActiveIndex] = useState(0);
-
+    const [SelectedTag, setSelectedTag] = useState('Tudo');
     // Mudar slide a cada 3 segundos
     useEffect(() => {
         const interval = setInterval(() => {
@@ -132,17 +132,17 @@ function Home() {
             </div>
             {/* Seção de Tags Pra todas as Seções Abaixo*/}
             <div className="newTags">
-                <button className='newTagsItem'><img src={infinity} alt="infinity" /> Tudo</button>
-                <button className='newTagsItem'><img src={swords} alt="swords" /> Ação</button>
-                <button className='newTagsItem'><img src={explore} alt="explore" /> Aventura</button>
-                <button className='newTagsItem'><img src={comedyMask} alt="comedyMask" /> Comédia</button>
-                <button className='newTagsItem'><img src={dominoMask} alt="dominoMask" /> Drama</button>
-                <button className='newTagsItem'><img src={wandStars} alt="wandStars" /> Fantasia</button>
-                <button className='newTagsItem'><img src={skull} alt="skull" /> Horror</button>
-                <button className='newTagsItem'><img src={heart} alt="heart" /> Romance</button>
-                <button className='newTagsItem'><img src={rocket} alt="rocket" /> Sci-fi</button>
-                <button className='newTagsItem'><img src={eye} alt="eye" /> Suspense</button>
-                <button className='newTagsItem'><img src={coffee} alt="coffee" /> Slice of Life</button>
+                <button className={`newTagsItem ${SelectedTag === 'Tudo' ? 'selected' : ''}`} onClick={() => setSelectedTag('Tudo')}><img src={infinity} alt="infinity" /> Tudo</button>
+                <button className={`newTagsItem ${SelectedTag === 'Acao' ? 'selected' : ''}`} onClick={() => setSelectedTag('Acao')}><img src={swords} alt="swords" /> Ação</button>
+                <button className={`newTagsItem ${SelectedTag === 'Aventura' ? 'selected' : ''}`} onClick={() => setSelectedTag('Aventura')}><img src={explore} alt="explore" /> Aventura</button>
+                <button className={`newTagsItem ${SelectedTag === 'Comedia' ? 'selected' : ''}`} onClick={() => setSelectedTag('Comedia')}><img src={comedyMask} alt="comedyMask" /> Comédia</button>
+                <button className={`newTagsItem ${SelectedTag === 'Drama' ? 'selected' : ''}`} onClick={() => setSelectedTag('Drama')}><img src={dominoMask} alt="dominoMask" /> Drama</button>
+                <button className={`newTagsItem ${SelectedTag === 'Fantasia' ? 'selected' : ''}`} onClick={() => setSelectedTag('Fantasia')}><img src={wandStars} alt="wandStars" /> Fantasia</button>
+                <button className={`newTagsItem ${SelectedTag === 'Horror' ? 'selected' : ''}`} onClick={() => setSelectedTag('Horror')}><img src={skull} alt="skull" /> Horror</button>
+                <button className={`newTagsItem ${SelectedTag === 'Romance' ? 'selected' : ''}`} onClick={() => setSelectedTag('Romance')}><img src={heart} alt="heart" /> Romance</button>
+                <button className={`newTagsItem ${SelectedTag === 'Sci-fi' ? 'selected' : ''}`} onClick={() => setSelectedTag('Sci-fi')}><img src={rocket} alt="rocket" /> Sci-fi</button>
+                <button className={`newTagsItem ${SelectedTag === 'Suspense' ? 'selected' : ''}`} onClick={() => setSelectedTag('Suspense')}><img src={eye} alt="eye" /> Suspense</button>
+                <button className={`newTagsItem ${SelectedTag === 'SliceofLife' ? 'selected' : ''}`} onClick={() => setSelectedTag('SliceofLife')}><img src={coffee} alt="coffee" /> Slice of Life</button>
             </div>
 
             {/* Seção de Novos Capitulos */}
