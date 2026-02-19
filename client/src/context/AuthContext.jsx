@@ -13,7 +13,6 @@ export function AuthProvider({ children }) {
       const resposta = await fetch(`${API_URL}/auth/me`, { credentials: 'include' });
       if (resposta.ok) {
         const data = await resposta.json();
-        resultado = data.user;
         setUsuario(data.user);
       } else {
         const data = await resposta.json();

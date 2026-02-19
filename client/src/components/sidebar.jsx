@@ -18,6 +18,7 @@ import profileIcon from '../assets/icons/profile.svg';
 import { notify } from '../services/notify';
 import { API_URL } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { calcularXp } from '../services/nivelUser';
 
 function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
     const { usuario, setUsuario } = useAuth();
@@ -54,7 +55,7 @@ function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
             <div className='profile_info'>
                 <div className='section'>
                     <div className='profileZoom'><img  src={profileIcon} onContextMenu={(e) => e.preventDefault()} /></div>
-                    <div className='card'>Nv. {usuario ? usuario.nivel : 0}</div>
+                    <div className='card'>Nv. {usuario ? calcularXp(usuario.xp) : 0}</div>
                 </div>
                 <h3>{usuario ? usuario.username : "Nome do Usuario"}</h3>
                 <h4>{usuario ? usuario.titulo : "Leitor Não Verificado"}</h4>

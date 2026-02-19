@@ -2,11 +2,9 @@
     position: fixed;
     top: -100%; /* Esconde completamente fora da tela */
     opacity: 0;
-    
     right: 7vw; 
     width: 360px;
     height: 450px;
-    
     z-index: 1500;
     background: rgba(8, 9, 15, 0.9); /* Sutilmente mais opaco para leitura */
     border: 1px solid rgba(255, 255, 255, 0.1);
