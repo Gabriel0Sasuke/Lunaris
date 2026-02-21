@@ -15,6 +15,12 @@ import Home from './pages/home.jsx'
 import Login from './pages/login.jsx'
 import Cadastro from './pages/cadastro.jsx'
 import Browser from './pages/browser.jsx'
+import Manga from './pages/manga.jsx'
+import NotFound from './pages/notFound.jsx' 
+import Perfil from './pages/perfil.jsx'
+import History from './pages/history.jsx'
+import Library from './pages/library.jsx'
+import Config from './pages/config.jsx'
 
 function App() {
   // Controlar Abertura do Sidebar
@@ -31,11 +37,16 @@ function App() {
       <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
       <Notifications isNotificationsOpen={isNotificationsOpen} />
       <Routes>
-
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
         <Route path='/cadastro' element={<Cadastro />} />
         <Route path='/browser' element={<Browser />} />
+        <Route path='/manga/:id' element={<Manga />} />
+        <Route path='/perfil' element={<Perfil />} />
+        <Route path='/history' element={<History />} />
+        <Route path='/library' element={<Library />} />
+        <Route path='/config' element={<Config />} />
+        <Route path='*' element={<NotFound />} />
       </Routes>
       <Footer />
       <ToastContainer {...toastConfig} />

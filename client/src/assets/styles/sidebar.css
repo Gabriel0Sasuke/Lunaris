@@ -226,6 +226,7 @@ h4{
 @media (max-width: 600px) {
     .sidebar {
         width: 100%;
+        height: 100dvh;
         right: -100%;
         border-left: none;
     }

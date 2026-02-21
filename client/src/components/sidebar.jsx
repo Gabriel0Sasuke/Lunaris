@@ -63,13 +63,13 @@ function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
                 <div className='linha'></div>
             <div className='buttons'>
                 {usuario ? (
-                    <button className='SideButton'><img src={person} alt="Meu Perfil" /> Meu Perfil</button>
+                    <button className='SideButton' onClick={() => link('/perfil')}><img src={person} alt="Meu Perfil" /> Meu Perfil</button>
                 ) : (
                     <button className='SideButton' onClick={() => link('/login')}><img src={person} alt="Faça Login ou Cadastre-se" /> Login/Cadastro</button>
                 )}
-                <button className='SideButton'><img src={library} alt="Minha Biblioteca" /> Minha Biblioteca</button>
-                <button className='SideButton'><img src={history} alt="Histórico" /> Histórico</button>
-                <button className='SideButton'><img src={settings} alt="Configurações" /> Configurações</button>
+                <button className='SideButton' onClick={() => link('/library')}><img src={library} alt="Minha Biblioteca" /> Minha Biblioteca</button>
+                <button className='SideButton' onClick={() => link('/history')}><img src={history} alt="Histórico" /> Histórico</button>
+                <button className='SideButton' onClick={() => link('/config')}><img src={settings} alt="Configurações" /> Configurações</button>
             </div>
                 {usuario ? <div className='linha' id='exitLinha'></div> : ""}
             {usuario ? <button className='ExitButton' onClick={handleLogout}><img src={logoutIcon} alt="Log-Out" /> Log-Out</button>
