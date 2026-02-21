@@ -1,9 +1,12 @@
 import '../assets/styles/notFound.css'
 
+import { useNavigate } from 'react-router-dom';
+
 import history from '../assets/ui/history.svg';
 function NotFound(){
+    const navigate = useNavigate();
     function goBack(){
-        window.history.back();
+        navigate('/');
     }
     return(
         <main className="NotFound-content">

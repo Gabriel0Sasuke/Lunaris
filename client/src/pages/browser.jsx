@@ -26,7 +26,6 @@ import history from '../assets/ui/history.svg';
 import openbook from '../assets/ui/openbook.svg';
 import search from '../assets/ui/search.svg';
 import clock from '../assets/ui/clock.svg';
-import layer from '../assets/ui/layer.svg';
 import add from '../assets/ui/add.svg';
 import remove from '../assets/ui/remove.svg';
 import filterIcon from '../assets/ui/filter.svg';
@@ -266,6 +265,7 @@ function Browser() {
     const [SelectedTag, setSelectedTag] = useState('Tudo');
     const [showAll, setShowAll] = useState(false);
     const [filter, setFilter] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     // Filtros de ordenação
     const [RankBy, setRankBy] = useState('A-Z');
@@ -283,7 +283,7 @@ function Browser() {
         <main className="browser-content">
             <div className="browserSearchContainer">
                 <div className="browserSearch">
-                    <input type="text" name="browserInput" id="browserInput" placeholder="Pesquise por título, autor ou palavras-chave" readOnly />
+                    <input type="text" name="browserInput"  id="browserInput" placeholder="Pesquise por título, autor ou palavras-chave" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                 </div>
                 <div className="BrowserTags">
                     {displayedTags.map(tag => (

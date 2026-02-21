@@ -17,5 +17,9 @@ export function calcularXp(xp) {
         return 7;
     }else if (xp < 2560) {
         return 8;
+    }else if (xp < 5120) {
+        return 9;
+    }else {
+        return 10;
     }
 }
