@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
       if (resposta.ok) {
         const data = await resposta.json();
         setUsuario(data.user);
+        resultado = data.user;
       } else {
         const data = await resposta.json();
         console.error('Erro na verificação:', data.message);
