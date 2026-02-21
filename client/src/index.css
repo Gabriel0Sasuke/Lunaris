@@ -90,6 +90,7 @@ main{
   min-height: calc(100vh - 100px);
   margin-left: auto;
   margin-right: auto;
+  scroll-behavior: smooth;
 }
 .no-select {
   -webkit-user-select: none; /* Chrome, Safari */

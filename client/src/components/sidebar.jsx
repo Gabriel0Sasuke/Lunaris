@@ -18,6 +18,7 @@ import profileIcon from '../assets/icons/profile.svg';
 import { notify } from '../services/notify';
 import { API_URL } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { calcularXp } from '../services/nivelUser';
 
 function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
     const { usuario, setUsuario } = useAuth();
@@ -54,7 +55,7 @@ function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
             <div className='profile_info'>
                 <div className='section'>
                     <div className='profileZoom'><img  src={profileIcon} onContextMenu={(e) => e.preventDefault()} /></div>
-                    <div className='card'>Nv. {usuario ? usuario.nivel : 0}</div>
+                    <div className='card'>Nv. {usuario ? calcularXp(usuario.xp) : 0}</div>
                 </div>
                 <h3>{usuario ? usuario.username : "Nome do Usuario"}</h3>
                 <h4>{usuario ? usuario.titulo : "Leitor Não Verificado"}</h4>
@@ -62,13 +63,13 @@ function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
                 <div className='linha'></div>
             <div className='buttons'>
                 {usuario ? (
-                    <button className='SideButton'><img src={person} alt="Meu Perfil" /> Meu Perfil</button>
+                    <button className='SideButton' onClick={() => link('/perfil')}><img src={person} alt="Meu Perfil" /> Meu Perfil</button>
                 ) : (
                     <button className='SideButton' onClick={() => link('/login')}><img src={person} alt="Faça Login ou Cadastre-se" /> Login/Cadastro</button>
                 )}
-                <button className='SideButton'><img src={library} alt="Minha Biblioteca" /> Minha Biblioteca</button>
-                <button className='SideButton'><img src={history} alt="Histórico" /> Histórico</button>
-                <button className='SideButton'><img src={settings} alt="Configurações" /> Configurações</button>
+                <button className='SideButton' onClick={() => link('/library')}><img src={library} alt="Minha Biblioteca" /> Minha Biblioteca</button>
+                <button className='SideButton' onClick={() => link('/history')}><img src={history} alt="Histórico" /> Histórico</button>
+                <button className='SideButton' onClick={() => link('/config')}><img src={settings} alt="Configurações" /> Configurações</button>
             </div>
                 {usuario ? <div className='linha' id='exitLinha'></div> : ""}
             {usuario ? <button className='ExitButton' onClick={handleLogout}><img src={logoutIcon} alt="Log-Out" /> Log-Out</button>

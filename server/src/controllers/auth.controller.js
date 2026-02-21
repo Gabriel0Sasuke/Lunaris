@@ -74,7 +74,7 @@ const login = async (req, res) => {
 // Verificação
 const verificacao = async (req, res) => {
   const userId = req.user.id;
-  const query = "SELECT id, email, username, nivel, titulo FROM usuario WHERE id = ?";
+  const query = "SELECT id, email, username, xp, titulo, foto, account_type FROM usuario WHERE id = ?";
   try{
     const [rows] = await pool.query(query, [userId]);
     if(rows.length === 0){
