@@ -5,22 +5,22 @@ import { toastConfig } from './services/notify';
 import { API_URL } from './services/api';
 
 // Componentes
-import Header from './components/header.jsx'
-import Sidebar from './components/sidebar.jsx'
-import Footer from './components/footer.jsx'
-import Notifications from './components/notifications.jsx'
+import Header from './components/header'
+import Sidebar from './components/sidebar'
+import Footer from './components/footer'
+import Notifications from './components/notifications'
 import { useAuth } from './context/AuthContext.jsx'; // Importe o hook
 // Páginas
-import Home from './pages/home.jsx'
-import Login from './pages/login.jsx'
-import Cadastro from './pages/cadastro.jsx'
-import Browser from './pages/browser.jsx'
-import Manga from './pages/manga.jsx'
-import NotFound from './pages/notFound.jsx' 
-import Perfil from './pages/perfil.jsx'
-import History from './pages/history.jsx'
-import Library from './pages/library.jsx'
-import Config from './pages/config.jsx'
+import Home from './pages/home'
+import Login from './pages/login'
+import Cadastro from './pages/cadastro'
+import Browser from './pages/browser'
+import Manga from './pages/manga'
+import NotFound from './pages/notFound'
+import Perfil from './pages/perfil'
+import History from './pages/history'
+import Library from './pages/library'
+import Config from './pages/config'
 
 function App() {
   // Controlar Abertura do Sidebar
@@ -54,3 +54,4 @@ function App() {
   )
 }
 export default App
+

@@ -1,0 +1,109 @@
+.mangaCard{
+    width: 160px;
+    height: auto;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+.mangaCardImage{
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 12px;
+    position: relative;
+}
+.mangaCardImage img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+.mangaCardImageTags{
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    z-index: 2;
+}
+.CardImageTag{
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    font-size: 0.6rem;
+    color: white;
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: row;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.mangaCardInfo{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.mangaCardInfo h3{
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    
+    /* Propriedades para ellipsis multi-linha */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limita a 2 linhas */
+    line-clamp: 2; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    margin: 0;
+}
+.mangaCardSubInfo{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    font-size: 0.7rem;
+    color: gray;
+    align-items: center;
+}
+.mangaCardTag{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+}
+.mangaCardTag img{
+    width: 14px;
+    height: 14px;
+}
+.mangaCardTag:nth-child(1){
+    font-weight: bold;
+    filter: brightness(0) saturate(100%) invert(83%) sepia(77%) saturate(2526%) hue-rotate(10deg) brightness(109%) contrast(103%);
+}
+
+@media (max-width: 768px) {
+    .mangaCard {
+        width: 140px;
+    }
+    .mangaCardInfo h3 {
+        font-size: 0.9rem;
+    }
+    .CardImageTag{
+        font-size: 0.5rem;
+        padding: 3px 6px;
+    }
+}
+.mangaCardTag:nth-child(3){
+    font-weight: bold;
+    filter: brightness(0) saturate(100%) invert(11%) sepia(95%) saturate(5851%) hue-rotate(231deg) brightness(107%) contrast(108%);
+}
+
+.mangaCard.grid-mode {
+    width: 100%;
+}
