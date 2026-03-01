@@ -17,4 +17,7 @@ Router.get('/me', authMiddleware, authController.verificacao);
 // Logout
 Router.get('/logout', authController.logout);
 
+//Google
+Router.post('/google', authController.google);
+
 module.exports = Router;

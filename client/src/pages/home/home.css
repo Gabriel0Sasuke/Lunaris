@@ -230,7 +230,8 @@
 }
 .mangaRow{
     width: 95%;
-    margin: 1vh auto;
+    padding: 0.5rem 0;
+    margin: 0.5vh auto;
     display: flex;
     flex-direction: row;
     gap: 16px;

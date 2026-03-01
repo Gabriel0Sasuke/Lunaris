@@ -1,25 +1,48 @@
-export function calcularXp(xp) {
-    if (xp < 10) {
+const XP_BASE = 10;
+
+function normalizarXp(xp) {
+    const valor = Number(xp);
+    if (!Number.isFinite(valor) || valor < 0) {
         return 0;
-    }else if (xp < 20) {
-        return 1;
-    }else if (xp < 40) {
-        return 2;
-    }else if (xp < 80) {
-        return 3;
-    }else if (xp < 160) {
-        return 4;
-    }else if (xp < 320) {
-        return 5;
-    }else if (xp < 640) {
-        return 6;
-    }else if (xp < 1280) {
-        return 7;
-    }else if (xp < 2560) {
-        return 8;
-    }else if (xp < 5120) {
-        return 9;
-    }else {
-        return 10;
     }
+    return Math.floor(valor);
+}
+
+export function xpNecessarioParaNivel(nivel) {
+    const nivelSeguro = Math.max(0, Math.floor(Number(nivel) || 0));
+    if (nivelSeguro === 0) {
+        return 0;
+    }
+    return XP_BASE * (2 ** (nivelSeguro - 1));
+}
+
+export function calcularXp(xp) {
+    const xpTotal = normalizarXp(xp);
+    if (xpTotal < XP_BASE) {
+        return 0;
+    }
+    return Math.floor(Math.log2(xpTotal / XP_BASE)) + 1;
+}
+
+export function calcularProgressoXp(xp) {
+    const xpTotal = normalizarXp(xp);
+    const nivel = calcularXp(xpTotal);
+
+    const limiteNivelAtual = xpNecessarioParaNivel(nivel);
+    const limiteProximoNivel = xpNecessarioParaNivel(nivel + 1);
+    const xpAtualNoNivel = xpTotal - limiteNivelAtual;
+    const xpParaProximoNivel = limiteProximoNivel - limiteNivelAtual;
+    const xpFaltante = Math.max(0, limiteProximoNivel - xpTotal);
+    const progressoPercentual = Math.min(100, Math.max(0, (xpAtualNoNivel / xpParaProximoNivel) * 100));
+
+    return {
+        xpTotal,
+        nivel,
+        limiteNivelAtual,
+        limiteProximoNivel,
+        xpAtualNoNivel,
+        xpParaProximoNivel,
+        xpFaltante,
+        progressoPercentual,
+    };
 }

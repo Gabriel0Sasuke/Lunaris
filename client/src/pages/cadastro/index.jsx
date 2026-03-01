@@ -1,6 +1,8 @@
 //React
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useGoogleLogin } from '@react-oauth/google';
+import { useAuth } from '../../context/AuthContext';
 
 // Serviços
 import { notify } from '../../services/notify';
@@ -26,6 +28,7 @@ function Cadastro() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const { verificarUsuario } = useAuth();
         
     const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&  email.length <= 255;
     const senhaForte = password.length >= 8 && password.length <= 100 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[!@#$%^&*]/.test(password);
@@ -47,7 +50,6 @@ function Cadastro() {
         password: password,
         username: username
     };
-         console.log("Dados prontos para o envio:", cadastroData);
   
         // Envio para o servidor
         try{
@@ -59,20 +61,62 @@ function Cadastro() {
             if(resposta.ok){
                 const data = await resposta.json()
                 notify.success(data.message);
-                console.log(data.message);
             }else{
                 //O Servidor respondeu mas algo deu errado.
                 const data = await resposta.json();
-                notify.error('Erro ao cadastrar usuário: ' + data.message);
+                notify.error(data.message);
             }
 
         }catch(error){
-            console.log("Erro:", error)
-            notify.error('Erro ao cadastrar usuário, Erro: "'+ error.message + '"');
+            notify.error('Não foi possível conectar ao servidor.');
         }finally{
             setLoadingState(false);
         }
         };
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                const resposta = await fetch(`${API_URL}/auth/google`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ token: tokenResponse.access_token }),
+                });
+
+                if (resposta.ok) {
+                    const data = await resposta.json();
+                    notify.success(data.message);
+                    await verificarUsuario();
+                    link('/');
+                } else {
+                    const data = await resposta.json();
+                    notify.error(data.message);
+                }
+            } catch (error) {
+                notify.error('Não foi possível conectar ao servidor.');
+            } finally {
+                setLoadingState(false);
+            }
+        },
+        onError: () => {
+            notify.error('Não foi possível autenticar com Google.');
+            setLoadingState(false);
+        },
+    });
+
+    const handleGoogleCadastro = () => {
+        setLoadingState(true);
+        googleLogin();
+    };
+
+    const handleDiscordCadastro = () => {
+        setLoadingState(true);
+        notify.info('Cadastro com Discord em breve');
+        setLoadingState(false);
+    };
         
     return (
         <main className="auth-page">
@@ -113,7 +157,10 @@ function Cadastro() {
                          <span>OU</span>
                          <div className="line"></div>
                     </div>
-                    <button className='socialLogin'><img src="/icon/google.svg"/>Google</button>
+                    <div className='socialLoginRow'>
+                        <button type="button" className='socialLogin' onClick={handleGoogleCadastro} disabled={loadingState}>{loadingState ? <img src={loading} /> : <><img src="/icon/google.svg"/>Google</>}</button>
+                        <button type="button" className='socialLogin' onClick={handleDiscordCadastro} disabled={loadingState}>{loadingState ? <img src={loading} /> : <><img src="/icon/discord.svg"/>Discord</>}</button>
+                    </div>
                 </div>
             </form>
 

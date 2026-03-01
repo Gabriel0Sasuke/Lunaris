@@ -10,6 +10,10 @@
     flex-direction: column;
     gap: 8px;
     flex: 0 0 auto;
+    transition: all 0.3s ease;
+}
+.mangaCard:hover{
+    transform: scale(1.05);
 }
 .mangaCardImage{
     width: 100%;

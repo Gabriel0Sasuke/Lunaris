@@ -13,6 +13,7 @@ import './login.css';
 //Icons
 import lunaris from '../../assets/icons/logo.svg';
 import loading from '../../assets/ui/loading.svg';
+import { useGoogleLogin } from '@react-oauth/google';
 
 function Login() {
     // Navegação
@@ -35,43 +36,83 @@ function Login() {
 
     // Envio do Formulário
     const handleSubmit = async (e) => {
-        // 1. Impede o navegador de recarregar a página
-     e.preventDefault();
-     setLoadingState(true);
+        e.preventDefault();
+        setLoadingState(true);
 
-    // 2. Criação do pacote JSON
-    const loginData = {
-        email: email,
-        password: password
-    };
-         console.log("Dados prontos para o envio:", loginData);
-  
-        // Envio para o servidor
-        try{
+        const loginData = {
+            email,
+            password,
+        };
+
+        try {
             const resposta = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 credentials: 'include',
-                headers:{
-                    'Content-Type' : 'application/json'
-                },body: JSON.stringify(loginData)});
-            if(resposta.ok){
-                const data = await resposta.json()
-                notify.success(data.message);
-                await verificarUsuario(); // Atualiza o estado global
-                link('/');
-            }else{
-                //O Servidor respondeu mas algo deu errado.
-                const data = await resposta.json();
-                notify.error('Erro ao fazer login: ' + data.message);
-            }
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData),
+            });
 
-        }catch(error){
-            console.log("Erro:", error)
-            notify.error('Erro ao fazer login, Erro: "'+ error.message + '"');
-        }finally{
+            if (resposta.ok) {
+                const data = await resposta.json();
+                notify.success(data.message);
+                await verificarUsuario();
+                link('/');
+            } else {
+                const data = await resposta.json();
+                notify.error(data.message);
+            }
+        } catch (error) {
+            notify.error('Não foi possível conectar ao servidor.');
+        } finally {
             setLoadingState(false);
         }
-        };
+    };
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                const resposta = await fetch(`${API_URL}/auth/google`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ token: tokenResponse.access_token }),
+                });
+
+                if (resposta.ok) {
+                    const data = await resposta.json();
+                    notify.success(data.message);
+                    await verificarUsuario();
+                    link('/');
+                } else {
+                    const data = await resposta.json();
+                    notify.error(data.message);
+                }
+            } catch (error) {
+                notify.error('Não foi possível conectar ao servidor.');
+            } finally {
+                setLoadingState(false);
+            }
+        },
+        onError: () => {
+            notify.error('Não foi possível autenticar com Google.');
+            setLoadingState(false);
+        },
+    });
+
+    const handleGoogleLogin = () => {
+        setLoadingState(true);
+        googleLogin();
+    };
+
+    const handleDiscordLogin = () => {
+        setLoadingState(true);
+        notify.info('Login com Discord em breve');
+        setLoadingState(false);
+    };
     return (
         <main className="auth-page">
             <form onSubmit={handleSubmit}>
@@ -99,7 +140,10 @@ function Login() {
                             <span>OU</span>
                             <div className="line"></div>
                         </div>
-                    <button className='socialLogin'><img src="/icon/google.svg"/>Google</button>
+                    <div className='socialLoginRow'>
+                        <button type="button" className='socialLogin' onClick={handleGoogleLogin} disabled={loadingState}>{loadingState ? <img src={loading} /> : <><img src="/icon/google.svg"/>Google</>}</button>
+                        <button type="button" className='socialLogin' onClick={handleDiscordLogin} disabled={loadingState}>{loadingState ? <img src={loading} /> : <><img src="/icon/discord.svg"/>Discord</>}</button>
+                    </div>
                 </div>
             </form>
 

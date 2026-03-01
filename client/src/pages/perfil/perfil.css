@@ -1,22 +1,63 @@
 .perfil-content{
     width: 100%;
-    height: 100vh;
+    height: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-bottom: 1rem;
+}
+.profileSwitch {
+    padding: 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+}
+.profileSwitch button {
+    padding: 0.5rem 2rem;
+    border-radius: 9999px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: white;
+    transition: all 0.3s ease;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: Inter-Bold, sans-serif;
+}
+.profileSwitch button img {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+}
+.profileSwitch button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateY(-1px);
+    cursor: pointer;
+}
+.profileSwitch button.selected {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
 }
 .profileInfo{
     width: 50vw;
-    height: 60vh;
+    height: 50vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 30px;
-    margin-top: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 60px;
+    margin-top: 1rem;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
 }
 .profileIcon{
     width: 150px;
@@ -61,4 +102,121 @@
     margin-top: 0.2rem;
     font-size: 1.2rem;
     color: rgba(255, 255, 255, 0.7);
+}
+.profileTags{
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+.profileTag{
+    padding: 0.5rem 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    color: white;
+}
+.profileTag.admin{
+    background: rgba(253, 11, 11, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.2);
+    color: red;
+}
+.profileExperience{
+    width: 50vw;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 60px;
+    margin-top: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+}
+.ExperienceTitle{
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    margin-top: 4vh;
+    gap: 0.5rem;
+    align-items: center; /* alinha verticalmente */
+}
+.ExperienceTitle h3{
+    font-size: 1rem;
+    color: white;
+    margin: 0;
+    line-height: 1;
+}
+.ExperienceTitle img{
+    width: 26px;
+    height: 26px;
+    display: block;
+}
+.ExperienceInfos{
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    margin-top: 2vh;
+    gap: 0.5rem;
+    align-items: center; /* alinha verticalmente */
+}
+.ExperienceInfos h4{
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    line-height: 1;
+}
+.ExperienceInfos span{
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    line-height: 1;
+    margin-left: auto;
+    font-family: Inter-ExtraBold, sans-serif;
+}
+.ExperienceInfos span h2{
+    display: inline;
+    font-size: 1.5rem;
+    color: white;
+    margin: 0;
+    line-height: 1;
+    font-family: Inter-ExtraBold, sans-serif;
+    white-space: nowrap;
+}
+.ExperienceBar{
+    width: 90%;
+    height: 4vh;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    margin-top: 0.5rem;
+}
+.ExperienceBarFill{
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(37, 99, 235, 1),rgba(37, 99, 235, 1) ,rgb(158, 0, 194));
+    border-radius: 9999px;
+    background-size: 220% 100%;
+    background-position: 0% 50%;
+    transition: width 0.3s ease;
+    animation: BarFillbgAnimation 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    will-change: background-position, opacity;
+}
+@keyframes BarFillbgAnimation {
+    0% {
+        background-position: 0% 50%;
+        opacity: 1;
+    }
+    45% {
+        opacity: 0.92;
+    }
+    50% {
+        background-position: 100% 50%;
+        opacity: 0.98;
+    }
+    100% {
+        background-position: 0% 50%;
+        opacity: 1;
+    }
 }

@@ -39,8 +39,7 @@ function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
             const data = await resposta.json();
             notify.error(data.message);
           }
-        } catch (error) {
-          console.error(error);
+                } catch {
           notify.error('Erro ao fazer logout');
         }
     }
