@@ -20,4 +20,6 @@ Router.get('/logout', authController.logout);
 //Google
 Router.post('/google', authController.google);
 
+//Verificar se ta online
+Router.post('/online', authMiddleware, authController.online);
 module.exports = Router;

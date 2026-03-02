@@ -17,6 +17,7 @@
     max-height: 600px;
     overflow: hidden;
     position: relative;
+    touch-action: pan-y;
     /* Remover propriedades de scroll snap antigas se existirem */
 }
 
@@ -109,7 +110,6 @@
     font-size: 3rem;
     font-weight: bold;
     font-family: Inter-ExtraBold, sans-serif;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
     margin-bottom: 1vh;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -121,7 +121,7 @@
     height: auto;
     margin: 16px 0;
     font-size: 1.2rem;
-    color: gray;
+    color: rgb(194, 194, 194);
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -237,6 +237,7 @@
     gap: 16px;
     overflow-x: auto;
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 .mangaRow::-webkit-scrollbar {
     height: 0px;
@@ -346,6 +347,7 @@
         flex-wrap: nowrap;
         overflow-x: auto;
         justify-content: flex-start;
+        align-items: center;
         padding-bottom: 8px; /* Espaço para scrollbar se visível */
         margin-top: 24px;
         -webkit-overflow-scrolling: touch;
@@ -362,6 +364,14 @@
     .mangaGrid {
         gap: 12px;
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    .newTagsItem {
+        white-space: nowrap;
+        flex-shrink: 0;
+        line-height: 1.2;
+        min-height: 34px;
+        padding: 6px 12px;
     }
 }
 
@@ -404,7 +414,8 @@
 
     /* Novos elementos responsivos (Mobile) */
     .newTagsItem {
-        padding: 6px 12px;
+        min-height: 32px;
+        padding: 6px 10px;
         font-size: 0.8rem;
         white-space: nowrap;
     }

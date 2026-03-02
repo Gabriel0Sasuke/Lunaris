@@ -20,7 +20,9 @@ app.use(express.json());
 const authRouter = require('./src/routes/auth.route');
 app.use('/auth', authRouter);
 
-
+// Sistema (Verificação de sistema online, etc.)
+const systemRouter = require('./src/routes/system.route');
+app.use('/system', systemRouter);
 
 // Servidor
 app.listen(port, () => {

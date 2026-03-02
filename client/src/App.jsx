@@ -3,13 +3,16 @@ import { useState, useEffect } from 'react'
 import { ToastContainer } from 'react-toastify';
 import { toastConfig } from './services/notify';
 import { API_URL } from './services/api';
+import { notify } from './services/notify'
 
 // Componentes
 import Header from './components/header'
 import Sidebar from './components/sidebar'
 import Footer from './components/footer'
 import Notifications from './components/notifications'
-import { useAuth } from './context/AuthContext.jsx'; // Importe o hook
+import { useAuth } from './context/AuthContext.jsx'; 
+import PrivateRoutes from './context/PrivateRoutes.jsx';
+import PublicRoutes from './context/PublicRoute.jsx';
 // Páginas
 import Home from './pages/home'
 import Login from './pages/login'
@@ -17,10 +20,15 @@ import Cadastro from './pages/cadastro'
 import Browser from './pages/browser'
 import Manga from './pages/manga'
 import NotFound from './pages/notFound'
+import Forbidden from './pages/forbidden'
+import AuthRequired from './pages/authRequired'
 import Perfil from './pages/perfil'
 import History from './pages/history'
 import Library from './pages/library'
 import Config from './pages/config'
+import Admin from './pages/admin'
+import Scan from './pages/scan'
+import Community from './pages/community'
 
 function App() {
   // Controlar Abertura do Sidebar
@@ -31,21 +39,76 @@ function App() {
   // O AuthContext agora gerencia o usuário!
   const { usuario } = useAuth();
   
+  //Função pra atualizar o estado online do usuario
+  const atualizarOnline = async () => {
+    if (!usuario?.id) return;
+
+    try {
+      const resposta = await fetch(`${API_URL}/auth/online`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      let data = null;
+      try {
+        data = await resposta.json();
+      } catch {}
+
+      if (!resposta.ok) {
+        console.error(data?.message || 'Erro ao atualizar status online.');
+        return;
+      }
+
+      console.log(data?.message || 'Status atualizado.');
+    } catch (error) {
+      console.error('Falha ao atualizar status online:', error);
+    }
+  }
+  useEffect(() => {
+    // Se Estiver logado, atualizar seu status
+    if(usuario != null){
+      atualizarOnline();
+    }else{
+      return
+    }
+  }, [usuario]);
   return (
     <BrowserRouter>
       <Header setIsSidebarOpen={setIsSidebarOpen} setIsNotificationsOpen={setIsNotificationsOpen} isNotificationsOpen={isNotificationsOpen} />
       <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
       <Notifications isNotificationsOpen={isNotificationsOpen} />
       <Routes>
+        {/* Rotas Públicas (Acessíveis a Todos) */}
         <Route path='/' element={<Home />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/cadastro' element={<Cadastro />} />
         <Route path='/browser' element={<Browser />} />
         <Route path='/manga/:id' element={<Manga />} />
-        <Route path='/perfil' element={<Perfil />} />
-        <Route path='/history' element={<History />} />
-        <Route path='/library' element={<Library />} />
-        <Route path='/config' element={<Config />} />
+        <Route path='/403' element={<Forbidden />} />
+        <Route path='/auth-required' element={<AuthRequired />} />
+
+        {/* Rotas Públicas (Somente para Não-Logados) */}
+        <Route element={<PublicRoutes />}>
+          <Route path='/login' element={<Login />} />
+          <Route path='/cadastro' element={<Cadastro />} />
+        </Route>
+
+        {/* Rotas Privadas (Somente para Usuários Logados) */}
+        <Route element={<PrivateRoutes />}>
+          <Route path='/community' element={<Community />} />
+          <Route path='/perfil' element={<Perfil />} />
+          <Route path='/history' element={<History />} />
+          <Route path='/library' element={<Library />} />
+          <Route path='/config' element={<Config />} />
+        </Route>
+        
+        {/* Rotas Privadas (Somente para Admins e Scanlators) */}
+        <Route element={<PrivateRoutes AllowedRoles={['admin', 'scan']} />}>
+          <Route path='/scan' element={<Scan />} />
+        </Route>
+
+          {/* Rotas Privadas (Somente para Admins) */}
+        <Route element={<PrivateRoutes AllowedRoles={['admin']} />}>
+          <Route path='/admin' element={<Admin />} />
+        </Route>
+
         <Route path='*' element={<NotFound />} />
       </Routes>
       <Footer />

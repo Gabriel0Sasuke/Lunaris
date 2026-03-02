@@ -25,8 +25,41 @@ function Perfil(){
             case 'scan':
                 return 'Scanlator';
             default:
-                return 'Desconecido';
+                return 'Desconhecido';
         }
+    }
+    function lastSeen(lastSeenValue) {
+        // Se o last_seen tiver sido atualizado há menos de 5 minutos, considerar online
+        if (!lastSeenValue) return 'Desconhecido';
+        const data = new Date(lastSeenValue);
+        if (Number.isNaN(data.getTime())) return 'Desconhecido';
+        const agora = new Date();
+        const diffMs = agora - data;
+        const diffMinutes = Math.floor(diffMs / 1000 / 60);
+        const diffHours = Math.floor(diffMinutes / 60);
+        const diffDays = Math.floor(diffHours / 24);
+        if (diffMinutes < 0) {
+            return 'Online';
+        }
+        if (diffMinutes < 5) {
+            return 'Online';
+        }
+        if (diffMinutes < 60) {
+            return `Online há ${diffMinutes} minutos`;
+        } else if (diffHours < 24) {
+            return `Online há ${diffHours} horas`;
+        } else {
+            return `Online há ${diffDays} dias`;
+        }
+    }
+
+    function isOnline(lastSeenValue) {
+        if (!lastSeenValue) return false;
+        const data = new Date(lastSeenValue);
+        if (Number.isNaN(data.getTime())) return false;
+
+        const diffMinutes = Math.floor((new Date() - data) / 1000 / 60);
+        return diffMinutes < 5;
     }
     return(
         <main className="perfil-content">
@@ -48,6 +81,7 @@ function Perfil(){
                     <div className="profileTag">Membro desde {usuario?.created_at ? new Date(usuario.created_at).toLocaleDateString('pt-BR') : 'Desconhecido'}</div>
                     <div className="profileTag">Último login: {usuario?.last_seen ? new Date(usuario.last_seen).toLocaleDateString('pt-BR') : 'Nunca'}</div>
                     <div className={usuario?.account_type === 'admin' ? 'profileTag admin' : 'profileTag'}>{formatarCargo(usuario?.account_type)}</div>
+                    <div className={`profileTag ${isOnline(usuario?.last_seen) ? 'online' : 'offline'}`}>{lastSeen(usuario?.last_seen)}</div>
                 </div>
             </div>
 

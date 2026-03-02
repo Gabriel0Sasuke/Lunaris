@@ -1,7 +1,7 @@
 .sidebar{
     position: fixed;
     top: 0;
-    right: -350px;
+    right: 0;
     width: 350px;
     height: 100vh;
     background: linear-gradient(180deg,  #0f1c35, #131313, #131313);
@@ -10,8 +10,11 @@
     display: flex;
     flex-direction: column;
     padding-top: 5vh;
-    transition: right 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out;
     border-left: 3px solid rgba(255, 255, 255, 0.1);
+    transform: translateX(100%);
+    will-change: transform;
+    pointer-events: none;
     
     /* Scroll para quando a altura reduzir */
     overflow-y: auto;
@@ -34,7 +37,8 @@
 }
 
 .sidebar.active {
-    right: 0;
+    transform: translateX(0);
+    pointer-events: auto;
 }
 
 .blankScreen{
@@ -44,13 +48,13 @@
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: -1;
+    z-index: 1999;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease-in-out;
 }
 
-.sidebar.active .blankScreen {
+.blankScreen.active {
     opacity: 1;
     pointer-events: auto;
 }
@@ -227,12 +231,12 @@ h4{
     .sidebar {
         width: 100%;
         height: 100dvh;
-        right: -100%;
         border-left: none;
+        transform: translateX(100%);
     }
 
     .sidebar.active {
-        right: 0;
+        transform: translateX(0);
     }
 
     .profile_info {

@@ -165,10 +165,22 @@ const socialMediaAuth = async (req, res, ID) => {
               });
               return res.status(200).json({ message: 'Login realizado com sucesso' });
 }
+const online = async(req, res) => {
+  const id = req.user.id;
+  const query = "UPDATE usuario SET last_seen = now() WHERE id = ?";
+
+  try {
+    await pool.query(query, [id]);
+    return res.status(200).json({ message: 'Status Atualizado.' });
+  } catch (e) {
+    return res.status(500).json({ message: 'Erro ao atualizar Status' });
+  }
+}
 module.exports = {
   cadastro,
   login,
   verificacao,
   logout,
-  google
+  google,
+  online
 }

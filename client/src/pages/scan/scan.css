@@ -1,0 +1,74 @@
+.scan-content {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 1rem;
+}
+
+.ScanNavButton {
+    margin-top: 2rem;
+    padding: 0.3rem;
+    display: flex;
+    flex-direction: row;
+    gap: 0.3rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    max-width: min(92vw, 900px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.ScanNavButton::-webkit-scrollbar {
+    display: none;
+}
+
+.ScanNavBtn {
+    min-width: 100px;
+    height: 40px;
+    padding: 0 1.2rem;
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.ScanNavBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.ScanNavBtn.active {
+    background-color: rgba(37, 99, 235, 0.4);
+    border: 1px solid rgba(37, 99, 235, 0.6);
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+    color: white;
+}
+
+.ScanNavBtn.active:hover {
+    background-color: rgba(37, 99, 235, 0.5);
+    box-shadow: 0 0 30px rgba(37, 99, 235, 0.8);
+}
+
+@media (max-width: 600px) {
+    .ScanNavButton {
+        width: 92vw;
+    }
+
+    .ScanNavBtn {
+        min-width: 88px;
+        height: 36px;
+        padding: 0 0.9rem;
+        font-size: 0.82rem;
+    }
+}

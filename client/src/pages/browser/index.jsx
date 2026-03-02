@@ -342,7 +342,7 @@ function Browser() {
                 {mockMangas.map(manga => (
                     <MangaCard key={manga.id} manga={manga} isGrid={true} />
                 ))}
-            </div>    
+            </div>
 
             </div>
         </main>

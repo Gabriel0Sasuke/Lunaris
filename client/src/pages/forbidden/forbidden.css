@@ -1,0 +1,106 @@
+.forbidden-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 80vh;
+    text-align: center;
+}
+
+.F403 {
+    margin-top: 10vh;
+    font-size: 8rem;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ef4444, #7f1d1d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-emphasis-color: transparent;
+    text-shadow: 0 0 12px rgba(239, 68, 68, 0.45);
+}
+
+.FDiv {
+    padding: 30px;
+    width: 25vw;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+    animation: ForbiddenBorderPulse 3s infinite;
+}
+
+.FDiv h2 {
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.FDiv span {
+    font-size: 0.9rem;
+    color: #b8b8b8;
+}
+
+.FDiv button {
+    display: flex;
+    flex-direction: row;
+    padding: 15px 20px;
+    border: none;
+    background-color: #dc2626;
+    color: #fff;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.FDiv button img {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    filter: brightness(0) saturate(100%) invert(100%);
+}
+
+.FDiv button:hover {
+    background-color: #b91c1c;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+@keyframes ForbiddenBorderPulse {
+    0% {
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+    }
+}
+
+@media (max-width: 1024px) {
+    .F403 {
+        font-size: 6rem;
+    }
+
+    .FDiv {
+        width: 50vw;
+    }
+}
+
+@media (max-width: 768px) {
+    .F403 {
+        font-size: 8rem;
+    }
+
+    .FDiv {
+        width: 90vw;
+        min-width: unset;
+        padding: 30px 20px;
+    }
+}

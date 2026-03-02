@@ -29,6 +29,7 @@ import { useState, useEffect, useRef } from 'react';
 function Home() {
     const [activeIndex, setActiveIndex] = useState(0);
     const [SelectedTag, setSelectedTag] = useState('Tudo');
+    const touchStartX = useRef(null);
     // Mudar slide a cada 3 segundos
     useEffect(() => {
         const interval = setInterval(() => {
@@ -40,6 +41,35 @@ function Home() {
 
     const newChaptersRef = useRef(null);
     const newMangasRef = useRef(null);
+
+    const nextSlide = () => {
+        setActiveIndex((current) => (current === 2 ? 0 : current + 1));
+    };
+
+    const prevSlide = () => {
+        setActiveIndex((current) => (current === 0 ? 2 : current - 1));
+    };
+
+    const handleCarouselTouchStart = (e) => {
+        touchStartX.current = e.touches[0]?.clientX ?? null;
+    };
+
+    const handleCarouselTouchEnd = (e) => {
+        if (touchStartX.current === null) return;
+
+        const touchEndX = e.changedTouches[0]?.clientX ?? touchStartX.current;
+        const deltaX = touchEndX - touchStartX.current;
+
+        if (Math.abs(deltaX) > 40) {
+            if (deltaX < 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+        }
+
+        touchStartX.current = null;
+    };
 
     useEffect(() => {
         const setupScroll = (ref) => {
@@ -71,7 +101,7 @@ function Home() {
     return (
         <main className="home-content">
             {/* Carrousel de Items de Mangá em destaque*/}
-            <div id="carousel">
+            <div id="carousel" onTouchStart={handleCarouselTouchStart} onTouchEnd={handleCarouselTouchEnd}>
 
                 {/* ITEM 1 - Solo Leveling */}
                 <div className={`carousel-item ${activeIndex === 0 ? 'active' : ''}`}>
