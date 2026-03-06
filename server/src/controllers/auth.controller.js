@@ -1,5 +1,4 @@
 // Importações
-const dotenv = require('dotenv').config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../database/sql');
@@ -74,7 +73,7 @@ const login = async (req, res) => {
 // Verificação
 const verificacao = async (req, res) => {
   const userId = req.user.id;
-  const query = "SELECT id, email, username, xp, titulo, foto, account_type, last_seen, created_at FROM usuario WHERE id = ?";
+  const query = "SELECT id, email, username, xp, titulo, foto, account_type, last_seen, created_at, scan_afiliada, ativa FROM usuario WHERE id = ?";
   const updateLastSeenQuery = "UPDATE usuario SET last_seen = NOW() WHERE id = ?";
   try{
     const [rows] = await pool.query(query, [userId]);
@@ -82,10 +81,14 @@ const verificacao = async (req, res) => {
       return res.status(404).json({ message: 'Usuário não encontrado' });
     }else{
       const user = rows[0];
-      await pool.query(updateLastSeenQuery, [userId]);
-      return res.status(200).json({ user });
+      if(user.ativa){
+        await pool.query(updateLastSeenQuery, [userId]);
+        return res.status(200).json({ user });
+      }else{
+        return res.status(403).json({ message: 'Usuário desativado' });
+      }
     }
-  }catch (error) {    
+  }catch (error) {
     return res.status(500).json({ message: 'Erro ao verificar usuário' + error.message });
   }
 }

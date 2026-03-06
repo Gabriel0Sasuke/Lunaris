@@ -79,15 +79,16 @@ function App() {
       <Routes>
         {/* Rotas Públicas (Acessíveis a Todos) */}
         <Route path='/' element={<Home />} />
+        <Route path='/home' element={<Home />} />
         <Route path='/browser' element={<Browser />} />
         <Route path='/manga/:id' element={<Manga />} />
         <Route path='/403' element={<Forbidden />} />
-        <Route path='/auth-required' element={<AuthRequired />} />
 
         {/* Rotas Públicas (Somente para Não-Logados) */}
         <Route element={<PublicRoutes />}>
           <Route path='/login' element={<Login />} />
           <Route path='/cadastro' element={<Cadastro />} />
+          <Route path='/auth-required' element={<AuthRequired />} />
         </Route>
 
         {/* Rotas Privadas (Somente para Usuários Logados) */}

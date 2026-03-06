@@ -24,6 +24,18 @@ app.use('/auth', authRouter);
 const systemRouter = require('./src/routes/system.route');
 app.use('/system', systemRouter);
 
+//Tags (Adicionar, remover, editar tags, Listar tags, etc.)
+const tagRouter = require('./src/routes/tag.route');
+app.use('/tag', tagRouter);
+
+// Mangás (Adicionar, remover, editar mangás, Listar mangás, etc.)
+const mangaRouter = require('./src/routes/manga.route');
+app.use('/manga', mangaRouter);
+
+// Scanlators (Adicionar, remover, editar scanlators, Listar scanlators, etc.)
+const scanRouter = require('./src/routes/scan.route');
+app.use('/scanlators', scanRouter);
+
 // Servidor
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);

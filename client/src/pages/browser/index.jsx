@@ -1,5 +1,5 @@
 //React
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 //Componentes
 import MangaCard from '../../components/mangaCard';
@@ -9,16 +9,6 @@ import './browser.css';
 
 //Imports
 //Icones do button
-import coffee from '../../assets/ui/coffee.svg';
-import comedyMask from '../../assets/ui/comedy-mask.svg';
-import heart from '../../assets/ui/favorite.svg';
-import skull from '../../assets/ui/skull.svg';
-import swords from '../../assets/ui/swords.svg';
-import rocket from '../../assets/ui/rocket.svg';
-import wandStars from '../../assets/ui/wand-stars.svg';
-import dominoMask from '../../assets/ui/domino-mask.svg';
-import eye from '../../assets/ui/eye.svg';
-import explore from '../../assets/ui/explore.svg';
 import infinity from '../../assets/ui/infinity.svg';
 import star from '../../assets/ui/star.svg';
 import person from '../../assets/ui/person.svg';
@@ -30,33 +20,7 @@ import add from '../../assets/ui/add.svg';
 import remove from '../../assets/ui/remove.svg';
 import filterIcon from '../../assets/ui/filter.svg';
 import filterOff from '../../assets/ui/filterOff.svg';
-
-const tags = [
-    { id: 'Tudo', label: 'Tudo', icon: infinity },
-    { id: 'Acao', label: 'Ação', icon: swords },
-    { id: 'Aventura', label: 'Aventura', icon: explore },
-    { id: 'Comedia', label: 'Comédia', icon: comedyMask },
-    { id: 'Drama', label: 'Drama', icon: dominoMask },
-    { id: 'Fantasia', label: 'Fantasia', icon: wandStars },
-    { id: 'Horror', label: 'Horror', icon: skull },
-    { id: 'Romance', label: 'Romance', icon: heart },
-    { id: 'Sci-fi', label: 'Sci-fi', icon: rocket },
-    { id: 'Suspense', label: 'Suspense', icon: eye },
-    { id: 'SliceofLife', label: 'Slice of Life', icon: coffee },
-    { id: 'Misterio', label: 'Mistério', icon: search },
-    { id: 'Sobrenatural', label: 'Sobrenatural', icon: wandStars },
-    { id: 'Psicologico', label: 'Psicológico', icon: eye },
-    { id: 'Escolar', label: 'Escolar', icon: openbook },
-    { id: 'Historico', label: 'Histórico', icon: history },
-    { id: 'Isekai', label: 'Isekai', icon: clock },
-    { id: 'ArtesMarciais', label: 'Artes Marciais', icon: swords },
-    { id: 'Shounen', label: 'Shounen', icon: star },
-    { id: 'Seinen', label: 'Seinen', icon: person },
-    { id: 'Shoujo', label: 'Shoujo', icon: heart },
-    { id: 'Josei', label: 'Josei', icon: heart },
-    { id: 'Esportes', label: 'Esportes', icon: explore },
-    { id: 'Mecha', label: 'Mecha', icon: rocket }
-];
+import { API_URL } from '../../services/api';
 
 const mockMangas = [
     {
@@ -264,6 +228,7 @@ const mockMangas = [
 function Browser() {
     const [SelectedTag, setSelectedTag] = useState('Tudo');
     const [showAll, setShowAll] = useState(false);
+    const [tags, setTags] = useState([{ id: 'Tudo', label: 'Tudo', icon: infinity, prioridade: 1 }]);
     const [filter, setFilter] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -271,6 +236,39 @@ function Browser() {
     const [RankBy, setRankBy] = useState('A-Z');
     const [Type, setType] = useState('Todos');
     const [Status, setStatus] = useState('Todos');
+
+    useEffect(() => {
+        const fetchBrowserTags = async () => {
+            try {
+                const response = await fetch(`${API_URL}/tag/list`, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar tags');
+                }
+
+                const data = await response.json();
+                const sortedTags = (Array.isArray(data) ? data : [])
+                    .map((tag) => ({
+                        id: tag.slug || tag.name,
+                        label: tag.name,
+                        icon: tag.icon ? `data:image/svg+xml;utf8,${encodeURIComponent(tag.icon)}` : infinity,
+                        prioridade: Number(tag.prioridade) === 1 ? 1 : 0
+                    }))
+                    .sort((a, b) => b.prioridade - a.prioridade || a.label.localeCompare(b.label));
+
+                setTags([
+                    { id: 'Tudo', label: 'Tudo', icon: infinity, prioridade: 1 },
+                    ...sortedTags
+                ]);
+            } catch {
+                setTags([{ id: 'Tudo', label: 'Tudo', icon: infinity, prioridade: 1 }]);
+            }
+        };
+
+        fetchBrowserTags();
+    }, []);
 
     const displayedTags = showAll ? tags : tags.slice(0, 10);
     
@@ -295,12 +293,15 @@ function Browser() {
                             <img src={tag.icon} alt={tag.id} /> {tag.label}
                         </button>
                     ))}
-                    <button 
-                        className="BrowserTagsItem show-more-btn" 
-                        onClick={() => setShowAll(!showAll)}
-                    >
-                        <img src={showAll ? remove : add} alt={showAll ? "Mostrar menos" : "Mostrar mais"} /> {showAll ? 'Mostrar menos' : 'Mostrar mais'}
-                    </button>
+                    {tags.length > 10 && (
+                        <button
+                            className="BrowserTagsItem show-more-btn"
+                            onClick={() => setShowAll((prev) => !prev)}
+                        >
+                            <img src={showAll ? remove : add} alt={showAll ? 'Mostrar menos' : 'Adicionar mais'} />
+                            {showAll ? 'Mostrar menos' : 'Adicionar mais'}
+                        </button>
+                    )}
                     <button onClick={() => setFilter(!filter)} className="BrowserTagsItem filter-btn">
                         <img src={filter ? filterOff : filterIcon} alt={filter ? "Fechar filtros" : "Abrir filtros"} />
                         {filter ? "Fechar filtros" : "Abrir filtros"}

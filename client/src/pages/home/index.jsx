@@ -9,27 +9,53 @@ import openbook from '../../assets/ui/openbook.svg';
 import bookmark from '../../assets/ui/bookmark.svg';
 
 //Icones do button
-import coffee from '../../assets/ui/coffee.svg';
-import comedyMask from '../../assets/ui/comedy-mask.svg';
-import heart from '../../assets/ui/favorite.svg';
-import skull from '../../assets/ui/skull.svg';
-import swords from '../../assets/ui/swords.svg';
-import rocket from '../../assets/ui/rocket.svg';
-import wandStars from '../../assets/ui/wand-stars.svg';
-import dominoMask from '../../assets/ui/domino-mask.svg';
-import eye from '../../assets/ui/eye.svg';
-import explore from '../../assets/ui/explore.svg';
 import infinity from '../../assets/ui/infinity.svg';
 
 //Componentes
 import MangaCard from '../../components/mangaCard';
 
 import { useState, useEffect, useRef } from 'react';
+import { API_URL } from '../../services/api';
 
 function Home() {
     const [activeIndex, setActiveIndex] = useState(0);
     const [SelectedTag, setSelectedTag] = useState('Tudo');
+    const [homeTags, setHomeTags] = useState([{ id: 'Tudo', label: 'Tudo', icon: infinity, prioridade: 1 }]);
     const touchStartX = useRef(null);
+
+    useEffect(() => {
+        const fetchHomeTags = async () => {
+            try {
+                const response = await fetch(`${API_URL}/tag/list`, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar tags');
+                }
+
+                const data = await response.json();
+                const sortedTags = (Array.isArray(data) ? data : [])
+                    .map((tag) => ({
+                        id: tag.slug || tag.name,
+                        label: tag.name,
+                        icon: tag.icon ? `data:image/svg+xml;utf8,${encodeURIComponent(tag.icon)}` : infinity,
+                        prioridade: Number(tag.prioridade) === 1 ? 1 : 0
+                    }))
+                    .sort((a, b) => b.prioridade - a.prioridade || a.label.localeCompare(b.label));
+
+                const MAX_HOME_TAGS = 11;
+                setHomeTags([
+                    { id: 'Tudo', label: 'Tudo', icon: infinity, prioridade: 1 },
+                    ...sortedTags.slice(0, Math.max(0, MAX_HOME_TAGS - 1))
+                ]);
+            } catch {
+                setHomeTags([{ id: 'Tudo', label: 'Tudo', icon: infinity, prioridade: 1 }]);
+            }
+        };
+
+        fetchHomeTags();
+    }, []);
     // Mudar slide a cada 3 segundos
     useEffect(() => {
         const interval = setInterval(() => {
@@ -162,17 +188,15 @@ function Home() {
             </div>
             {/* Seção de Tags Pra todas as Seções Abaixo*/}
             <div className="newTags">
-                <button className={`newTagsItem ${SelectedTag === 'Tudo' ? 'selected' : ''}`} onClick={() => setSelectedTag('Tudo')}><img src={infinity} alt="infinity" /> Tudo</button>
-                <button className={`newTagsItem ${SelectedTag === 'Acao' ? 'selected' : ''}`} onClick={() => setSelectedTag('Acao')}><img src={swords} alt="swords" /> Ação</button>
-                <button className={`newTagsItem ${SelectedTag === 'Aventura' ? 'selected' : ''}`} onClick={() => setSelectedTag('Aventura')}><img src={explore} alt="explore" /> Aventura</button>
-                <button className={`newTagsItem ${SelectedTag === 'Comedia' ? 'selected' : ''}`} onClick={() => setSelectedTag('Comedia')}><img src={comedyMask} alt="comedyMask" /> Comédia</button>
-                <button className={`newTagsItem ${SelectedTag === 'Drama' ? 'selected' : ''}`} onClick={() => setSelectedTag('Drama')}><img src={dominoMask} alt="dominoMask" /> Drama</button>
-                <button className={`newTagsItem ${SelectedTag === 'Fantasia' ? 'selected' : ''}`} onClick={() => setSelectedTag('Fantasia')}><img src={wandStars} alt="wandStars" /> Fantasia</button>
-                <button className={`newTagsItem ${SelectedTag === 'Horror' ? 'selected' : ''}`} onClick={() => setSelectedTag('Horror')}><img src={skull} alt="skull" /> Horror</button>
-                <button className={`newTagsItem ${SelectedTag === 'Romance' ? 'selected' : ''}`} onClick={() => setSelectedTag('Romance')}><img src={heart} alt="heart" /> Romance</button>
-                <button className={`newTagsItem ${SelectedTag === 'Sci-fi' ? 'selected' : ''}`} onClick={() => setSelectedTag('Sci-fi')}><img src={rocket} alt="rocket" /> Sci-fi</button>
-                <button className={`newTagsItem ${SelectedTag === 'Suspense' ? 'selected' : ''}`} onClick={() => setSelectedTag('Suspense')}><img src={eye} alt="eye" /> Suspense</button>
-                <button className={`newTagsItem ${SelectedTag === 'SliceofLife' ? 'selected' : ''}`} onClick={() => setSelectedTag('SliceofLife')}><img src={coffee} alt="coffee" /> Slice of Life</button>
+                {homeTags.map((tag) => (
+                    <button
+                        key={tag.id}
+                        className={`newTagsItem ${SelectedTag === tag.id ? 'selected' : ''}`}
+                        onClick={() => setSelectedTag(tag.id)}
+                    >
+                        <img src={tag.icon} alt={tag.label} /> {tag.label}
+                    </button>
+                ))}
             </div>
 
             {/* Seção de Novos Capitulos */}
