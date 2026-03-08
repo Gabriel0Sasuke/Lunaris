@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './ScanSections.css';
+import './Scansections.css';
 import Cropper from 'react-easy-crop';
 import { createPortal } from 'react-dom';
 import { notify } from '../../../services/notify';
