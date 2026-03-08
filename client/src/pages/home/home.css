@@ -20,6 +20,12 @@
     touch-action: pan-y;
     /* Remover propriedades de scroll snap antigas se existirem */
 }
+.carouselEmptyState {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 16px;
+}
 
 .carousel-item {
     position: absolute; /* Sobrepor slides */
@@ -115,6 +121,8 @@
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 .carousel-item-info span{
     width: 100%;
@@ -126,6 +134,8 @@
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    -webkit-line-clamp: 8;
+    line-clamp: 8;
 }
 .buttonsBox{
     margin-top: auto;
@@ -249,6 +259,55 @@
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 16px;
 }
+.mangaEmptyState {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(0, 0, 0, 0.35));
+    backdrop-filter: blur(10px);
+}
+.mangaEmptyStateRow {
+    width: 100%;
+    min-height: 220px;
+    flex: 0 0 100%;
+}
+.mangaEmptyIcon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    color: #9ec5ff;
+}
+.mangaEmptyState h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #ffffff;
+}
+.mangaEmptyState p {
+    margin: 10px 0 0;
+    max-width: 540px;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.5;
+}
+.mangaEmptyState button {
+    margin-top: 18px;
+    padding: 10px 18px;
+    border: 1px solid rgba(37, 99, 235, 0.8);
+    border-radius: 9999px;
+    background: rgba(37, 99, 235, 0.75);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.mangaEmptyState button:hover {
+    transform: translateY(-1px);
+    background: rgba(37, 99, 235, 0.95);
+}
 .mangaGridSeeAll{
     width: 95%;
     margin: 1vh auto 4vh auto;
@@ -316,6 +375,18 @@
         backdrop-filter: blur(20px) brightness(0.6); /* Melhora legibilidade */
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .mangaEmptyState {
+        padding: 28px 18px;
+    }
+
+    .mangaEmptyState h3 {
+        font-size: 1.15rem;
+    }
+
+    .mangaEmptyState p {
+        font-size: 0.95rem;
     }
 
     .carousel-item-info h2 {

@@ -17,11 +17,88 @@ import MangaCard from '../../components/mangaCard';
 import { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../../services/api';
 
+//Services
+import { notify } from '../../services/notify';
+import { formatRelativeTimeShort } from '../../services/CreatedManga';
+
 function Home() {
     const [activeIndex, setActiveIndex] = useState(0);
-    const [SelectedTag, setSelectedTag] = useState('Tudo');
-    const [homeTags, setHomeTags] = useState([{ id: 'Tudo', label: 'Tudo', icon: infinity, prioridade: 1 }]);
+    const [SelectedTag, setSelectedTag] = useState(0);
+    const [homeTags, setHomeTags] = useState([{ id: 0, label: 'Tudo', icon: infinity, prioridade: 1 }]);
     const touchStartX = useRef(null);
+    const [mangasList, setMangasList] = useState([]);
+    const [recentMangasList, setRecentMangasList] = useState([]);
+    const [topMangasList, setTopMangasList] = useState([]);
+
+    const carouselItems = topMangasList.slice(0, 3);
+
+    // Pegar Os Mangás
+    // Mangás de A-Z
+    useEffect(() => {
+        const fetchMangas = async () => {
+            try {
+                // Quantidade Maxima
+                const MAX_MANGAS = 24;
+                const response = await fetch(`${API_URL}/manga/list?tag=${encodeURIComponent(String(SelectedTag))}&MAX=${MAX_MANGAS}`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Erro ao carregar mangas');
+                setMangasList(Array.isArray(data.manga) ? data.manga : []);
+            } catch (error) {
+                notify.error(error.message || 'Erro ao carregar mangas');
+            }
+        };
+        fetchMangas();
+    }, [SelectedTag]);
+
+    // Mangás Recentes
+    useEffect(() => {
+        const fetchRecentMangas = async () => {
+            try {
+                const MAX_RECENT_MANGAS = 14;
+                const response = await fetch(`${API_URL}/manga/recent?tag=${encodeURIComponent(String(SelectedTag))}&MAX=${MAX_RECENT_MANGAS}`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Erro ao carregar mangas recentes');
+                setRecentMangasList(Array.isArray(data.manga) ? data.manga : []);
+            } catch (error) {
+                notify.error(error.message || 'Erro ao carregar mangas recentes');
+            }
+        };
+        fetchRecentMangas();
+    }, [SelectedTag]);
+
+    // Mangás Mais Populares
+    useEffect(() => {
+        const fetchTopMangas = async () => {
+            try {
+                const MAX_TOP_MANGAS = 24;
+                const response = await fetch(`${API_URL}/manga/top?tag=${encodeURIComponent(String(SelectedTag))}&MAX=${MAX_TOP_MANGAS}`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Erro ao carregar mangas mais populares');
+                setTopMangasList(Array.isArray(data.manga) ? data.manga : []);
+            } catch (error) {
+                notify.error(error.message || 'Erro ao carregar mangas mais populares');
+                setTopMangasList([]);
+            }
+        };
+        fetchTopMangas();
+    }, [SelectedTag]);
+
+    useEffect(() => {
+        if (carouselItems.length === 0) {
+            setActiveIndex(0);
+            return;
+        }
+
+        if (activeIndex >= carouselItems.length) {
+            setActiveIndex(0);
+        }
+    }, [carouselItems.length, activeIndex]);
 
     useEffect(() => {
         const fetchHomeTags = async () => {
@@ -35,9 +112,10 @@ function Home() {
                 }
 
                 const data = await response.json();
-                const sortedTags = (Array.isArray(data) ? data : [])
+                const sortedTags = (Array.isArray(data.tags) ? data.tags : [])
                     .map((tag) => ({
-                        id: tag.slug || tag.name,
+                        id: tag.id,
+                        slug: tag.slug,
                         label: tag.name,
                         icon: tag.icon ? `data:image/svg+xml;utf8,${encodeURIComponent(tag.icon)}` : infinity,
                         prioridade: Number(tag.prioridade) === 1 ? 1 : 0
@@ -46,34 +124,42 @@ function Home() {
 
                 const MAX_HOME_TAGS = 11;
                 setHomeTags([
-                    { id: 'Tudo', label: 'Tudo', icon: infinity, prioridade: 1 },
+                    { id: 0, label: 'Tudo', icon: infinity, prioridade: 1 },
                     ...sortedTags.slice(0, Math.max(0, MAX_HOME_TAGS - 1))
                 ]);
             } catch {
-                setHomeTags([{ id: 'Tudo', label: 'Tudo', icon: infinity, prioridade: 1 }]);
+                setHomeTags([{ id: 0, label: 'Tudo', icon: infinity, prioridade: 1 }]);
             }
         };
 
         fetchHomeTags();
     }, []);
+
     // Mudar slide a cada 3 segundos
     useEffect(() => {
+        const totalSlides = carouselItems.length;
+        if (totalSlides <= 1) return;
+
         const interval = setInterval(() => {
-            setActiveIndex((current) => (current === 2 ? 0 : current + 1));
+            setActiveIndex((current) => ((current + 1) % totalSlides));
         }, 5000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [carouselItems.length]);
 
     const newChaptersRef = useRef(null);
     const newMangasRef = useRef(null);
 
     const nextSlide = () => {
-        setActiveIndex((current) => (current === 2 ? 0 : current + 1));
+        const totalSlides = carouselItems.length;
+        if (totalSlides <= 1) return;
+        setActiveIndex((current) => ((current + 1) % totalSlides));
     };
 
     const prevSlide = () => {
-        setActiveIndex((current) => (current === 0 ? 2 : current - 1));
+        const totalSlides = carouselItems.length;
+        if (totalSlides <= 1) return;
+        setActiveIndex((current) => ((current - 1 + totalSlides) % totalSlides));
     };
 
     const handleCarouselTouchStart = (e) => {
@@ -128,63 +214,33 @@ function Home() {
         <main className="home-content">
             {/* Carrousel de Items de Mangá em destaque*/}
             <div id="carousel" onTouchStart={handleCarouselTouchStart} onTouchEnd={handleCarouselTouchEnd}>
-
-                {/* ITEM 1 - Solo Leveling */}
-                <div className={`carousel-item ${activeIndex === 0 ? 'active' : ''}`}>
-                    <img src="/banner/sololeveling.png" alt="Solo Leveling" />
-                    <div className="carousel-item-info">
-                        <div className="carousel-info-tags">
-                            <div className="info-tag">EM ALTA #1</div>
-                            <div className="info-tag"><img src={star} alt="star" />4.9</div>
-                            <div className="info-tag"><img src={layer} alt="layer" />Chapters: 124</div>
-                            <div className="info-tag"><img src={history} alt="history" />Status: Em Lançamento</div>
+                {carouselItems.length > 0 ? (
+                    carouselItems.map((manga, index) => (
+                        <div key={manga.id || manga.titulo || `carousel-${index}`} className={`carousel-item ${activeIndex === index ? 'active' : ''}`}>
+                            <img src={manga.banner || manga.foto || '/banner/sololeveling.png'} alt={manga.titulo || `Mangá em alta ${index + 1}`} />
+                            <div className="carousel-item-info">
+                                <div className="carousel-info-tags">
+                                    <div className="info-tag">EM ALTA #{index + 1}</div>
+                                    <div className="info-tag"><img src={star} alt="star" />{manga.rating || 'N/A'}</div>
+                                    <div className="info-tag"><img src={layer} alt="layer" />{manga.tipo || 'Tipo'} - {manga.demografia || 'Demografia'}</div>
+                                    <div className="info-tag"><img src={history} alt="history" />Status: {manga.status || 'Em Lançamento'}</div>
+                                </div>
+                                <h2>{manga.titulo || 'Mangá em destaque'}</h2>
+                                <span>{manga.sinopse || 'Confira um dos mangás mais populares do momento na plataforma.'}</span>
+                                <div className="buttonsBox">
+                                    <button className="btn-primary"><img src={openbook} alt="openbook" /> Ler Agora</button>
+                                    <button className="btn-secondary"><img src={bookmark} alt="bookmark" /> Adicionar a Lista</button>
+                                </div>
+                            </div>
                         </div>
-                        <h2>Solo Leveling: Arise from the shadow and the dawn</h2>
-                        <span>Sung Jinwoo, um caçador de rank E, descobre poderes misteriosos após um evento traumático. Agora, ele deve se tornar mais forte para proteger aqueles que ama enquanto desvendar os segredos por trás de seu novo destino.</span>
-                        <div className="buttonsBox">
-                            <button className="btn-primary"><img src={openbook} alt="openbook" /> Ler Agora</button>
-                            <button className="btn-secondary"><img src={bookmark} alt="bookmark" /> Adicionar a Lista</button>
-                        </div>
+                    ))
+                ) : (
+                    <div className="carouselEmptyState mangaEmptyState">
+                        <div className="mangaEmptyIcon">{'(>_<)'}</div>
+                        <h3>Nenhum destaque no momento</h3>
+                        <p>Estamos preparando os mangás em alta. Tente novamente em instantes.</p>
                     </div>
-                </div>
-
-                {/* ITEM 2 - One Piece */}
-                <div className={`carousel-item ${activeIndex === 1 ? 'active' : ''}`}>
-                    <img src="/banner/onepiece.png" alt="One Piece" />
-                    <div className="carousel-item-info">
-                        <div className="carousel-info-tags">
-                            <div className="info-tag">EM ALTA #2</div>
-                            <div className="info-tag"><img src={star} alt="star" />5.0</div>
-                            <div className="info-tag"><img src={layer} alt="layer" />Chapters: 1100+</div>
-                            <div className="info-tag"><img src={history} alt="history" />Status: Em Lançamento</div>
-                        </div>
-                        <h2>One Piece: A Grande Era dos Piratas</h2>
-                        <span>Monkey D. Luffy viaja pelo Grand Line com sua tripulação em busca do tesouro lendário One Piece para se tornar o Rei dos Piratas. Uma jornada épica repleta de batalhas, risadas e momentos emocionantes.</span>
-                        <div className="buttonsBox">
-                            <button className="btn-primary"><img src={openbook} alt="openbook" /> Ler Agora</button>
-                            <button className="btn-secondary"><img src={bookmark} alt="bookmark" /> Adicionar a Lista</button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ITEM 3 - Jujutsu Kaisen */}
-                <div className={`carousel-item ${activeIndex === 2 ? 'active' : ''}`}>
-                    <img src="/banner/jujutsu.png" alt="Jujutsu Kaisen" />
-                    <div className="carousel-item-info">
-                        <div className="carousel-info-tags">
-                            <div className="info-tag">EM ALTA #3</div>
-                            <div className="info-tag"><img src={star} alt="star" />4.8</div>
-                            <div className="info-tag"><img src={layer} alt="layer" />Chapters: 248</div>
-                            <div className="info-tag"><img src={history} alt="history" />Status: Finalizado</div>
-                        </div>
-                        <h2>Jujutsu Kaisen: Batalha de Feiticeiros</h2>
-                        <span>Yuuji Itadori entra no mundo dos Feiticeiros Jujutsu após engolir um dedo amaldiçoado. Agora ele deve reunir os outros fragmentos do demônio Sukuna para proteger a humanidade das maldições.</span>
-                        <div className="buttonsBox">
-                            <button className="btn-primary"><img src={openbook} alt="openbook" /> Ler Agora</button>
-                            <button className="btn-secondary"><img src={bookmark} alt="bookmark" /> Adicionar a Lista</button>
-                        </div>
-                    </div>
-                </div>
+                )}
             </div>
             {/* Seção de Tags Pra todas as Seções Abaixo*/}
             <div className="newTags">
@@ -202,412 +258,105 @@ function Home() {
             {/* Seção de Novos Capitulos */}
             <div className="SectionInfo"><div className='Bar'></div><span className='SectionTitle'>Capitulos Recém-Lançados</span></div>
             <div className="mangaRow" ref={newChaptersRef}>
-                {MangaCard({ manga: {
-                    title: "Solo Leveling",
-                    image: "/manga/sololeveling.png",
-                    genre: "Ação",
-                    genre2: "Fantasia",
-                    rating: "4.9",
-                    views: "1.2M",
-                    lastUpdate: "4h"
-                }})}
-            {MangaCard({ manga: {
-                title: "One Piece",
-                image: "/manga/onepiece.jpg",
-                genre: "Aventura",
-                genre2: "Ação",
-                rating: "5.0",
-                views: "3.5M",
-                lastUpdate: "2h"
-            }})}
-            {MangaCard({ manga: {
-                title: "Jujutsu Kaisen",
-                image: "/manga/jujutsu.jpg",
-                genre: "Ação",
-                genre2: "Sobrenatural",
-                rating: "4.8",
-                views: "2.1M",
-                lastUpdate: "1h"
-            }})}
-            {MangaCard({ manga: {
-                title: "Chainsaw Man",
-                image: "/manga/chainsaw.jpg",
-                genre: "Ação",
-                genre2: "Horror",
-                rating: "4.8",
-                views: "1.8M",
-                lastUpdate: "5h"
-            }})}
-            {MangaCard({ manga: {
-                title: "Black Clover",
-                image: "/manga/blackclover.webp",
-                genre: "Ação",
-                genre2: "Fantasia",
-                rating: "4.7",
-                views: "1.1M",
-                lastUpdate: "3h"
-            }})}
-            {MangaCard({ manga: {
-                title: "My Hero Academia",
-                image: "/manga/myhero.jpg",
-                genre: "Aventura",
-                genre2: "Ação",
-                rating: "4.7",
-                views: "1.5M",
-                lastUpdate: "6h"
-            }})}
-            {MangaCard({ manga: {
-                title: "Demon Slayer",
-                image: "/manga/demon.jpg",
-                genre: "Ação",
-                genre2: "Histórico",
-                rating: "4.9",
-                views: "2.8M",
-                lastUpdate: "8h"
-            }})}
-            {MangaCard({ manga: {
-                title: "Boruto: TBV",
-                image: "/manga/boruto.jpg",
-                genre: "Ação",
-                genre2: "Aventura",
-                rating: "4.6",
-                views: "900K",
-                lastUpdate: "7h"
-            }})}
-            {MangaCard({ manga: {
-                title: "Dragon Ball Super",
-                image: "/manga/dragonball.jpg",
-                genre: "Ação",
-                genre2: "Sci-fi",
-                rating: "4.5",
-                views: "1.2M",
-                lastUpdate: "4h"
-            }})}
-            {MangaCard({ manga: {
-                title: "Oshi no Ko",
-                image: "/manga/oshinoko.webp",
-                genre: "Drama",
-                genre2: "Sobrenatural",
-                rating: "4.9",
-                views: "950K",
-                lastUpdate: "9h"
-            }})}
+                <div className="mangaEmptyState mangaEmptyStateRow">
+                    <div className="mangaEmptyIcon">{'(>_<)'}</div>
+                    <h3>Em breve</h3>
+                    <p>Estamos preparando os capítulos recém-lançados para esta seção.</p>
+                </div>
+            </div>
+            {/* Seção de Mangás em alta */}
+            <div className="SectionInfo"><div className='Bar'></div><span className='SectionTitle'>Mangás em Alta</span></div>
+            <div className="mangaRow" ref={newChaptersRef}>
+                {topMangasList.length > 0 ? (
+                    topMangasList.map((manga) => (
+                        <MangaCard
+                            key={manga.id}
+                            manga={{
+                                title: manga.titulo,
+                                image: manga.foto,
+                                genre: manga.tipo,
+                                genre2: manga.demografia,
+                                rating: manga.rating || 'N/A',
+                                views: manga.views ?? 0,
+                                lastUpdate: formatRelativeTimeShort(manga.created_at)
+                            }}
+                        />
+                    ))
+                ) : (
+                    <div className="mangaEmptyState mangaEmptyStateRow">
+                        <div className="mangaEmptyIcon">{'(>_<)'}</div>
+                        <h3>Nenhum mangá encontrado</h3>
+                        <p>Não encontramos resultados para esse filtro. Tente outra tag ou volte para "Tudo".</p>
+                        {SelectedTag !== 0 && (
+                            <button type="button" onClick={() => setSelectedTag(0)}>
+                                Ver Todos os Mangás
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
             {/* Seção de Novos Mangás */}
             <div className="SectionInfo"><div className='Bar'></div><span className='SectionTitle'>Novos Mangás</span></div>
             <div className="mangaRow" ref={newMangasRef}>
-                {MangaCard({ manga: {
-                    title: "Kagurabachi",
-                    image: "/manga/kagurabachi.jpg",
-                    genre: "Ação",
-                    genre2: "Sobrenatural",
-                    rating: "4.8",
-                    views: "800K",
-                    lastUpdate: "3d"
-                }})}
-            {MangaCard({ manga: {
-                title: "Kaiju No. 8",
-                image: "/manga/kaiju.jpg",
-                genre: "Ação",
-                genre2: "Sci-fi",
-                rating: "4.7",
-                views: "1.2M",
-                lastUpdate: "1d"
-            }})}
-            {MangaCard({ manga: {
-                title: "Sakamoto Days",
-                image: "/manga/sakamoto.jpg",
-                genre: "Ação",
-                genre2: "Comédia",
-                rating: "4.9",
-                views: "700K",
-                lastUpdate: "2d"
-            }})}
-            {MangaCard({ manga: {
-                title: "Dandadan",
-                image: "/manga/dandadan.jpg",
-                genre: "Ação",
-                genre2: "Sobrenatural",
-                rating: "4.9",
-                views: "1.1M",
-                lastUpdate: "4d"
-            }})}
-            {MangaCard({ manga: {
-                title: "Blue Lock",
-                image: "/manga/bluelock.jpg",
-                genre: "Esportes",
-                genre2: "Ação",
-                rating: "4.8",
-                views: "2.5M",
-                lastUpdate: "5d"
-            }})}
-            {MangaCard({ manga: {
-                title: "Frieren",
-                image: "/manga/frieren.webp",
-                genre: "Fantasia",
-                genre2: "Aventura",
-                rating: "5.0",
-                views: "3.2M",
-                lastUpdate: "6d"
-            }})}
-            {MangaCard({ manga: {
-                title: "Mashle",
-                image: "/manga/mashle.jpg",
-                genre: "Comédia",
-                genre2: "Fantasia",
-                rating: "4.6",
-                views: "1.5M",
-                lastUpdate: "7d"
-            }})}
-            {MangaCard({ manga: {
-                title: "One Punch Man",
-                image: "/manga/onepunch.jpg",
-                genre: "Ação",
-                genre2: "Sobrenatural",
-                rating: "4.8",
-                views: "900K",
-                lastUpdate: "1w"
-            }})}
-            {MangaCard({ manga: {
-                title: "Mushoku Tensei",
-                image: "/manga/mushoku.jpg",
-                genre: "Ação",
-                genre2: "Aventura",
-                rating: "5.0",
-                views: "200B",
-                lastUpdate: "1w"
-            }})}
-            {MangaCard({ manga: {
-                title: "Gachiakuta",
-                image: "/manga/gachiakuta.jpg",
-                genre: "Ação",
-                genre2: "Fantasia",
-                rating: "4.8",
-                views: "450K",
-                lastUpdate: "2w"
-            }})}
+                {recentMangasList.length > 0 ? (
+                    recentMangasList.map((manga) => (
+                        <MangaCard
+                            key={manga.id}
+                            manga={{
+                                title: manga.titulo,
+                                image: manga.foto,
+                                genre: manga.tipo,
+                                genre2: manga.demografia,
+                                rating: manga.rating || 'N/A',
+                                views: manga.views ?? 0,
+                                lastUpdate: formatRelativeTimeShort(manga.created_at)
+                            }}
+                        />
+                    ))
+                ) : (
+                    <div className="mangaEmptyState mangaEmptyStateRow">
+                        <div className="mangaEmptyIcon">{'(>_<)'}</div>
+                        <h3>Nenhum mangá encontrado</h3>
+                        <p>Não encontramos resultados para esse filtro. Tente outra tag ou volte para "Tudo".</p>
+                        {SelectedTag !== 0 && (
+                            <button type="button" onClick={() => setSelectedTag(0)}>
+                                Ver Todos os Mangás
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
             {/* Seção de Descubra mais com tudo */}
             <div className="SectionInfo"><div className='Bar'></div><span className='SectionTitle'>Descubra Mais</span></div>
             <div className='mangaGrid'>
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Solo Leveling",
-                    image: "/manga/sololeveling.png",
-                    genre: "Ação",
-                    genre2: "Fantasia",
-                    rating: "4.9",
-                    views: "1.2M",
-                    lastUpdate: "4h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "One Piece",
-                    image: "/manga/onepiece.jpg",
-                    genre: "Aventura",
-                    genre2: "Ação",
-                    rating: "5.0",
-                    views: "3.5M",
-                    lastUpdate: "2h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Jujutsu Kaisen",
-                    image: "/manga/jujutsu.jpg",
-                    genre: "Ação",
-                    genre2: "Sobrenatural",
-                    rating: "4.8",
-                    views: "2.1M",
-                    lastUpdate: "1h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Chainsaw Man",
-                    image: "/manga/chainsaw.jpg",
-                    genre: "Ação",
-                    genre2: "Horror",
-                    rating: "4.8",
-                    views: "1.8M",
-                    lastUpdate: "5h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Black Clover",
-                    image: "/manga/blackclover.webp",
-                    genre: "Ação",
-                    genre2: "Fantasia",
-                    rating: "4.7",
-                    views: "1.1M",
-                    lastUpdate: "3h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "My Hero Academia",
-                    image: "/manga/myhero.jpg",
-                    genre: "Aventura",
-                    genre2: "Ação",
-                    rating: "4.7",
-                    views: "1.5M",
-                    lastUpdate: "6h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Demon Slayer",
-                    image: "/manga/demon.jpg",
-                    genre: "Ação",
-                    genre2: "Histórico",
-                    rating: "4.9",
-                    views: "2.8M",
-                    lastUpdate: "8h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Boruto: TBV",
-                    image: "/manga/boruto.jpg",
-                    genre: "Ação",
-                    genre2: "Aventura",
-                    rating: "4.6",
-                    views: "900K",
-                    lastUpdate: "7h"
-                }})}
-                {/* Linha 2 */}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Dragon Ball Super",
-                    image: "/manga/dragonball.jpg",
-                    genre: "Ação",
-                    genre2: "Sci-fi",
-                    rating: "4.5",
-                    views: "1.2M",
-                    lastUpdate: "4h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Oshi no Ko",
-                    image: "/manga/oshinoko.webp",
-                    genre: "Drama",
-                    genre2: "Sobrenatural",
-                    rating: "4.9",
-                    views: "950K",
-                    lastUpdate: "9h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Kagurabachi",
-                    image: "/manga/kagurabachi.jpg",
-                    genre: "Ação",
-                    genre2: "Sobrenatural",
-                    rating: "4.8",
-                    views: "800K",
-                    lastUpdate: "3d"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Kaiju No. 8",
-                    image: "/manga/kaiju.jpg",
-                    genre: "Ação",
-                    genre2: "Sci-fi",
-                    rating: "4.7",
-                    views: "1.2M",
-                    lastUpdate: "1d"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Sakamoto Days",
-                    image: "/manga/sakamoto.jpg",
-                    genre: "Ação",
-                    genre2: "Comédia",
-                    rating: "4.9",
-                    views: "700K",
-                    lastUpdate: "2d"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Dandadan",
-                    image: "/manga/dandadan.jpg",
-                    genre: "Ação",
-                    genre2: "Sobrenatural",
-                    rating: "4.9",
-                    views: "1.1M",
-                    lastUpdate: "4d"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Blue Lock",
-                    image: "/manga/bluelock.jpg",
-                    genre: "Esportes",
-                    genre2: "Ação",
-                    rating: "4.8",
-                    views: "2.5M",
-                    lastUpdate: "5d"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Frieren",
-                    image: "/manga/frieren.webp",
-                    genre: "Fantasia",
-                    genre2: "Aventura",
-                    rating: "5.0",
-                    views: "3.2M",
-                    lastUpdate: "6d"
-                }})}
-                {/* Linha 3 */}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Mashle",
-                    image: "/manga/mashle.jpg",
-                    genre: "Comédia",
-                    genre2: "Fantasia",
-                    rating: "4.6",
-                    views: "1.5M",
-                    lastUpdate: "7d"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "One Punch Man",
-                    image: "/manga/onepunch.jpg",
-                    genre: "Ação",
-                    genre2: "Sobrenatural",
-                    rating: "4.8",
-                    views: "900K",
-                    lastUpdate: "1w"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Mushoku Tensei",
-                    image: "/manga/mushoku.jpg",
-                    genre: "Ação",
-                    genre2: "Aventura",
-                    rating: "5.0",
-                    views: "200B",
-                    lastUpdate: "1w"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Gachiakuta",
-                    image: "/manga/gachiakuta.jpg",
-                    genre: "Ação",
-                    genre2: "Fantasia",
-                    rating: "4.8",
-                    views: "450K",
-                    lastUpdate: "2w"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Solo Leveling",
-                    image: "/manga/sololeveling.png",
-                    genre: "Ação",
-                    genre2: "Fantasia",
-                    rating: "4.9",
-                    views: "1.2M",
-                    lastUpdate: "1d"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "One Piece",
-                    image: "/manga/onepiece.jpg",
-                    genre: "Aventura",
-                    genre2: "Ação",
-                    rating: "5.0",
-                    views: "3.5M",
-                    lastUpdate: "3h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Jujutsu Kaisen",
-                    image: "/manga/jujutsu.jpg",
-                    genre: "Ação",
-                    genre2: "Sobrenatural",
-                    rating: "4.8",
-                    views: "2.1M",
-                    lastUpdate: "2h"
-                }})}
-                {MangaCard({ isGrid: true, manga: {
-                    title: "Chainsaw Man",
-                    image: "/manga/chainsaw.jpg",
-                    genre: "Ação",
-                    genre2: "Horror",
-                    rating: "4.8",
-                    views: "1.8M",
-                    lastUpdate: "6h"
-                }})}
+                {mangasList.length > 0 ? (
+                    mangasList.map((manga) => (
+                        <MangaCard
+                            key={manga.id}
+                            manga={{
+                                title: manga.titulo,
+                                image: manga.foto,
+                                genre: manga.tipo,
+                                genre2: manga.demografia,
+                                rating: manga.rating || 'N/A',
+                                views: manga.views ?? 0,
+                                lastUpdate: formatRelativeTimeShort(manga.created_at)
+                            }}
+                            isGrid
+                        />
+                    ))
+                ) : (
+                    <div className="mangaEmptyState">
+                        <div className="mangaEmptyIcon">{'(>_<)'}</div>
+                        <h3>Nenhum mangá encontrado</h3>
+                        <p>Não encontramos resultados para esse filtro. Tente outra tag ou volte para "Tudo".</p>
+                        {SelectedTag !== 0 && (
+                            <button type="button" onClick={() => setSelectedTag(0)}>
+                                Ver Todos os Mangás
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
             <div className="mangaGridSeeAll">
                 <button>Ver Todos</button>

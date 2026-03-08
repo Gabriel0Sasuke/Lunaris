@@ -4,7 +4,6 @@ const Router = express.Router();
 const authMiddleware = require('../middleware/auth.middleware');
 const authController = require('../controllers/auth.controller');
 
-
 // Cadastro
 Router.post('/cadastro', authController.cadastro);
 

@@ -81,8 +81,8 @@ function AddManga({ onManageTags }) {
                     throw new Error('Erro ao buscar tags.');
                 }
                 const responseData = await resposta.json();
-                const tagsArray = Array.isArray(responseData)
-                    ? responseData
+                const tagsArray = Array.isArray(responseData.tags)
+                    ? responseData.tags
                     : Array.isArray(responseData?.tag)
                         ? responseData.tag
                         : [];

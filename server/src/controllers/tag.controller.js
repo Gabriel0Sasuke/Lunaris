@@ -13,7 +13,7 @@ const normalizeSlug = (value) => value
 const listTags = async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT id, name, slug, icon, prioridade FROM tags ORDER BY prioridade DESC, name ASC');
-        res.json(rows);
+        res.status(200).json( { tags: rows } );
     } catch (err) {
         console.error('Erro listTags:', err.message);
         res.status(500).json({ message: 'Erro Interno do Servidor' });

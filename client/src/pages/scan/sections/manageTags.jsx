@@ -36,7 +36,9 @@ function ManageTags() {
             }
 
             const data = await response.json();
-            const tagsArray = Array.isArray(data) ? data : [];
+            const tagsArray = Array.isArray(data?.tags)
+                ? data.tags
+                : (Array.isArray(data) ? data : []);
             setTags(tagsArray);
         } catch (error) {
             notify.error(error.message || 'Erro ao carregar tags.');

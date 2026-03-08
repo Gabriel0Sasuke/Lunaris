@@ -14,6 +14,12 @@ const uploadFields = upload.fields([
 // Rota para listar todas as mangas
 Router.get('/list', mangaController.getAllMangas);
 
+// Rota para listar mangas com mais views
+Router.get('/top', mangaController.getTopMangas);
+
+// Rota para listar mangas mais recentes
+Router.get('/recent', mangaController.getRecentMangas);
+
 // Rota para criar um novo mangá
 Router.post('/create', ScanMiddleware, uploadFields, mangaController.CreateManga);
 

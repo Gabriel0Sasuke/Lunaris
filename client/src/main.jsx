@@ -5,8 +5,11 @@ import App from './App.jsx'
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from './context/AuthContext.jsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { registerSW } from 'virtual:pwa-register';
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+registerSW({ immediate: true });
 
 function GlobalAssetGuard() {
   useEffect(() => {
