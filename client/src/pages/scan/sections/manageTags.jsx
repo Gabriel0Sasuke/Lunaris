@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import './ScanSections.css';
+import './Scansections.css';
 import { API_URL } from '../../../services/api';
 import { notify } from '../../../services/notify';
 import description from '../../../assets/ui/description.svg';
