@@ -9,7 +9,7 @@ import { API_URL } from '../../../services/api';
 import photo from '../../../assets/ui/photo.svg';
 import panorama from '../../../assets/ui/panorama.svg';
 import photoAdd from '../../../assets/ui/photoAdd.svg';
-import openBook from '../../../assets/ui/openBook.svg';
+import openBook from '../../../assets/ui/openbook.svg';
 import description from '../../../assets/ui/description.svg';
 import trash from '../../../assets/ui/trash.svg';
 import list from '../../../assets/ui/list.svg';
