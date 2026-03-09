@@ -47,6 +47,20 @@ body{
   min-height: 100vh;
 }
 
+img,
+svg {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.no-context-menu {
+  -webkit-touch-callout: none;
+}
+
+.no-drag {
+  -webkit-user-drag: none;
+}
+
 /* Background Blobs (New) */
 body::before, body::after {
   content: '';

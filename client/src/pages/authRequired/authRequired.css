@@ -1,0 +1,108 @@
+.authRequired-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 80vh;
+    text-align: center;
+}
+
+.AR401 {
+    margin-top: 10vh;
+    font-size: 8rem;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--primary, #1337ec), #091b72);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-emphasis-color: transparent;
+    text-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+}
+
+.ARDiv {
+    padding: 30px;
+    width: 25vw;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+}
+
+.ARDiv h2 {
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.ARDiv span {
+    font-size: 0.9rem;
+    color: #b8b8b8;
+}
+
+.ARDiv button {
+    display: flex;
+    flex-direction: row;
+    padding: 15px 20px;
+    border: none;
+    background-color: #2563eb;
+    color: #fff;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.ARDiv button img {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    filter: brightness(0) saturate(100%) invert(100%);
+}
+
+.ARDiv button:hover {
+    background-color: #1e40af;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
+}
+
+.authCadastroText {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #8f8f8f;
+}
+
+.authCadastroText a {
+    color: #8f8f8f;
+    text-decoration: none;
+}
+
+.authCadastroText a:hover {
+    color: #a3a3a3;
+}
+
+@media (max-width: 1024px) {
+    .AR401 {
+        font-size: 6rem;
+    }
+
+    .ARDiv {
+        width: 50vw;
+    }
+}
+
+@media (max-width: 768px) {
+    .AR401 {
+        font-size: 8rem;
+    }
+
+    .ARDiv {
+        width: 90vw;
+        min-width: unset;
+        padding: 30px 20px;
+    }
+}

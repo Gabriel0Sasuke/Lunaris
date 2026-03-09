@@ -8,23 +8,17 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const verificarUsuario = async () => {
-    let resultado = null;
     try {
       const resposta = await fetch(`${API_URL}/auth/me`, { credentials: 'include' });
       if (resposta.ok) {
         const data = await resposta.json();
         setUsuario(data.user);
-        resultado = data.user;
       } else {
-        const data = await resposta.json();
-        console.error('Erro na verificação:', data.message);
         setUsuario(null);
       }
-    } catch (error) {
-      console.error('Erro na requisição:', error);
+    } catch {
       setUsuario(null);
     } finally {
-      console.log("Verificação de usuário concluída.", resultado);
       setLoading(false);
     }
   };

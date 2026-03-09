@@ -4,7 +4,6 @@ const Router = express.Router();
 const authMiddleware = require('../middleware/auth.middleware');
 const authController = require('../controllers/auth.controller');
 
-
 // Cadastro
 Router.post('/cadastro', authController.cadastro);
 
@@ -17,4 +16,9 @@ Router.get('/me', authMiddleware, authController.verificacao);
 // Logout
 Router.get('/logout', authController.logout);
 
+//Google
+Router.post('/google', authController.google);
+
+//Verificar se ta online
+Router.post('/online', authMiddleware, authController.online);
 module.exports = Router;
