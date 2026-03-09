@@ -26,7 +26,7 @@ const cadastro = async (req, res) => {
             }
     
           } else {
-            return res.status(500).json({ message: 'Erro ao cadastrar usuário' + error.message });
+            return res.status(500).json({ message: 'Erro ao cadastrar usuário'});
           }
         }
       } else {
@@ -64,7 +64,7 @@ const login = async (req, res) => {
             }
           }
         } catch (error) {
-          return res.status(500).json({ message: 'Erro ao fazer login' + error.message });
+          return res.status(500).json({ message: 'Erro ao fazer login'});
         }
       } else {
         return res.status(400).json({ message: 'Dados incompletos' });
@@ -78,7 +78,7 @@ const verificacao = async (req, res) => {
   try{
     const [rows] = await pool.query(query, [userId]);
     if(rows.length === 0){
-      return res.status(404).json({ message: 'Usuário não encontrado' });
+      return res.status(404).json({ message: 'Usuário não encontrado'});
     }else{
       const user = rows[0];
       if(user.ativa){
@@ -89,7 +89,7 @@ const verificacao = async (req, res) => {
       }
     }
   }catch (error) {
-    return res.status(500).json({ message: 'Erro ao verificar usuário' + error.message });
+    return res.status(500).json({ message: 'Erro ao verificar usuário'});
   }
 }
 // Logout
@@ -102,7 +102,7 @@ const logout = async (req, res) => {
     });
   return res.status(200).json({ message: 'Logout realizado com sucesso' });
   }catch (error) {    
-    return res.status(500).json({ message: 'Erro ao fazer logout' + error.message });
+    return res.status(500).json({ message: 'Erro ao fazer logout'});
   }
 }
 // Google

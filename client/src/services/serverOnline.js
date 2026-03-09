@@ -1,6 +1,8 @@
+import { API_URL } from "./api";
+
 async function CheckOnline() {
     try{
-        const resposta = await fetch('http://localhost:3000/system/online')
+        const resposta = await fetch(`${API_URL}/system/online`)
         if(resposta.ok){
         return true;
     }else{

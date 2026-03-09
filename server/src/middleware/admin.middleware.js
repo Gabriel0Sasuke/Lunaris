@@ -27,7 +27,7 @@ const AdminMiddleware = async (req, res, next) => {
             console.error('Erro AdminMiddleware:', err.message);
             return res.status(500).json({ message: 'Erro Interno do Servidor' });
         }
-        // Verificar se o usuário tem a role 'admin' ou 'scan'
+        // Verificar se o usuário tem a role 'admin'
     }catch (err) {
         return res.status(401).json({ message: 'Não Autorizado: Token Inválido' });
     }
