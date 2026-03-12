@@ -12,13 +12,14 @@ const normalizeSlug = (value) => value
 
 const listTags = async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT id, name, slug, icon, prioridade FROM tags ORDER BY prioridade DESC, name ASC');
-        res.status(200).json( { tags: rows } );
+        const { rows } = await pool.query('SELECT id, name, slug, icon, prioridade FROM tags ORDER BY prioridade DESC, name ASC');
+        return res.status(200).json({ tags: rows });
     } catch (err) {
         console.error('Erro listTags:', err.message);
-        res.status(500).json({ message: 'Erro Interno do Servidor' });
+        return res.status(500).json({ message: 'Erro Interno do Servidor' });
     }
 };
+
 const addTag = async (req, res) => {
     const name = req.body?.name?.trim();
     const rawSlug = req.body?.slug?.trim();
@@ -37,16 +38,16 @@ const addTag = async (req, res) => {
         return res.status(400).json({ message: 'O ícone deve ser um SVG válido' });
     }
 
-    const query = 'INSERT INTO tags (name, slug, icon) VALUES (?, ?, ?)';
+    const query = 'INSERT INTO tags (name, slug, icon) VALUES ($1, $2, $3) RETURNING id';
     try {
-        const [result] = await pool.query(query, [name, slug, icon]);
-        res.status(201).json({ message: 'Tag adicionada com sucesso', tag: { id: result.insertId, name, slug, icon } });
+        const { rows } = await pool.query(query, [name, slug, icon]);
+        return res.status(201).json({ message: 'Tag adicionada com sucesso', tag: { id: rows[0].id, name, slug, icon } });
     } catch (err) {
-        if (err && err.code === 'ER_DUP_ENTRY') {
+        if (err && err.code === '23505') {
             return res.status(409).json({ message: 'Já existe uma tag com esse nome ou slug' });
         }
         console.error('Erro addTag:', err.message);
-        res.status(500).json({ message: 'Erro Interno do Servidor' });
+        return res.status(500).json({ message: 'Erro Interno do Servidor' });
     }
 }
 
