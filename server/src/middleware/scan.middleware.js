@@ -12,9 +12,9 @@ const ScanMiddleware = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         const id = decoded.id;
-        const query = "SELECT account_type FROM usuario WHERE id = ?";
+        const query = "SELECT account_type FROM usuario WHERE id = $1";
         try{
-            const [rows] = await pool.query(query, [id]);
+            const { rows } = await pool.query(query, [id]);
             if(rows.length === 0){
                 return res.status(401).json({ message: 'Não Autorizado: Usuário Não Encontrado' });
             }

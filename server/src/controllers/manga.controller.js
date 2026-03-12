@@ -35,117 +35,78 @@ const parseTagInput = (value) => {
     }
     return [value];
 };
-// Rota para obter todos os mangás
-const getAllMangas = async (req, res) => {
-    const selectedTag = req.query.tag ?? 0;
-    const maxValue = Number(req.query.MAX ?? 0);
 
+const buildMangaListQuery = (orderBy, hasLimit) => `
+    SELECT J.*, COALESCE(STRING_AGG(DISTINCT TA.name, '||' ORDER BY TA.name), '') AS tag_names
+    FROM manga J
+    JOIN manga_tags MT_FILTER ON J.id = MT_FILTER.manga_id
+    JOIN tags T_FILTER ON MT_FILTER.tag_id = T_FILTER.id
+    LEFT JOIN manga_tags MT_ALL ON J.id = MT_ALL.manga_id
+    LEFT JOIN tags TA ON MT_ALL.tag_id = TA.id
+    WHERE ($1::int = 1 OR T_FILTER.id = $2)
+    GROUP BY J.id
+    ORDER BY ${orderBy}
+    ${hasLimit ? 'LIMIT $3' : ''}
+`;
+
+const fetchMangaList = async (res, { selectedTag, maxValue, orderBy }) => {
     const isAllTags = String(selectedTag) === 'Tudo' || Number(selectedTag) === 0;
     const selectedTagId = Number(selectedTag);
 
     if (!isAllTags && (!Number.isInteger(selectedTagId) || selectedTagId <= 0)) {
         return res.status(400).json({ message: 'Tag inválida. Envie um ID numérico maior que 0 ou 0 para todas.' });
     }
+
     if (!Number.isInteger(maxValue) || maxValue < 0) {
         return res.status(400).json({ message: 'Valor de MAX inválido. Envie um número inteiro maior que 0 ou 0 para sem limite.' });
     }
 
-    const query = `
-        SELECT J.*, GROUP_CONCAT(DISTINCT TA.name ORDER BY TA.name SEPARATOR '||') AS tag_names
-        FROM manga J
-        JOIN manga_tags MT_FILTER ON J.id = MT_FILTER.manga_id
-        JOIN tags T_FILTER ON MT_FILTER.tag_id = T_FILTER.id
-        LEFT JOIN manga_tags MT_ALL ON J.id = MT_ALL.manga_id
-        LEFT JOIN tags TA ON MT_ALL.tag_id = TA.id
-        WHERE (? = 1 OR T_FILTER.id = ?)
-        GROUP BY J.id
-        ORDER BY J.titulo ASC
-        ${maxValue > 0 ? 'LIMIT ?' : ''}
-    `;
+    const hasLimit = maxValue > 0;
+    const query = buildMangaListQuery(orderBy, hasLimit);
+    const queryParams = [isAllTags ? 1 : 0, isAllTags ? 0 : selectedTagId];
+    if (hasLimit) queryParams.push(maxValue);
 
+    const { rows } = await pool.query(query, queryParams);
+    return res.status(200).json({ manga: rows });
+};
+// Rota para obter todos os mangás
+const getAllMangas = async (req, res) => {
     try {
-        const queryParams = [isAllTags ? 1 : 0, isAllTags ? 0 : selectedTagId];
-        if (maxValue > 0) queryParams.push(maxValue);
-        const [rows] = await pool.query(query, queryParams);
-        res.status(200).json({ manga: rows });
+        return await fetchMangaList(res, {
+            selectedTag: req.query.tag ?? 0,
+            maxValue: Number(req.query.MAX ?? 0),
+            orderBy: 'J.titulo ASC'
+        });
     } catch (error) {
         console.error('Error fetching mangas:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
 // Rota para obter mangás com mais views
 const getTopMangas = async (req, res) => {
-    const selectedTag = req.query.tag ?? 0;
-    const maxValue = Number(req.query.MAX ?? 0);
-    const isAllTags = String(selectedTag) === 'Tudo' || Number(selectedTag) === 0;
-    const selectedTagId = Number(selectedTag);
-
-    if (!isAllTags && (!Number.isInteger(selectedTagId) || selectedTagId <= 0)) {
-        return res.status(400).json({ message: 'Tag inválida. Envie um ID numérico maior que 0 ou 0 para todas.' });
-    }
-    if (!Number.isInteger(maxValue) || maxValue < 0) {
-        return res.status(400).json({ message: 'Valor de MAX inválido. Envie um número inteiro maior que 0 ou 0 para sem limite.' });
-    }
-
-    const query = `
-        SELECT J.*, GROUP_CONCAT(DISTINCT TA.name ORDER BY TA.name SEPARATOR '||') AS tag_names
-        FROM manga J
-        JOIN manga_tags MT_FILTER ON J.id = MT_FILTER.manga_id
-        JOIN tags T_FILTER ON MT_FILTER.tag_id = T_FILTER.id
-        LEFT JOIN manga_tags MT_ALL ON J.id = MT_ALL.manga_id
-        LEFT JOIN tags TA ON MT_ALL.tag_id = TA.id
-        WHERE (? = 1 OR T_FILTER.id = ?)
-        GROUP BY J.id
-        ORDER BY J.views DESC
-        ${maxValue > 0 ? 'LIMIT ?' : ''}
-    `;
-
     try {
-        const queryParams = [isAllTags ? 1 : 0, isAllTags ? 0 : selectedTagId];
-        if (maxValue > 0) queryParams.push(maxValue);
-        const [rows] = await pool.query(query, queryParams);
-        res.status(200).json({ manga: rows });
+        return await fetchMangaList(res, {
+            selectedTag: req.query.tag ?? 0,
+            maxValue: Number(req.query.MAX ?? 0),
+            orderBy: 'J.views DESC'
+        });
     } catch (error) {
         console.error('Error fetching top mangas:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
 
 // Rota para obter os mangás mais recentes
 const getRecentMangas = async (req, res) => {
-    const selectedTag = req.query.tag ?? 0;
-    const maxValue = Number(req.query.MAX ?? 0);
-    const isAllTags = String(selectedTag) === 'Tudo' || Number(selectedTag) === 0;
-    const selectedTagId = Number(selectedTag);
-
-    if (!isAllTags && (!Number.isInteger(selectedTagId) || selectedTagId <= 0)) {
-        return res.status(400).json({ message: 'Tag inválida. Envie um ID numérico maior que 0 ou 0 para todas.' });
-    }
-    if (!Number.isInteger(maxValue) || maxValue < 0) {
-        return res.status(400).json({ message: 'Valor de MAX inválido. Envie um número inteiro maior que 0 ou 0 para sem limite.' });
-    }
-
-    const query = `
-        SELECT J.*, GROUP_CONCAT(DISTINCT TA.name ORDER BY TA.name SEPARATOR '||') AS tag_names
-        FROM manga J
-        JOIN manga_tags MT_FILTER ON J.id = MT_FILTER.manga_id
-        JOIN tags T_FILTER ON MT_FILTER.tag_id = T_FILTER.id
-        LEFT JOIN manga_tags MT_ALL ON J.id = MT_ALL.manga_id
-        LEFT JOIN tags TA ON MT_ALL.tag_id = TA.id
-        WHERE (? = 1 OR T_FILTER.id = ?)
-        GROUP BY J.id
-        ORDER BY J.created_at DESC
-        ${maxValue > 0 ? 'LIMIT ?' : ''}
-    `;
-
     try {
-        const queryParams = [isAllTags ? 1 : 0, isAllTags ? 0 : selectedTagId];
-        if (maxValue > 0) queryParams.push(maxValue);
-        const [rows] = await pool.query(query, queryParams);
-        res.status(200).json({ manga: rows });
+        return await fetchMangaList(res, {
+            selectedTag: req.query.tag ?? 0,
+            maxValue: Number(req.query.MAX ?? 0),
+            orderBy: 'J.created_at DESC'
+        });
     } catch (error) {
         console.error('Error fetching recent mangas:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
 
@@ -186,10 +147,10 @@ const CreateManga = async (req, res) => {
         return res.status(500).json({ message: 'Configuração do bucket incompleta (R2_BUCKET_NAME/R2_BASE_URL)' });
     }
 
-    let connection;
-    try{
-        connection = await pool.getConnection();
-        await connection.beginTransaction();
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
         await Promise.all([
             r2.send(new PutObjectCommand({
                 Bucket: bucketName,
@@ -207,41 +168,43 @@ const CreateManga = async (req, res) => {
         const bannerUrl = buildObjectUrl(r2BaseUrl, bannerKey);
         const coverUrl = buildObjectUrl(r2BaseUrl, coverKey);
 
-
-        const query = "INSERT INTO manga (titulo, sinopse, tipo, demografia, releasedate, status, autor, artista, banner, foto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const query = "INSERT INTO manga (titulo, sinopse, tipo, demografia, releasedate, status, autor, artista, banner, foto) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id";
         const values = [title, synopsis, type, demographic, releaseDate, status, author, artist, bannerUrl, coverUrl];
-        const [result] = await connection.query(query, values);
-        const mangaId = result.insertId;
+        const { rows: mangaRows } = await client.query(query, values);
+        const mangaId = mangaRows[0]?.id;
 
-        const [existingTags] = await connection.query('SELECT id FROM tags WHERE id IN (?)', [tagIds]);
+        const { rows: existingTags } = await client.query('SELECT id FROM tags WHERE id = ANY($1::int[])', [tagIds]);
         if (existingTags.length !== tagIds.length) {
-            await connection.rollback();
+            await client.query('ROLLBACK');
             return res.status(400).json({ message: 'Uma ou mais tags informadas não existem' });
         }
 
-        const tagValues = tagIds.map((tagId) => [mangaId, tagId]);
-        const tagQuery = 'INSERT INTO manga_tags (manga_id, tag_id) VALUES ?';
-        await connection.query(tagQuery, [tagValues]);
-        await connection.commit();
+        const valuesFlat = [];
+        const placeholders = tagIds.map((tagId, index) => {
+            const base = index * 2;
+            valuesFlat.push(mangaId, tagId);
+            return `($${base + 1}, $${base + 2})`;
+        }).join(', ');
+
+        await client.query(`INSERT INTO manga_tags (manga_id, tag_id) VALUES ${placeholders}`, valuesFlat);
+        await client.query('COMMIT');
         return res.status(201).json({ message: 'Mangá criado com sucesso' });
-    }catch (err) {
-    // 1. Desfaz alterações no banco
-    if (connection) await connection.rollback();
+    } catch (err) {
+        if (client) await client.query('ROLLBACK');
 
-    // 2. Tenta limpar o R2 em paralelo (sem travar se a limpeza falhar)
-    try {
-        await Promise.all([
-            r2.send(new DeleteObjectCommand({ Bucket: bucketName, Key: bannerKey })),
-            r2.send(new DeleteObjectCommand({ Bucket: bucketName, Key: coverKey }))
-        ]);
-    } catch (deleteError) {
-        console.error('Erro ao limpar arquivos no R2:', deleteError);
-    }
+        try {
+            await Promise.all([
+                r2.send(new DeleteObjectCommand({ Bucket: bucketName, Key: bannerKey })),
+                r2.send(new DeleteObjectCommand({ Bucket: bucketName, Key: coverKey }))
+            ]);
+        } catch (deleteError) {
+            console.error('Erro ao limpar arquivos no R2:', deleteError);
+        }
 
-    console.error('Erro geral no CreateManga:', err);
-    return res.status(500).json({ message: 'Erro ao criar o mangá' });
-}finally{
-        if(connection) connection.release();
+        console.error('Erro geral no CreateManga:', err);
+        return res.status(500).json({ message: 'Erro ao criar o mangá' });
+    } finally {
+        if (client) client.release();
     }
 }
 module.exports = {
