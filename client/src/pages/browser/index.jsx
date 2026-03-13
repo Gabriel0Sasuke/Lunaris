@@ -26,9 +26,36 @@ function Browser() {
     const [tags, setTags] = useState([{ id: 0, label: 'Tudo', icon: infinity, prioridade: 1 }]);
     const [mangas, setMangas] = useState([]);
     const [RankBy, setRankBy] = useState('A-Z');
-    const [Type, setType] = useState('Todos');
-    const [Status, setStatus] = useState('Todos');
+    const [Type, setType] = useState('all');
+    const [Status, setStatus] = useState('all');
 
+    // Pegar Os Mangás
+    const fetchMangas = async () => {
+            const tagParam = SelectedTag > 0 ? encodeURIComponent(String(SelectedTag)) : '';
+            try{
+                const response = await fetch(`${API_URL}/manga/list${tagParam ? `?tag=${tagParam}&` : '?'}orderby=${RankBy}&type=${Type}&status=${Status}&search=${encodeURIComponent(searchTerm.trim())}`, {
+                    credentials: 'include'
+                });
+            const MangasData = await response.json();
+            setMangas(Array.isArray(MangasData.manga) ? MangasData.manga : []);
+            } catch (error) {
+                notify.error('Erro ao carregar mangas');
+                setMangas([]);
+                return;
+            }
+        };
+        // useEffect pra quando pesquisa
+    useEffect(()=> {
+        const delayDebounceFn = setTimeout(() => {
+            fetchMangas();
+        }, 1000); // Aguarda 1000ms (1 Segundo) Após o usuario parar de digitar pra pesquisar
+    }, [searchTerm]);
+    // useEffect pra quando troca o filtro ou a tag
+    useEffect(() => {
+        fetchMangas();
+    }, [SelectedTag, RankBy, Type, Status]);
+
+    // Pegar as Tags para o filtro
     useEffect(() => {
         const fetchBrowserTags = async () => {
             try {
@@ -62,31 +89,12 @@ function Browser() {
         fetchBrowserTags();
     }, []);
 
-    useEffect(() => {
-        const fetchMangas = async () => {
-            try {
-                const response = await fetch(`${API_URL}/manga/list?tag=${encodeURIComponent(String(SelectedTag))}&MAX=0`, {
-                    credentials: 'include'
-                });
-
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Erro ao carregar mangás');
-                setMangas(Array.isArray(data.manga) ? data.manga : []);
-            } catch (error) {
-                notify.error(error.message || 'Erro ao carregar mangás');
-                setMangas([]);
-            }
-        };
-
-        fetchMangas();
-    }, [SelectedTag]);
-
     const displayedTags = showAll ? tags : tags.slice(0, 10);
 
     const resetFilter = () => {
         setRankBy('A-Z');
-        setType('Todos');
-        setStatus('Todos');
+        setType('all');
+        setStatus('all');
     };
 
     return (
@@ -140,16 +148,16 @@ function Browser() {
                         <input type="radio" name="rank" id="rank1" value="A-Z" checked={RankBy === 'A-Z'} readOnly />
                         <label htmlFor="rank1" readOnly>A-Z</label>
                     </div>
-                    <div className={`FilterRankOptions ${RankBy === 'Popularidade' ? 'selected' : ''}`} onClick={() => setRankBy('Popularidade')}>
-                        <input type="radio" name="rank" id="rank2" value="Popularidade" checked={RankBy === 'Popularidade'} readOnly />
+                    <div className={`FilterRankOptions ${RankBy === 'views' ? 'selected' : ''}`} onClick={() => setRankBy('views')}>
+                        <input type="radio" name="rank" id="rank2" value="views" checked={RankBy === 'views'} readOnly />
                         <label htmlFor="rank2" readOnly>Popularidade</label>
                     </div>
-                    <div className={`FilterRankOptions ${RankBy === 'Avaliacao' ? 'selected' : ''}`} onClick={() => setRankBy('Avaliacao')}>
-                        <input type="radio" name="rank" id="rank3" value="Avaliacao" checked={RankBy === 'Avaliacao'} readOnly />
+                    <div className={`FilterRankOptions`} > {/* Avaliação desativada por enquanto */}
+                        <input type="radio" name="rank" id="rank3" value="rating" checked={RankBy === 'rating'} readOnly />
                         <label htmlFor="rank3" readOnly>Avaliação</label>
                     </div>
-                    <div className={`FilterRankOptions ${RankBy === 'Data de Lançamento' ? 'selected' : ''}`} onClick={() => setRankBy('Data de Lançamento')}>
-                        <input type="radio" name="rank" id="rank4" value="Data de Lançamento" checked={RankBy === 'Data de Lançamento'} readOnly />
+                    <div className={`FilterRankOptions ${RankBy === 'recent' ? 'selected' : ''}`} onClick={() => setRankBy('recent')}>
+                        <input type="radio" name="rank" id="rank4" value="recent" checked={RankBy === 'recent'} readOnly />
                         <label htmlFor="rank4" readOnly>Data de Lançamento</label>
                     </div>
                 </div>
@@ -157,19 +165,19 @@ function Browser() {
                 <div className="browserFilterType">
                     <h4>Tipo:</h4>
                     <div className="FilterTypeOptions">
-                        <button className={`${Type === 'Todos' ? 'selected' : ''}`} type="button" onClick={() => setType('Todos')}>Todos</button>
-                        <button className={`${Type === 'Manga' ? 'selected' : ''}`} type="button" onClick={() => setType('Manga')}>Manga</button>
-                        <button className={`${Type === 'Manhwa' ? 'selected' : ''}`} type="button" onClick={() => setType('Manhwa')}>Manhwa</button>
-                        <button className={`${Type === 'Manhua' ? 'selected' : ''}`} type="button" onClick={() => setType('Manhua')}>Manhua</button>
+                        <button className={`${Type === 'all' ? 'selected' : ''}`} type="button" onClick={() => setType('all')}>Todos</button>
+                        <button className={`${Type === 'manga' ? 'selected' : ''}`} type="button" onClick={() => setType('manga')}>Manga</button>
+                        <button className={`${Type === 'manhwa' ? 'selected' : ''}`} type="button" onClick={() => setType('manhwa')}>Manhwa</button>
+                        <button className={`${Type === 'manhua' ? 'selected' : ''}`} type="button" onClick={() => setType('manhua')}>Manhua</button>
                     </div>
                 </div>
 
                 <div className="browserFilterStatus">
                     <h4>Status:</h4>
                     <div className="FilterStatusOptions">
-                        <button className={`${Status === 'Todos' ? 'selected' : ''}`} type="button" onClick={() => setStatus('Todos')}>Todos</button>
-                        <button className={`${Status === 'Lancando' ? 'selected' : ''}`} type="button" onClick={() => setStatus('Lancando')}>Lançando</button>
-                        <button className={`${Status === 'Completo' ? 'selected' : ''}`} type="button" onClick={() => setStatus('Completo')}>Completo</button>
+                        <button className={`${Status === 'all' ? 'selected' : ''}`} type="button" onClick={() => setStatus('all')}>Todos</button>
+                        <button className={`${Status === 'ongoing' ? 'selected' : ''}`} type="button" onClick={() => setStatus('ongoing')}>Lançando</button>
+                        <button className={`${Status === 'completed' ? 'selected' : ''}`} type="button" onClick={() => setStatus('completed')}>Completo</button>
                     </div>
                 </div>
             </div>

@@ -3,19 +3,14 @@ const r2 = require('../database/bucket');
 const { PutObjectCommand, DeleteObjectCommand} = require('@aws-sdk/client-s3');
 const crypto = require('crypto');
 
-const getR2BaseUrl = () => {
-    const explicitBase = process.env.R2_BASE_URL || process.env.R2_PUBLIC_URL;
-    if (explicitBase) return explicitBase.replace(/\/+$/, '');
-
-    const endpoint = process.env.R2_ENDPOINT;
-    const bucket = process.env.R2_BUCKET_NAME;
-    if (!endpoint || !bucket) return '';
-
-    // Fallback para evitar salvar `undefined/...` caso R2_BASE_URL nao esteja configurada.
-    return `${endpoint.replace(/\/+$/, '')}/${bucket}`;
-};
-
 const buildObjectUrl = (baseUrl, key) => `${baseUrl}/${key.replace(/^\/+/, '')}`;
+
+const LIST_MANGAS_BASE_QUERY = `
+    SELECT J.*, COALESCE(STRING_AGG(DISTINCT TA.name, '||' ORDER BY TA.name), '') AS tag_names
+    FROM manga J
+    LEFT JOIN manga_tags MT_ALL ON J.id = MT_ALL.manga_id
+    LEFT JOIN tags TA ON MT_ALL.tag_id = TA.id
+`;
 
 const parseTagInput = (value) => {
     if (Array.isArray(value)) return value;
@@ -36,76 +31,89 @@ const parseTagInput = (value) => {
     return [value];
 };
 
-const buildMangaListQuery = (orderBy, hasLimit) => `
-    SELECT J.*, COALESCE(STRING_AGG(DISTINCT TA.name, '||' ORDER BY TA.name), '') AS tag_names
-    FROM manga J
-    JOIN manga_tags MT_FILTER ON J.id = MT_FILTER.manga_id
-    JOIN tags T_FILTER ON MT_FILTER.tag_id = T_FILTER.id
-    LEFT JOIN manga_tags MT_ALL ON J.id = MT_ALL.manga_id
-    LEFT JOIN tags TA ON MT_ALL.tag_id = TA.id
-    WHERE ($1::int = 1 OR T_FILTER.id = $2)
-    GROUP BY J.id
-    ORDER BY ${orderBy}
-    ${hasLimit ? 'LIMIT $3' : ''}
-`;
+const ListMangas = async (req, res) => {
+    // Pegando Dados Brutos do Client
+    const rawTag = req.query.tag;
+    const rawLimit = req.query.max ?? req.query.MAX;
+    const rawType = req.query.type;
+    const rawOrderBy = req.query.orderby;
+    const rawStatus = req.query.status;
+    const rawSearch = req.query.search;
 
-const fetchMangaList = async (res, { selectedTag, maxValue, orderBy }) => {
-    const isAllTags = String(selectedTag) === 'Tudo' || Number(selectedTag) === 0;
-    const selectedTagId = Number(selectedTag);
+    // Tratando Dados
+    const hasTag = rawTag !== undefined && rawTag !== null && rawTag !== '';
+    const hasLimit = rawLimit !== undefined && rawLimit !== null && rawLimit !== '';
+    const hasType = typeof rawType === 'string' && rawType.trim() !== '' && rawType !== 'all';
+    const hasStatus = typeof rawStatus === 'string' && rawStatus.trim() !== '' && rawStatus !== 'all';
+    const hasSearch = typeof rawSearch === 'string' && rawSearch.trim() !== '';
 
-    if (!isAllTags && (!Number.isInteger(selectedTagId) || selectedTagId <= 0)) {
-        return res.status(400).json({ message: 'Tag inválida. Envie um ID numérico maior que 0 ou 0 para todas.' });
+    // Validando Dados
+    let tagId;
+    if (hasTag) {
+        tagId = Number(rawTag);
+        if (!Number.isInteger(tagId) || tagId <= 0) {
+            return res.status(400).json({ message: 'Tag inválida. Envie um ID numérico maior que 0.' });
+        }
     }
 
-    if (!Number.isInteger(maxValue) || maxValue < 0) {
-        return res.status(400).json({ message: 'Valor de MAX inválido. Envie um número inteiro maior que 0 ou 0 para sem limite.' });
+    let limit;
+    if (hasLimit) {
+        limit = Number(rawLimit);
+        if (!Number.isInteger(limit) || limit <= 0) {
+            return res.status(400).json({ message: 'Limite inválido. Deve ser um número inteiro maior que 0.' });
+        }
+    }
+    // Mapa de Ordenamento Permitida
+    const orderByMap = {
+        'A-Z': 'J.titulo ASC',
+        'Z-A': 'J.titulo DESC',
+        views: 'J.views DESC',
+        recent: 'J.created_at DESC'
+    };
+    const orderBy = orderByMap[rawOrderBy] || orderByMap['A-Z'];
+
+    const queryParams = [];
+    const whereClauses = [];
+
+    if (hasTag) {
+        queryParams.push(tagId);
+        whereClauses.push(`EXISTS (SELECT 1 FROM manga_tags MT_FILTER WHERE MT_FILTER.manga_id = J.id AND MT_FILTER.tag_id = $${queryParams.length})`);
     }
 
-    const hasLimit = maxValue > 0;
-    const query = buildMangaListQuery(orderBy, hasLimit);
-    const queryParams = [isAllTags ? 1 : 0, isAllTags ? 0 : selectedTagId];
-    if (hasLimit) queryParams.push(maxValue);
+    if (hasType) {
+        queryParams.push(String(rawType).trim());
+        whereClauses.push(`J.tipo = $${queryParams.length}`);
+    }
 
-    const { rows } = await pool.query(query, queryParams);
-    return res.status(200).json({ manga: rows });
-};
-// Rota para obter todos os mangás
-const getAllMangas = async (req, res) => {
+    if (hasStatus) {
+        queryParams.push(String(rawStatus).trim());
+        whereClauses.push(`J.status = $${queryParams.length}`);
+    }
+
+    if (hasSearch) {
+        queryParams.push(`%${String(rawSearch).trim()}%`);
+        whereClauses.push(`(J.titulo ILIKE $${queryParams.length} OR J.autor ILIKE $${queryParams.length} OR J.artista ILIKE $${queryParams.length})`);
+    }
+
+    const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+    const limitSql = hasLimit ? `LIMIT $${queryParams.length + 1}` : '';
+
+    const query = `
+        ${LIST_MANGAS_BASE_QUERY}
+        ${whereSql}
+        GROUP BY J.id
+        ORDER BY ${orderBy}
+        ${limitSql}
+    `;
+
+    if (hasLimit) queryParams.push(limit);
+
+    // Executando Consulta
     try {
-        return await fetchMangaList(res, {
-            selectedTag: req.query.tag ?? 0,
-            maxValue: Number(req.query.MAX ?? 0),
-            orderBy: 'J.titulo ASC'
-        });
+        const { rows } = await pool.query(query, queryParams);
+        return res.status(200).json({ manga: rows });
     } catch (error) {
         console.error('Error fetching mangas:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
-    }
-}
-// Rota para obter mangás com mais views
-const getTopMangas = async (req, res) => {
-    try {
-        return await fetchMangaList(res, {
-            selectedTag: req.query.tag ?? 0,
-            maxValue: Number(req.query.MAX ?? 0),
-            orderBy: 'J.views DESC'
-        });
-    } catch (error) {
-        console.error('Error fetching top mangas:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
-    }
-}
-
-// Rota para obter os mangás mais recentes
-const getRecentMangas = async (req, res) => {
-    try {
-        return await fetchMangaList(res, {
-            selectedTag: req.query.tag ?? 0,
-            maxValue: Number(req.query.MAX ?? 0),
-            orderBy: 'J.created_at DESC'
-        });
-    } catch (error) {
-        console.error('Error fetching recent mangas:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
@@ -141,7 +149,7 @@ const CreateManga = async (req, res) => {
     const bannerKey = `banners/${titleSlug}-${crypto.randomUUID()}.jpeg`;
     const coverKey = `covers/${titleSlug}-${crypto.randomUUID()}.jpeg`;
     const bucketName = process.env.R2_BUCKET_NAME;
-    const r2BaseUrl = getR2BaseUrl();
+    const r2BaseUrl = process.env.R2_BASE_URL || process.env.R2_PUBLIC_URL;
 
     if (!bucketName || !r2BaseUrl) {
         return res.status(500).json({ message: 'Configuração do bucket incompleta (R2_BUCKET_NAME/R2_BASE_URL)' });
@@ -208,8 +216,6 @@ const CreateManga = async (req, res) => {
     }
 }
 module.exports = {
-    getAllMangas,
     CreateManga,
-    getTopMangas,
-    getRecentMangas
+    ListMangas
 }

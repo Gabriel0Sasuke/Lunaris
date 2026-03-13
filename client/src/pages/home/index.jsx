@@ -14,8 +14,10 @@ import infinity from '../../assets/ui/infinity.svg';
 //Componentes
 import MangaCard from '../../components/mangaCard';
 
+//React
 import { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
 
 //Services
 import { notify } from '../../services/notify';
@@ -29,77 +31,52 @@ function Home() {
     const [mangasList, setMangasList] = useState([]);
     const [recentMangasList, setRecentMangasList] = useState([]);
     const [topMangasList, setTopMangasList] = useState([]);
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true);
 
     const carouselItems = topMangasList.slice(0, 3);
 
     // Pegar Os Mangás
-    // Mangás de A-Z
     useEffect(() => {
+        setIsLoading(true);
         const fetchMangas = async () => {
-            try {
-                // Quantidade Maxima
-                const MAX_MANGAS = 24;
-                const response = await fetch(`${API_URL}/manga/list?tag=${encodeURIComponent(String(SelectedTag))}&MAX=${MAX_MANGAS}`, {
+            // Declaração de Valor Maximo
+            const MAX_MANGAS_GRID = 24; // Valor Maximo de Grid
+            const MAX_MANGAS_ROWS = 14; // Valor Maximo de Rows
+            const tagParam = SelectedTag > 0 ? encodeURIComponent(String(SelectedTag)) : '';
+            try{
+            const response = await Promise.all([
+                fetch(`${API_URL}/manga/list${tagParam ? `?tag=${tagParam}&` : '?'}orderby=A-Z&max=${MAX_MANGAS_GRID}`, {
                     credentials: 'include'
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Erro ao carregar mangas');
-                setMangasList(Array.isArray(data.manga) ? data.manga : []);
+                }),
+                fetch(`${API_URL}/manga/list${tagParam ? `?tag=${tagParam}&` : '?'}orderby=views&max=${MAX_MANGAS_ROWS}`, {
+                    credentials: 'include'
+                }),
+                fetch(`${API_URL}/manga/list${tagParam ? `?tag=${tagParam}&` : '?'}orderby=recent&max=${MAX_MANGAS_ROWS}`, {
+                    credentials: 'include'
+                })
+            ]);
+            const mangasData = await response[0].json();
+            const topMangasData = await response[1].json();
+            const recentMangasData = await response[2].json();
+
+            setMangasList(Array.isArray(mangasData.manga) ? mangasData.manga : []);
+            setRecentMangasList(Array.isArray(recentMangasData.manga) ? recentMangasData.manga : []);
+            setTopMangasList(Array.isArray(topMangasData.manga) ? topMangasData.manga : []);
             } catch (error) {
-                notify.error(error.message || 'Erro ao carregar mangas');
+                notify.error('Erro ao carregar mangas');
+                setMangasList([]);
+                setRecentMangasList([]);
+                setTopMangasList([]);
+                return;
+            }finally {
+                setIsLoading(false);
             }
-        };
+        }
         fetchMangas();
     }, [SelectedTag]);
 
-    // Mangás Recentes
-    useEffect(() => {
-        const fetchRecentMangas = async () => {
-            try {
-                const MAX_RECENT_MANGAS = 14;
-                const response = await fetch(`${API_URL}/manga/recent?tag=${encodeURIComponent(String(SelectedTag))}&MAX=${MAX_RECENT_MANGAS}`, {
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Erro ao carregar mangas recentes');
-                setRecentMangasList(Array.isArray(data.manga) ? data.manga : []);
-            } catch (error) {
-                notify.error(error.message || 'Erro ao carregar mangas recentes');
-            }
-        };
-        fetchRecentMangas();
-    }, [SelectedTag]);
-
-    // Mangás Mais Populares
-    useEffect(() => {
-        const fetchTopMangas = async () => {
-            try {
-                const MAX_TOP_MANGAS = 24;
-                const response = await fetch(`${API_URL}/manga/top?tag=${encodeURIComponent(String(SelectedTag))}&MAX=${MAX_TOP_MANGAS}`, {
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Erro ao carregar mangas mais populares');
-                setTopMangasList(Array.isArray(data.manga) ? data.manga : []);
-            } catch (error) {
-                notify.error(error.message || 'Erro ao carregar mangas mais populares');
-                setTopMangasList([]);
-            }
-        };
-        fetchTopMangas();
-    }, [SelectedTag]);
-
-    useEffect(() => {
-        if (carouselItems.length === 0) {
-            setActiveIndex(0);
-            return;
-        }
-
-        if (activeIndex >= carouselItems.length) {
-            setActiveIndex(0);
-        }
-    }, [carouselItems.length, activeIndex]);
-
+    // Buscar as Tags para o filtro
     useEffect(() => {
         const fetchHomeTags = async () => {
             try {
@@ -134,6 +111,19 @@ function Home() {
 
         fetchHomeTags();
     }, []);
+
+
+    useEffect(() => {
+        if (carouselItems.length === 0) {
+            setActiveIndex(0);
+            return;
+        }
+
+        if (activeIndex >= carouselItems.length) {
+            setActiveIndex(0);
+        }
+    }, [carouselItems.length, activeIndex]);
+
 
     // Mudar slide a cada 3 segundos
     useEffect(() => {
@@ -358,8 +348,16 @@ function Home() {
                     </div>
                 )}
             </div>
+            {/* Seção de teste pro skeleton loading do manga*/}
+            <div className="SectionInfo"><div className='Bar'></div><span className='SectionTitle'>Skeleton Loading</span></div>
+            <div className="mangaRow" ref={newMangasRef}>
+                {Array.from({ length: 8 }).map((_, i) => (
+                    <MangaCard key={i} isLoading />
+                    ))}
+            </div>
+            
             <div className="mangaGridSeeAll">
-                <button>Ver Todos</button>
+                <button onClick={ () => navigate('/browser') }>Ver Todos</button>
             </div>
         </main>
     );

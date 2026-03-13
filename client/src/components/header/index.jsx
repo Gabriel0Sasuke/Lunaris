@@ -34,7 +34,6 @@ export function Header( { setIsSidebarOpen, setIsNotificationsOpen, isNotificati
             </div>
 
             <div className='navActions'>
-                <input type="text" name="search" id="search" placeholder='Pesquise seu Mangá' />
                 <div className='notification' onClick={() => setIsNotificationsOpen(prev => !prev)}><img src={isNotificationsOpen ? notificationFull : notification} onContextMenu={(e) => e.preventDefault()} /></div>
                 <div className='profile' onClick={() => setIsSidebarOpen(true)}><img  src={profileIcon} onContextMenu={(e) => e.preventDefault()} /></div>
             </div>

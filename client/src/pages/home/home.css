@@ -350,6 +350,7 @@
 
 @media (max-width: 768px) {
     #carousel {
+        margin-top: 9vh !important;
         aspect-ratio: 4 / 5; /* Formato retrato para mobile */
         max-height: 75vh;
         height: auto;
