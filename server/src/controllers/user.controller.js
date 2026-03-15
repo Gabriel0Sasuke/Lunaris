@@ -3,11 +3,15 @@ const pool = require('../database/sql');
 const bookmarkManga = async (req, res) => {
     // O ID do usuário é obtido do token de autenticação (via authMiddleware)
     const userId = req.user.id;
-    const mangaId = Number(req.body.mangaid);
+    const mangaIdRaw = req.body.mangaid;
     
     // Validações básicas
-    if (!mangaId) return res.status(400).json({ message: 'Manga ID é obrigatório' });
-    if (isNaN(mangaId)) return res.status(400).json({ message: 'Manga ID deve ser um número' });
+    if (mangaIdRaw === undefined || mangaIdRaw === null || mangaIdRaw === '') {
+        return res.status(400).json({ message: 'Manga ID é obrigatório' });
+    }
+
+    const mangaId = Number(mangaIdRaw);
+    if (!Number.isFinite(mangaId)) return res.status(400).json({ message: 'Manga ID deve ser um número' });
     if (mangaId <= 0) return res.status(400).json({ message: 'Manga ID deve ser um número positivo' });
     if (!Number.isInteger(mangaId)) return res.status(400).json({ message: 'Manga ID deve ser um número inteiro' });
 
@@ -37,11 +41,15 @@ const bookmarkManga = async (req, res) => {
 const checkBookmark = async (req, res) => {
     // O ID do usuário é obtido do token de autenticação (via authMiddleware)
     const userId = req.user.id;
-    const mangaId = Number(req.query.mangaid);
+    const mangaIdRaw = req.query.mangaid;
     
     // Validações básicas
-    if (!mangaId) return res.status(400).json({ message: 'Manga ID é obrigatório' });
-    if (isNaN(mangaId)) return res.status(400).json({ message: 'Manga ID deve ser um número' });
+    if (mangaIdRaw === undefined || mangaIdRaw === null || mangaIdRaw === '') {
+        return res.status(400).json({ message: 'Manga ID é obrigatório' });
+    }
+
+    const mangaId = Number(mangaIdRaw);
+    if (!Number.isFinite(mangaId)) return res.status(400).json({ message: 'Manga ID deve ser um número' });
     if (mangaId <= 0) return res.status(400).json({ message: 'Manga ID deve ser um número positivo' });
     if (!Number.isInteger(mangaId)) return res.status(400).json({ message: 'Manga ID deve ser um número inteiro' });
 
