@@ -38,8 +38,12 @@ function Browser() {
                 const response = await fetch(`${API_URL}/manga/list${tagParam ? `?tag=${tagParam}&` : '?'}orderby=${RankBy}&type=${Type}&status=${Status}&search=${encodeURIComponent(searchTerm.trim())}`, {
                     credentials: 'include'
                 });
-            const MangasData = await response.json();
-            setMangas(Array.isArray(MangasData.manga) ? MangasData.manga : []);
+                const MangasData = await response.json();
+                if (!response.ok) {
+                    notify.error(MangasData?.message || 'Erro ao carregar mangas');
+                    return;
+                }
+                setMangas(Array.isArray(MangasData.manga) ? MangasData.manga : []);
             } catch (error) {
                 notify.error('Erro ao carregar mangas');
                 setMangas([]);
