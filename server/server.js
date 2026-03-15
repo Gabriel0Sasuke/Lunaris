@@ -9,6 +9,11 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Configura a confiança em proxy/load balancer, quando habilitado via variável de ambiente
+if (process.env.TRUST_PROXY === 'true') {
+  app.set('trust proxy', 1);
+}
+
 // CORS - aceita qualquer origem se FRONTEND_URL for "*"
 const corsOrigin = process.env.FRONTEND_URL === '*' ? true : [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174'];
 
