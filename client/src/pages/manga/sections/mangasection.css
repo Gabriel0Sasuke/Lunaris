@@ -1,0 +1,293 @@
+.MangaSection{
+    border-radius: 12px;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    align-items: center;
+    width: 60%;
+}
+.MangaSynopse{
+    background: rgba(37, 99, 235, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 30px;
+    border-radius: 12px;
+    width: 100%;
+    height: auto;
+}
+.MangaSynopse h2{
+    font-family: Inter-Bold, sans-serif;
+    font-size: 1.4rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+.MangaSynopse h2 img{
+    width: 28px;
+    height: 28px;
+    align-self: center;
+    filter: brightness(0) saturate(100%) invert(33%) sepia(100%) saturate(3593%) hue-rotate(216deg) brightness(95%) contrast(93%);
+}
+.MangaSynopse p{
+    font-family: Inter, sans-serif;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 10px;
+    line-height: 1.7;
+}
+.MangaSynopseLine{
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 20px 0;
+}
+.MangaSynopseExtra{
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    width: 100%;
+}
+.MangaSynopseExtraItem{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.MangaSynopseExtraItemLabel{
+    font-family: Inter-Bold, sans-serif;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+.MangaSynopseExtraItemValue{
+    font-family: Inter-Bold, sans-serif;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+.MangaInfo{
+    background: rgba(37, 99, 235, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 30px;
+    border-radius: 12px;
+    width: 100%;
+}
+.MangaInfo h2{
+    font-family: Inter-Bold, sans-serif;
+    font-size: 1.4rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+.MangaInfo h2 img{
+    width: 28px;
+    height: 28px;
+    align-self: center;
+    filter: brightness(0) saturate(100%) invert(33%) sepia(100%) saturate(3593%) hue-rotate(216deg) brightness(95%) contrast(93%);
+}
+.MangaInfoItems{
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+}
+.MangaInfoItem{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.MangaInfoItemLabel{
+    font-family: Inter-Bold, sans-serif;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+.MangaInfoItemValue{
+    font-family: Inter-Bold, sans-serif;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+.MangaTags{
+    background: rgba(37, 99, 235, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 30px;
+    border-radius: 12px;
+    width: 100%;
+}
+.MangaTags h2{
+    font-family: Inter-Bold, sans-serif;
+    font-size: 1.4rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+.MangaTags h2 img{
+    width: 28px;
+    height: 28px;
+    align-self: center;
+    filter: brightness(0) saturate(100%) invert(33%) sepia(100%) saturate(3593%) hue-rotate(216deg) brightness(95%) contrast(93%);
+}
+.MangaTagsItems{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+.MangaTag{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    max-width: 180px;
+    background: rgba(37, 99, 235, 0.2);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    border-radius: 9999px;
+    padding: 4px 12px;
+    font-family: Inter-Bold, sans-serif;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.95);
+}
+.MangaTagIcon{
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    display: block;
+}
+.MangaTagText{
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.MangaTagsEmpty{
+    font-family: Inter, sans-serif;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 1200px){
+    .MangaSection{
+        width: 85%;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .MangaSynopse,
+    .MangaInfo,
+    .MangaTags{
+        padding: 22px;
+    }
+
+    .MangaSynopse p{
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+
+    .MangaSynopseExtra,
+    .MangaInfoItems{
+        flex-wrap: wrap;
+        gap: 14px 22px;
+    }
+}
+
+@media (max-width: 900px){
+    .MangaSection{
+        width: 94%;
+        padding: 12px 0;
+        gap: 14px;
+    }
+
+    .MangaSynopse,
+    .MangaInfo,
+    .MangaTags{
+        padding: 18px;
+        border-radius: 10px;
+    }
+
+    .MangaSynopse h2,
+    .MangaInfo h2,
+    .MangaTags h2{
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .MangaSynopse h2 img,
+    .MangaInfo h2 img,
+    .MangaTags h2 img{
+        width: 22px;
+        height: 22px;
+    }
+
+    .MangaSynopse p{
+        font-size: 0.98rem;
+        line-height: 1.55;
+    }
+
+    .MangaSynopseExtra,
+    .MangaInfoItems{
+        gap: 12px 18px;
+    }
+
+    .MangaTag{
+        max-width: 160px;
+    }
+}
+
+@media (max-width: 600px){
+    .MangaSection{
+        width: 100%;
+        padding: 10px 12px;
+        box-sizing: border-box;
+    }
+
+    .MangaSynopse,
+    .MangaInfo,
+    .MangaTags{
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .MangaSynopse h2,
+    .MangaInfo h2,
+    .MangaTags h2{
+        font-size: 1.05rem;
+        gap: 8px;
+    }
+
+    .MangaSynopse p{
+        font-size: 0.92rem;
+        line-height: 1.5;
+    }
+
+    .MangaSynopseExtra,
+    .MangaInfoItems{
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .MangaTag{
+        max-width: 140px;
+        font-size: 0.68rem;
+        padding: 4px 10px;
+    }
+
+    .MangaTagIcon{
+        width: 14px;
+        height: 14px;
+    }
+
+    .MangaTagsEmpty{
+        font-size: 0.88rem;
+    }
+}
