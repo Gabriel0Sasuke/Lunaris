@@ -160,7 +160,15 @@ function Manga(){
                 <div className="MangaHeaderCover"><img src={manga?.foto} alt={manga?.titulo} /></div>
                 <div className="MangaHeaderInfo">
 
-                    <div className="MangaHeaderInfoStatus">{manga?.status == 'completed' ? 'Completed Series' : 'Ongoing Series'}</div>
+                    <div className="MangaHeaderInfoStatus">
+                        {manga?.status === 'completed'
+                            ? 'Completed Series'
+                            : manga?.status === 'hiatus'
+                                ? 'On Hiatus'
+                                : manga?.status === 'cancelled'
+                                    ? 'Cancelled Series'
+                                    : 'Ongoing Series'}
+                    </div>
                     <h1 className="MangaHeaderInfoTitle">{manga?.titulo}</h1>
                 
                     <div className="MangaHeaderInfoCreators">
