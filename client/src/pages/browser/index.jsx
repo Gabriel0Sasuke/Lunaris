@@ -28,9 +28,11 @@ function Browser() {
     const [RankBy, setRankBy] = useState('A-Z');
     const [Type, setType] = useState('all');
     const [Status, setStatus] = useState('all');
+    const [isLoading, setIsLoading] = useState(true);
 
     // Pegar Os Mangás
     const fetchMangas = async () => {
+            setIsLoading(true);
             const tagParam = SelectedTag > 0 ? encodeURIComponent(String(SelectedTag)) : '';
             try{
                 const response = await fetch(`${API_URL}/manga/list${tagParam ? `?tag=${tagParam}&` : '?'}orderby=${RankBy}&type=${Type}&status=${Status}&search=${encodeURIComponent(searchTerm.trim())}`, {
@@ -42,14 +44,19 @@ function Browser() {
                 notify.error('Erro ao carregar mangas');
                 setMangas([]);
                 return;
+            } finally {
+                setIsLoading(false);
             }
         };
-        // useEffect pra quando pesquisa
+    // useEffect pra quando pesquisa
     useEffect(()=> {
         const delayDebounceFn = setTimeout(() => {
             fetchMangas();
-        }, 1000); // Aguarda 1000ms (1 Segundo) Após o usuario parar de digitar pra pesquisar
+        }, 500); // Aguarda 500ms Após o usuario parar de digitar pra pesquisar
+
+        return () => clearTimeout(delayDebounceFn);
     }, [searchTerm]);
+
     // useEffect pra quando troca o filtro ou a tag
     useEffect(() => {
         fetchMangas();
@@ -105,7 +112,7 @@ function Browser() {
                         type="text"
                         name="browserInput"
                         id="browserInput"
-                        placeholder="Pesquise por título, autor ou palavras-chave"
+                        placeholder="Pesquise por título, autor, artista ou palavras-chave"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -182,11 +189,16 @@ function Browser() {
                 </div>
             </div>
             <div className="browserContent">
-                {mangas.length > 0 ? (
+                {isLoading ? (
+                    Array.from({ length: 16 }).map((_, i) => (
+                        <MangaCard key={i} isLoading isGrid />
+                    ))
+                ) : mangas.length > 0 ? (
                     mangas.map((manga) => (
                         <MangaCard
                             key={manga.id}
                             manga={{
+                                id: manga.id,
                                 title: manga.titulo,
                                 image: manga.foto,
                                 genre: manga.tipo,
@@ -201,7 +213,7 @@ function Browser() {
                 ) : (
                     <div className="browserEmptyState">
                         <h3>Nenhum mangá encontrado</h3>
-                        <p>Não encontramos resultados para essa tag. Tente outra ou volte para "Tudo".</p>
+                        <p>Nenhum mangá encontrado usando a opção de tag/filtros/pesquisa atuais.</p>
                         {SelectedTag !== 0 && (
                             <button type="button" onClick={() => setSelectedTag(0)}>
                                 Ver Todos

@@ -1,13 +1,17 @@
 import './mangaCard.css';
-
+import { useNavigate } from 'react-router-dom';
 //UI
 import star from '../../assets/ui/star.svg';
 import eye from '../../assets/ui/eye.svg';
 import clock from '../../assets/ui/clock.svg'; 
 
 function MangaCard( { manga, isGrid, isLoading } ) {
+    const navigate = useNavigate();
+    const onClick = (path) => {
+        navigate(path);
+    }
     return (
-        <div className={`mangaCard no-select ${isGrid ? 'grid-mode' : ''}`}>
+        <div className={`mangaCard no-select ${isGrid ? 'grid-mode' : ''}`} onClick={() => !isLoading && manga?.id && onClick(`/manga/${manga.id}`)}>
                     <div className='mangaCardImage'>
                         {!isLoading ? <img src={manga.image} alt={manga.title} /> : <div className='skeletonImage'> </div>}
                         <div className='mangaCardImageTags'>

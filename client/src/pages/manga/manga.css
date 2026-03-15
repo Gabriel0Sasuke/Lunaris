@@ -1,1 +1,572 @@
 /* estilos da página manga */
+.manga-content {
+    display: flex;
+    flex-direction: column;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-top: 100px; /* Compensa a altura do Header fixo no Desktop */
+    min-height: 100vh;
+    box-sizing: border-box;
+    align-items: center;
+    overflow-x: hidden;
+}
+.MangaBackgroundBanner{
+    position: absolute;
+    aspect-ratio: 21 / 9;
+    width: 100%;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    top: 0;
+    overflow: hidden;
+    z-index: 0;
+}
+.MangaBackgroundBanner img{
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 24px;
+    object-fit: cover;
+    object-position: center top;
+    filter: brightness(0.6);
+}
+.MangaHeader{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 36px;
+    width: 85%;
+    z-index: 2;
+    margin-top: 1rem;
+}
+.MangaHeaderCover{
+    aspect-ratio: 2 / 3;
+    width: 300px;
+    background: #ccc;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+.MangaHeaderCover:hover{
+    transform: scale(1.02);
+}
+.MangaHeaderCover img{
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+    object-fit: cover;
+}
+.MangaHeaderInfo{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0 , 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 24px;
+    backdrop-filter: blur(5px);
+    width: 60vw;
+    height: 50vh;
+    margin-top: auto;
+}
+.MangaHeaderInfoStatus{
+    font-size: 0.9rem;
+    color: rgba(37, 99, 235, 0.8);
+    text-transform: uppercase;
+    font-family: Inter-ExtraBold, sans-serif;
+}
+.MangaHeaderInfoTitle{
+    font-size: 2.5rem;
+    color: white;
+    font-family: Inter-ExtraBold, sans-serif;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.MangaHeaderInfoCreators{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+.InfoCreatorLine{
+    width: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+}
+.MangaHeaderInfoCreator{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1rem;
+    font-family: Inter-Bold, sans-serif;
+}
+.MangaHeaderInfoCreatorLabel{
+    color: rgba(255, 255, 255, 0.6);
+}
+.MangaHeaderInfoCreatorValue{
+    color: rgba(255, 255, 255, 0.95);
+}
+.MangaHeaderInfoStatistics{
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    margin-top: 0.5rem;
+}
+.MangaHeaderInfoStatistic{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    padding: 8px 12px;
+    font-family: Inter-Bold, sans-serif;
+}
+.MangaHeaderInfoStatisticLabel{
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+}
+.MangaHeaderInfoStatisticValue{
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.9rem;
+}
+.MangaHeaderInfoStatistic img{
+    width: 16px;
+    height: 16px;
+    display: block;
+    align-self: center;
+    filter: brightness(0) saturate(100%) invert(87%) sepia(54%) saturate(2388%) hue-rotate(358deg) brightness(107%) contrast(101%);
+}
+.MangaHeaderInfoGenres{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 0.5rem;
+    max-width: 100%;
+    overflow: hidden;
+}
+.MangaHeaderInfoGenre{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    max-width: 180px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(37, 99, 235, 0.2);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    border-radius: 9999px;
+    padding: 4px 12px;
+    font-family: Inter-Bold, sans-serif;
+}
+.MangaHeaderInfoGenre img{
+    width: 16px;
+    height: 16px;
+    display: block;
+    align-self: center;
+}
+.MangaHeaderInfoGenreIcon{
+    width: 16px;
+    height: 16px;
+    display: block;
+    flex-shrink: 0;
+}
+.MangaHeaderInfoGenreText{
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.MangaHeaderInfoGenreMore{
+    max-width: fit-content;
+    padding: 4px 10px;
+}
+.MangaHeaderInfoActions{
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin-top: auto;
+}
+.MangaHeaderInfoAction{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.95);
+    border: 1px solid transparent;
+    border-radius: 20px;
+    padding: 20px 20px;
+    font-family: Inter-Bold, sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    user-select: none;
+}
+.MangaHeaderInfoAction:disabled{
+    cursor: not-allowed !important;
+    opacity: 0.65;
+    pointer-events: none;
+}
+.MangaHeaderInfoAction img{
+    width: 24px;
+    height: 24px;
+    display: block;
+    align-self: center;
+}
+.MangaHeaderInfoAction:nth-child(1){ /* Começar Leitura */
+    background: rgba(37, 99, 235, 0.6);
+    border-color: rgba(37, 99, 235, 0.8);
+}
+.MangaHeaderInfoAction:nth-child(1):hover{
+    background: rgba(37, 99, 235, 0.8);
+    border-color: rgba(37, 99, 235, 1);
+}
+.MangaHeaderInfoAction:nth-child(2){ /* Adicionar à Lista */
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+.MangaHeaderInfoAction:nth-child(2):hover{
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+.MangaHeaderInfoAction:nth-child(3){ /* Avaliar */
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+.MangaHeaderInfoAction:nth-child(3):hover{
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+.MangaHeaderInfoAction:nth-child(4){ /* Compartilhar */
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+.MangaHeaderInfoAction:nth-child(4):hover{
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.MangaSectionsNav{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 0.65rem;
+    width: auto;
+    max-width: 94%;
+    margin-top: 4rem;
+    padding: 0.3rem;
+    background: rgba(37, 99, 235, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    box-sizing: border-box;
+    z-index: 2;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.MangaSectionsNav::-webkit-scrollbar{
+    display: none;
+}
+
+.MangaSectionsNavItem{
+    min-width: 100px;
+    height: 40px;
+    padding: 0 1.2rem;
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: #ffffff;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+.MangaSectionsNavItem:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.MangaSectionsNavItem.is-active{
+    background-color: rgba(37, 99, 235, 0.4);
+    border: 1px solid rgba(37, 99, 235, 0.6);
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+    color: white;
+}
+
+.MangaSectionsNavItem.is-active:hover{
+    background-color: rgba(37, 99, 235, 0.5);
+    box-shadow: 0 0 30px rgba(37, 99, 235, 0.8);
+}
+
+.MangaSectionsNavPill{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 20px;
+    padding: 0 8px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.72rem;
+    font-family: Inter-Bold, sans-serif;
+    margin-left: 6px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 1200px) {
+    .MangaBackgroundBanner{
+        aspect-ratio: 16 / 9;
+    }
+
+    .MangaBackgroundBanner img{
+        transform: scale(1.08);
+        transform-origin: center top;
+    }
+
+    .MangaHeader{
+        width: 92%;
+        gap: 20px;
+    }
+
+    .MangaHeaderCover{
+        width: 240px;
+        flex-shrink: 0;
+    }
+
+    .MangaHeaderInfo{
+        width: calc(100% - 260px);
+        min-width: 0;
+        height: auto;
+        min-height: 420px;
+        padding: 20px;
+    }
+
+    .MangaHeaderInfoTitle{
+        font-size: 2rem;
+    }
+
+    .MangaHeaderInfoStatistics{
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .MangaHeaderInfoAction{
+        padding: 14px 16px;
+        font-size: 1rem;
+    }
+
+    .MangaSectionsNav{
+        width: 92%;
+        margin-top: 2.5rem;
+        max-width: 92%;
+    }
+}
+
+@media (max-width: 900px) {
+    .manga-content {
+        padding-top: 84px;
+    }
+
+    .MangaBackgroundBanner{
+        width: 96%;
+        border-radius: 18px;
+        left: 2%;
+    }
+
+    .MangaBackgroundBanner img{
+        border-radius: 18px;
+        transform: scale(1.12);
+        transform-origin: center top;
+    }
+
+    .MangaHeader{
+        width: 94%;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        margin-top: 0.75rem;
+    }
+
+    .MangaHeaderCover{
+        width: min(64vw, 300px);
+    }
+
+    .MangaHeaderInfo{
+        width: 100%;
+        min-height: 0;
+        height: auto;
+        margin-top: 0;
+        gap: 10px;
+    }
+
+    .MangaHeaderInfoTitle{
+        font-size: 1.75rem;
+    }
+
+    .MangaHeaderInfoCreators{
+        flex-wrap: wrap;
+        row-gap: 6px;
+    }
+
+    .InfoCreatorLine{
+        display: none;
+    }
+
+    .MangaHeaderInfoStatistics{
+        gap: 8px;
+    }
+
+    .MangaHeaderInfoStatistic{
+        font-size: 0.82rem;
+        padding: 7px 10px;
+    }
+
+    .MangaHeaderInfoGenres{
+        gap: 8px;
+    }
+
+    .MangaHeaderInfoGenre{
+        max-width: 150px;
+    }
+
+    .MangaHeaderInfoActions{
+        margin-top: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .MangaHeaderInfoAction{
+        min-height: 44px;
+    }
+
+    .MangaHeaderInfoAction:nth-child(1),
+    .MangaHeaderInfoAction:nth-child(2),
+    .MangaHeaderInfoAction:nth-child(3){
+        flex: 1 1 220px;
+        justify-content: center;
+    }
+
+    .MangaHeaderInfoAction:nth-child(4){
+        width: 56px;
+        padding: 10px;
+        justify-content: center;
+    }
+
+    .MangaSectionsNav{
+        width: 94%;
+        max-width: 94%;
+        margin-top: 1.4rem;
+    }
+
+    .MangaSectionsNavItem{
+        min-width: 92px;
+        height: 38px;
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .manga-content {
+        padding-top: 76px;
+    }
+
+    .MangaBackgroundBanner{
+        width: 100%;
+        top: 75px;
+        left: 0;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        aspect-ratio: 3 / 2;
+        z-index: 1;
+    }
+
+    .MangaBackgroundBanner img{
+        border-radius: 0;
+        transform: scale(1.2);
+        transform-origin: center top;
+    }
+
+    .MangaHeader{
+        width: 100%;
+        padding: 0 12px;
+        box-sizing: border-box;
+    }
+
+    .MangaHeaderCover{
+        width: min(72vw, 280px);
+    }
+
+    .MangaHeaderInfo{
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+    .MangaHeaderInfoStatus{
+        font-size: 0.78rem;
+    }
+
+    .MangaHeaderInfoTitle{
+        font-size: 1.35rem;
+    }
+
+    .MangaHeaderInfoCreator,
+    .MangaHeaderInfoStatistic,
+    .MangaHeaderInfoAction{
+        font-size: 0.82rem;
+    }
+
+    .MangaHeaderInfoGenre{
+        max-width: 130px;
+        font-size: 0.68rem;
+        padding: 4px 10px;
+    }
+
+    .MangaHeaderInfoActions{
+        gap: 8px;
+    }
+
+    .MangaHeaderInfoAction img{
+        width: 20px;
+        height: 20px;
+    }
+
+    .MangaSectionsNav{
+        width: calc(100% - 24px);
+        max-width: calc(100% - 24px);
+        margin-top: 1rem;
+    }
+
+    .MangaSectionsNavItem{
+        min-width: 84px;
+        height: 36px;
+        padding: 0 0.85rem;
+        font-size: 0.8rem;
+    }
+
+    .MangaSectionsNavPill{
+        min-width: 26px;
+        height: 18px;
+        font-size: 0.68rem;
+    }
+}

@@ -20,6 +20,103 @@
     touch-action: pan-y;
     /* Remover propriedades de scroll snap antigas se existirem */
 }
+
+@keyframes carouselSkeletonShimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.carouselSkeleton {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.carouselSkeletonMedia,
+.carouselSkeletonInfo,
+.carouselSkeletonTag,
+.carouselSkeletonTitle,
+.carouselSkeletonLine,
+.carouselSkeletonBtn {
+    background-color: rgba(255, 255, 255, 0.03);
+    background-image: linear-gradient(
+        110deg,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0) 80%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: carouselSkeletonShimmer 1.8s linear infinite;
+}
+
+.carouselSkeletonMedia {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+}
+
+.carouselSkeletonInfo {
+    position: absolute;
+    width: 50vw;
+    height: 85%;
+    bottom: 7.5%;
+    left: 20px;
+    border-radius: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    padding: 48px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.carouselSkeletonTags {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.carouselSkeletonTag {
+    height: 22px;
+    width: 90px;
+    border-radius: 10px;
+}
+
+.carouselSkeletonTitle {
+    height: 42px;
+    width: 80%;
+    border-radius: 12px;
+}
+
+.carouselSkeletonLine {
+    height: 16px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.carouselSkeletonLine.short {
+    width: 70%;
+}
+
+.carouselSkeletonButtons {
+    margin-top: auto;
+    display: flex;
+    gap: 16px;
+}
+
+.carouselSkeletonBtn {
+    height: 42px;
+    width: 160px;
+    border-radius: 10px;
+}
 .carouselEmptyState {
     width: 100%;
     height: 100%;
@@ -38,11 +135,13 @@
     opacity: 0; /* Escondido por padrão */
     transition: opacity 1s ease-in-out; /* Transição suave de fade */
     z-index: 1;
+    pointer-events: none;
 }
 
 .carousel-item.active {
     opacity: 1; /* Visível quando ativo */
     z-index: 2;
+    pointer-events: auto;
 }
 .carousel-item img {
     width: 100%;
@@ -154,6 +253,10 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+.buttonsBox button:disabled{
+    opacity: 0.65;
+    cursor: not-allowed;
 }
 .btn-primary{
     background-color: rgba(37, 99, 235, 0.7);

@@ -117,6 +117,50 @@ const ListMangas = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+const catchMangaById = async (req, res) => {
+    const id = req.query.id;
+    const mangaId = Number(id);
+    if (!Number.isInteger(mangaId) || mangaId <= 0) return res.status(400).json({ message: 'ID inválido. Deve ser um número inteiro maior que 0.' });
+
+    const query = `
+        WITH ranked_manga AS (
+            SELECT J.*, DENSE_RANK() OVER (ORDER BY J.views DESC NULLS LAST) AS rank_position
+            FROM manga J
+        )
+        SELECT RM.*, COALESCE(TAGS.tag_names, '') AS tag_names, COALESCE(TAGS.tags, '[]'::json) AS tags, COALESCE(BM.bookmarks, 0) AS bookmarks
+        FROM ranked_manga RM
+        LEFT JOIN LATERAL (
+            SELECT
+                COALESCE(STRING_AGG(T.name, '||' ORDER BY T.name), '') AS tag_names,
+                COALESCE(JSON_AGG(JSON_BUILD_OBJECT('name', T.name, 'icon', T.icon) ORDER BY T.name), '[]'::json) AS tags
+            FROM (
+                SELECT DISTINCT TA.id, TA.name, TA.icon
+                FROM manga_tags MT_ALL
+                LEFT JOIN tags TA ON MT_ALL.tag_id = TA.id
+                WHERE MT_ALL.manga_id = RM.id
+                AND TA.id IS NOT NULL
+            ) T
+        ) TAGS ON TRUE
+        LEFT JOIN LATERAL (
+            SELECT COUNT(*)::int AS bookmarks
+            FROM bookmark B
+            WHERE B.manga_id = RM.id
+        ) BM ON TRUE
+        WHERE RM.id = $1
+    `;
+    const values = [mangaId];
+    try {
+        const { rows } = await pool.query(query, values);
+        if (!rows[0]) {
+            return res.status(404).json({ message: 'Mangá não encontrado' });
+        }
+        return res.status(200).json({ manga: rows[0] });
+    } catch (error) {
+        console.error('Error fetching manga by ID:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
 
 // Rota para criar um novo mangá
 const CreateManga = async (req, res) => {
@@ -215,7 +259,29 @@ const CreateManga = async (req, res) => {
         if (client) client.release();
     }
 }
+//Função para incrementar views
+const IncrementViews = async (req, res) => {
+    const { mangaId } = req.body;
+    if (!mangaId || !Number.isInteger(Number(mangaId)) || Number(mangaId) <= 0) {
+        return res.status(400).json({ message: 'ID do mangá inválido. Deve ser um número inteiro maior que 0.' });
+    }
+    try {
+        const query = 'UPDATE manga SET views = COALESCE(views, 0) + 1 WHERE id = $1 RETURNING views';
+        const values = [mangaId];
+        const { rows } = await pool.query(query, values);
+        if (!rows[0]) {
+            return res.status(404).json({ message: 'Mangá não encontrado' });
+        }
+        return res.status(200).json({ views: rows[0].views });
+    } catch (error) {
+        console.error('Error incrementing manga views:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
 module.exports = {
     CreateManga,
-    ListMangas
+    catchMangaById,
+    ListMangas,
+    IncrementViews
 }

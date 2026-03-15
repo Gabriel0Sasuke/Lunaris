@@ -7,23 +7,29 @@ import layer from '../../assets/ui/layer.svg';
 import history from '../../assets/ui/history.svg';
 import openbook from '../../assets/ui/openbook.svg';
 import bookmark from '../../assets/ui/bookmark.svg';
+import bookmarkadded from '../../assets/ui/bookmarkadded.svg';
+import bookmarkremove from '../../assets/ui/bookmarkremove.svg';
+import loading from '../../assets/ui/loading.svg';
 
 //Icones do button
 import infinity from '../../assets/ui/infinity.svg';
 
 //Componentes
 import MangaCard from '../../components/mangaCard';
+import LoginRequiredPortal from '../../components/loginRequiredPortal';
 
 //React
 import { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 //Services
 import { notify } from '../../services/notify';
 import { formatRelativeTimeShort } from '../../services/CreatedManga';
 
 function Home() {
+    const { usuario } = useAuth();
     const [activeIndex, setActiveIndex] = useState(0);
     const [SelectedTag, setSelectedTag] = useState(0);
     const [homeTags, setHomeTags] = useState([{ id: 0, label: 'Tudo', icon: infinity, prioridade: 1 }]);
@@ -31,6 +37,10 @@ function Home() {
     const [mangasList, setMangasList] = useState([]);
     const [recentMangasList, setRecentMangasList] = useState([]);
     const [topMangasList, setTopMangasList] = useState([]);
+    const [carouselBookmarkStatus, setCarouselBookmarkStatus] = useState({});
+    const [carouselBookmarkLoading, setCarouselBookmarkLoading] = useState({});
+    const [carouselBookmarkHover, setCarouselBookmarkHover] = useState({});
+    const [loginPromptOpen, setLoginPromptOpen] = useState(false);
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
 
@@ -200,11 +210,96 @@ function Home() {
         };
     }, []);
 
+    const link = (pagina) => {
+        navigate(pagina);
+    };
+
+    const checkCarouselBookmarks = async (mangas) => {
+        if (!usuario?.id || !Array.isArray(mangas) || mangas.length === 0) return;
+
+        const updates = {};
+        await Promise.all(
+            mangas.map(async (manga) => {
+                if (!manga?.id) return;
+                try {
+                    const response = await fetch(`${API_URL}/user/bookmark/check?mangaid=${manga.id}`, {
+                        method: 'GET',
+                        credentials: 'include'
+                    });
+                    if (!response.ok) return;
+
+                    const data = await response.json();
+                    updates[manga.id] = Boolean(data.bookmarked);
+                } catch {
+                    return;
+                }
+            })
+        );
+
+        setCarouselBookmarkStatus((prev) => ({ ...prev, ...updates }));
+    };
+
+    const handleCarouselBookmark = async (mangaId) => {
+        if (!mangaId) return;
+        if (!usuario?.id) {
+            setLoginPromptOpen(true);
+            return;
+        }
+        if (carouselBookmarkLoading[mangaId]) return;
+
+        try {
+            setCarouselBookmarkLoading((prev) => ({ ...prev, [mangaId]: true }));
+
+            const response = await fetch(`${API_URL}/user/bookmark`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ mangaid: mangaId })
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao atualizar bookmark');
+            }
+
+            const data = await response.json();
+            setCarouselBookmarkStatus((prev) => ({ ...prev, [mangaId]: !prev[mangaId] }));
+            notify.success(data?.message || 'Bookmark atualizado');
+        } catch {
+            notify.error('Erro ao atualizar bookmark');
+        } finally {
+            setCarouselBookmarkLoading((prev) => ({ ...prev, [mangaId]: false }));
+        }
+    };
+
+    useEffect(() => {
+        checkCarouselBookmarks(carouselItems);
+    }, [usuario?.id, topMangasList]);
+
     return (
         <main className="home-content">
             {/* Carrousel de Items de Mangá em destaque*/}
             <div id="carousel" onTouchStart={handleCarouselTouchStart} onTouchEnd={handleCarouselTouchEnd}>
-                {carouselItems.length > 0 ? (
+                {isLoading ? (
+                    <div className="carouselSkeleton">
+                        <div className="carouselSkeletonMedia"></div>
+                        <div className="carouselSkeletonInfo">
+                            <div className="carouselSkeletonTags">
+                                <div className="carouselSkeletonTag"></div>
+                                <div className="carouselSkeletonTag"></div>
+                                <div className="carouselSkeletonTag"></div>
+                                <div className="carouselSkeletonTag"></div>
+                            </div>
+                            <div className="carouselSkeletonTitle"></div>
+                            <div className="carouselSkeletonLine"></div>
+                            <div className="carouselSkeletonLine"></div>
+                            <div className="carouselSkeletonLine short"></div>
+                            <div className="carouselSkeletonButtons">
+                                <div className="carouselSkeletonBtn"></div>
+                                <div className="carouselSkeletonBtn"></div>
+                            </div>
+                        </div>
+                    </div>
+                ) : carouselItems.length > 0 ? (
                     carouselItems.map((manga, index) => (
                         <div key={manga.id || manga.titulo || `carousel-${index}`} className={`carousel-item ${activeIndex === index ? 'active' : ''}`}>
                             <img src={manga.banner || manga.foto || '/banner/sololeveling.png'} alt={manga.titulo || `Mangá em alta ${index + 1}`} />
@@ -218,8 +313,37 @@ function Home() {
                                 <h2>{manga.titulo || 'Mangá em destaque'}</h2>
                                 <span>{manga.sinopse || 'Confira um dos mangás mais populares do momento na plataforma.'}</span>
                                 <div className="buttonsBox">
-                                    <button className="btn-primary"><img src={openbook} alt="openbook" /> Ler Agora</button>
-                                    <button className="btn-secondary"><img src={bookmark} alt="bookmark" /> Adicionar a Lista</button>
+                                    <button type="button" className="btn-primary" onClick={() => link(`/manga/${manga.id}`)}>
+                                        <img src={openbook} alt="openbook" /> Ler Agora
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn-secondary"
+                                        onClick={() => handleCarouselBookmark(manga.id)}
+                                        disabled={Boolean(carouselBookmarkLoading[manga.id])}
+                                        onMouseEnter={() => {
+                                            if (!carouselBookmarkLoading[manga.id]) {
+                                                setCarouselBookmarkHover((prev) => ({ ...prev, [manga.id]: true }));
+                                            }
+                                        }}
+                                        onMouseLeave={() => setCarouselBookmarkHover((prev) => ({ ...prev, [manga.id]: false }))}
+                                    >
+                                        <img
+                                            src={
+                                                carouselBookmarkLoading[manga.id]
+                                                    ? loading
+                                                    : carouselBookmarkStatus[manga.id]
+                                                        ? (carouselBookmarkHover[manga.id] ? bookmarkremove : bookmarkadded)
+                                                        : bookmark
+                                            }
+                                            alt="bookmark"
+                                        />
+                                        {carouselBookmarkLoading[manga.id]
+                                            ? ''
+                                            : carouselBookmarkStatus[manga.id]
+                                                ? (carouselBookmarkHover[manga.id] ? 'Remover da Lista' : 'Adicionado à Lista')
+                                                : 'Adicionar a Lista'}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -257,11 +381,16 @@ function Home() {
             {/* Seção de Mangás em alta */}
             <div className="SectionInfo"><div className='Bar'></div><span className='SectionTitle'>Mangás em Alta</span></div>
             <div className="mangaRow" ref={newChaptersRef}>
-                {topMangasList.length > 0 ? (
+                {isLoading ? (
+                    Array.from({ length: 8 }).map((_, i) => (
+                        <MangaCard key={i} isLoading />
+                    ))
+                ) : topMangasList.length > 0 ? (
                     topMangasList.map((manga) => (
                         <MangaCard
                             key={manga.id}
                             manga={{
+                                id: manga.id,
                                 title: manga.titulo,
                                 image: manga.foto,
                                 genre: manga.tipo,
@@ -276,7 +405,7 @@ function Home() {
                     <div className="mangaEmptyState mangaEmptyStateRow">
                         <div className="mangaEmptyIcon">{'(>_<)'}</div>
                         <h3>Nenhum mangá encontrado</h3>
-                        <p>Não encontramos resultados para esse filtro. Tente outra tag ou volte para "Tudo".</p>
+                        <p>Não encontramos resultados para esse filtro, ou há problema com a conexão.</p>
                         {SelectedTag !== 0 && (
                             <button type="button" onClick={() => setSelectedTag(0)}>
                                 Ver Todos os Mangás
@@ -288,11 +417,16 @@ function Home() {
             {/* Seção de Novos Mangás */}
             <div className="SectionInfo"><div className='Bar'></div><span className='SectionTitle'>Novos Mangás</span></div>
             <div className="mangaRow" ref={newMangasRef}>
-                {recentMangasList.length > 0 ? (
+                {isLoading ? (
+                    Array.from({ length: 8 }).map((_, i) => (
+                        <MangaCard key={i} isLoading />
+                    ))
+                ) : recentMangasList.length > 0 ? (
                     recentMangasList.map((manga) => (
                         <MangaCard
                             key={manga.id}
                             manga={{
+                                id: manga.id,
                                 title: manga.titulo,
                                 image: manga.foto,
                                 genre: manga.tipo,
@@ -307,7 +441,7 @@ function Home() {
                     <div className="mangaEmptyState mangaEmptyStateRow">
                         <div className="mangaEmptyIcon">{'(>_<)'}</div>
                         <h3>Nenhum mangá encontrado</h3>
-                        <p>Não encontramos resultados para esse filtro. Tente outra tag ou volte para "Tudo".</p>
+                        <p>Não encontramos resultados para esse filtro, ou há problema com a conexão.</p>
                         {SelectedTag !== 0 && (
                             <button type="button" onClick={() => setSelectedTag(0)}>
                                 Ver Todos os Mangás
@@ -319,11 +453,17 @@ function Home() {
             {/* Seção de Descubra mais com tudo */}
             <div className="SectionInfo"><div className='Bar'></div><span className='SectionTitle'>Descubra Mais</span></div>
             <div className='mangaGrid'>
-                {mangasList.length > 0 ? (
+                {isLoading ? (
+                    Array.from({ length: 16 }).map((_, i) => (
+                        <MangaCard key={i} isGrid isLoading />
+                    ))
+                ) : mangasList.length > 0 ? (
                     mangasList.map((manga) => (
                         <MangaCard
                             key={manga.id}
+                            isGrid
                             manga={{
+                                id: manga.id,
                                 title: manga.titulo,
                                 image: manga.foto,
                                 genre: manga.tipo,
@@ -332,14 +472,13 @@ function Home() {
                                 views: manga.views ?? 0,
                                 lastUpdate: formatRelativeTimeShort(manga.created_at)
                             }}
-                            isGrid
                         />
                     ))
                 ) : (
-                    <div className="mangaEmptyState">
+                    <div className="mangaEmptyState mangaEmptyStateGrid">
                         <div className="mangaEmptyIcon">{'(>_<)'}</div>
                         <h3>Nenhum mangá encontrado</h3>
-                        <p>Não encontramos resultados para esse filtro. Tente outra tag ou volte para "Tudo".</p>
+                        <p>Não encontramos resultados para esse filtro, ou há problema com a conexão.</p>
                         {SelectedTag !== 0 && (
                             <button type="button" onClick={() => setSelectedTag(0)}>
                                 Ver Todos os Mangás
@@ -348,17 +487,19 @@ function Home() {
                     </div>
                 )}
             </div>
-            {/* Seção de teste pro skeleton loading do manga*/}
-            <div className="SectionInfo"><div className='Bar'></div><span className='SectionTitle'>Skeleton Loading</span></div>
-            <div className="mangaRow" ref={newMangasRef}>
-                {Array.from({ length: 8 }).map((_, i) => (
-                    <MangaCard key={i} isLoading />
-                    ))}
-            </div>
             
             <div className="mangaGridSeeAll">
-                <button onClick={ () => navigate('/browser') }>Ver Todos</button>
+                <button onClick={() => link('/browser') }>Ver Todos</button>
             </div>
+
+            <LoginRequiredPortal
+                isOpen={loginPromptOpen}
+                onCancel={() => setLoginPromptOpen(false)}
+                onConfirm={() => {
+                    setLoginPromptOpen(false);
+                    link('/login');
+                }}
+            />
         </main>
     );
 }
