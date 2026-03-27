@@ -34,9 +34,9 @@ const parseTagInput = (value) => {
 const ListMangas = async (req, res) => {
     // Pegando Dados Brutos do Client
     const rawTag = req.query.tag;
-    const rawLimit = req.query.max ?? req.query.MAX;
+    const rawLimit = req.query.limit ?? req.query.max ?? req.query.MAX;
     const rawType = req.query.type;
-    const rawOrderBy = req.query.orderby;
+    const rawOrderBy = req.query.orderBy ?? req.query.orderby;
     const rawStatus = req.query.status;
     const rawSearch = req.query.search;
 
@@ -68,6 +68,7 @@ const ListMangas = async (req, res) => {
         'A-Z': 'J.titulo ASC',
         'Z-A': 'J.titulo DESC',
         views: 'J.views DESC',
+        top: 'J.views DESC',
         recent: 'J.created_at DESC'
     };
     const orderBy = orderByMap[rawOrderBy] || orderByMap['A-Z'];
@@ -153,7 +154,7 @@ const catchMangaById = async (req, res) => {
         const { rows } = await pool.query(query, values);
         if (!rows[0]) {
             return res.status(404).json({ message: 'Mangá não encontrado' });
-        }
+        } 
         return res.status(200).json({ manga: rows[0] });
     } catch (error) {
         console.error('Error fetching manga by ID:', error);

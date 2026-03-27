@@ -1,0 +1,557 @@
+.profileInfo{
+    width: 50vw;
+    max-width: 920px;
+    min-width: 320px;
+    height: 50vh;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 60px;
+    margin-top: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+}
+.profileIcon{
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 100%;
+    margin-top: 2rem;
+    border: 4px solid black;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+    overflow: hidden;
+    object-fit: cover;
+
+}
+.profileLevel{
+    position: absolute;
+    top: 150px;
+    width: 100px;
+    height: auto;
+    background: linear-gradient(90deg, rgba(37, 99, 235, 1),rgba(37, 99, 235, 1) ,rgb(158, 0, 194));
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    border: 4px solid black;
+    font-size: 1rem;
+}
+.profileIcon img{
+    width: 105%;
+    height: 105%;
+}
+.profileName{
+    margin-top: 1.5rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+.profileTitle{
+    margin-top: 0.2rem;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+.profileTags{
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 90%;
+}
+.profileTag{
+    padding: 0.5rem 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    color: white;
+}
+.profileTag.admin{
+    background: rgba(253, 11, 11, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.2);
+    color: red;
+}
+.profileTag.online{
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    color: rgb(134, 239, 172);
+}
+.profileTag.offline{
+    background: rgba(148, 163, 184, 0.15);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    color: rgb(226, 232, 240);
+}
+.profileExperience{
+    width: 50vw;
+    max-width: 920px;
+    min-width: 320px;
+    height: 50vh;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 60px;
+    margin-top: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+}
+.ExperienceTitle{
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    margin-top: 4vh;
+    gap: 0.5rem;
+    align-items: center; /* alinha verticalmente */
+}
+.ExperienceTitle h3{
+    font-size: 1rem;
+    color: white;
+    margin: 0;
+    line-height: 1;
+}
+.ExperienceTitle img{
+    width: 26px;
+    height: 26px;
+    display: block;
+}
+.ExperienceInfos{
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 2vh;
+    gap: 0.5rem;
+    align-items: center; /* alinha verticalmente */
+}
+.ExperienceInfos h4{
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    line-height: 1;
+}
+.ExperienceInfos span{
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    line-height: 1;
+    margin-left: auto;
+    font-family: Inter-ExtraBold, sans-serif;
+    white-space: nowrap;
+}
+.ExperienceInfos span h2{
+    display: inline;
+    font-size: 1.5rem;
+    color: white;
+    margin: 0;
+    line-height: 1;
+    font-family: Inter-ExtraBold, sans-serif;
+    white-space: nowrap;
+}
+.ExperienceBar{
+    width: 90%;
+    height: 4vh;
+    min-height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    margin-top: 0.5rem;
+}
+.ExperienceBarFill{
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(37, 99, 235, 1),rgba(37, 99, 235, 1) ,rgb(158, 0, 194));
+    border-radius: 9999px;
+    background-size: 220% 100%;
+    background-position: 0% 50%;
+    transition: width 0.3s ease;
+    animation: BarFillbgAnimation 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    will-change: background-position, opacity;
+}
+@keyframes BarFillbgAnimation {
+    0% {
+        background-position: 0% 50%;
+        opacity: 1;
+    }
+    45% {
+        opacity: 0.92;
+    }
+    50% {
+        background-position: 100% 50%;
+        opacity: 0.98;
+    }
+    100% {
+        background-position: 0% 50%;
+        opacity: 1;
+    }
+}
+
+@media (max-width: 1024px) {
+    .profileInfo,
+    .profileExperience {
+        width: 86vw;
+        border-radius: 40px;
+    }
+
+    .profileName {
+        font-size: 1.2rem;
+    }
+
+    .profileTitle {
+        font-size: 1rem;
+    }
+
+    .ExperienceInfos {
+        align-items: flex-start;
+    }
+
+    .ExperienceInfos span {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .perfil-content {
+        padding: 0 0.75rem 1rem;
+    }
+
+    .profileSwitch {
+        width: 100%;
+        max-width: 420px;
+        padding: 0.4rem;
+    }
+
+    .profileSwitch button {
+        flex: 1;
+        justify-content: center;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .profileInfo,
+    .profileExperience {
+        width: 100%;
+        min-width: 0;
+        border-radius: 24px;
+        padding: 0 0.75rem;
+        box-sizing: border-box;
+    }
+
+    .profileInfo {
+        min-height: 460px;
+        height: auto;
+        padding-bottom: 1rem;
+    }
+
+    .profileIcon {
+        width: 130px;
+        height: 130px;
+        margin-top: 1.5rem;
+    }
+
+    .profileLevel {
+        top: 126px;
+        width: 90px;
+        font-size: 0.9rem;
+    }
+
+    .profileName {
+        margin-top: 1.1rem;
+        font-size: 1rem;
+        text-align: center;
+        word-break: break-word;
+    }
+
+    .profileTitle {
+        font-size: 0.95rem;
+        text-align: center;
+        word-break: break-word;
+    }
+
+    .profileTags {
+        width: 100%;
+        gap: 0.4rem;
+    }
+
+    .profileTag {
+        font-size: 0.7rem;
+        padding: 0.45rem 0.65rem;
+    }
+
+    .profileExperience {
+        height: auto;
+        min-height: 260px;
+        padding-bottom: 1rem;
+    }
+
+    .ExperienceTitle,
+    .ExperienceInfos,
+    .ExperienceBar {
+        width: 100%;
+    }
+
+    .ExperienceInfos h4 {
+        font-size: 0.75rem;
+        line-height: 1.3;
+    }
+
+    .ExperienceInfos span {
+        font-size: 0.9rem;
+    }
+
+    .ExperienceInfos span h2 {
+        font-size: 1.25rem;
+    }
+}
+.edit-profile{
+    width: 50vw;
+    max-width: 920px;
+    min-width: 320px;
+    height: auto;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 60px;
+    margin-top: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+    padding: 1rem;
+}
+.profileImage{
+    display: flex;
+    flex-direction: row;
+}
+.profileImageIcon{
+    width: 120px;
+    height: 120px;
+    border-radius: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 4px solid black;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+.profileImageIcon img{
+    width: 105%;
+    height: 105%;
+}
+.profileImageInfo{
+    display: flex;
+    flex-direction: column;
+    margin-left: 1rem;
+    padding: 1rem 0;
+    gap: 0.60rem;
+}
+.profileImageInfo h3{
+    font-size: 1.2rem;
+    color: white;
+    margin: 0;
+}
+.profileImageInfo span{
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+.profileImageActions{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}
+.profileImageActions span{
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.2s ease;
+}
+.profileImageActions span:hover{
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+}
+.profileImageActions button{
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    color: white;
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.profileImageActions img{
+    width: 22px;
+    height: 22px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.1rem;
+    align-self: center;
+}
+.profileImageActions button:hover{
+    transform: translateY(-2px);
+    cursor: pointer;
+}
+.ProfileEditLine{
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 1rem 0;
+}
+.editProfileSection{
+    display: flex;
+    flex-direction:  column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.editProfileSection h2{
+    font-size: 1.2rem;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+.editProfileSection h2 img{
+    width: 28px;
+    height: 28px;
+}
+.editProfileDuo{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+.editProfileInput{
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+}
+.editProfileInput label{
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+.editProfileInput input{
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    color: white;
+}
+.editProfileInput input:focus{
+    outline: none;
+    border-color: rgba(37, 99, 235, 0.8);
+    box-shadow: 0 0 5px rgba(37, 99, 235, 0.5);
+}
+.editProfileBio{
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+.editProfileBio label{
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+.editProfileBio textarea{
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    font-size: 0.85rem;
+    color: white;
+    resize: vertical;
+    min-height: 80px;
+}
+.editProfileBio textarea:focus{
+    outline: none;
+    border-color: rgba(37, 99, 235, 0.8);
+    box-shadow: 0 0 5px rgba(37, 99, 235, 0.5);
+}
+.editProfileActions{
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding: 0 1rem;
+}
+.editProfileActions button{
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    color: white;
+    transition: transform 0.2s ease;
+}
+.editProfileActions button:hover{
+    transform: translateY(-2px);
+    cursor: pointer;
+}
+.editProfileActions .cancelButton{
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+.editProfileActions .cancelButton:hover{
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+.editProfileActions .saveButton{
+    background: rgba(37, 99, 235, 0.8);
+    border: 1px solid transparent;
+    color: white;
+}
+.editProfileActions .saveButton:hover{
+    background: rgba(37, 99, 235, 1);
+    border: 1px solid transparent;
+    color: white;
+}
+
+.ProfileModalCrop{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.ProfileCropModalCard{
+    width: min(92vw, 520px);
+    padding: 0.9rem;
+    border-radius: 14px;
+    background: rgba(10, 14, 28, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.ProfileCropStage{
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 70vh;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(2, 6, 23, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}

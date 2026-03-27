@@ -17,13 +17,15 @@ import { useAuth } from '../../context/AuthContext';
 
 //Services
 import { notify } from '../../services/notify';
-import { API_URL } from '../../services/api';
+import { mangaFormatter } from '../../utils/mangaFormatter';
+import { mangaAPI } from '../../services/mangaapi';
 
 //Sections
 import Overview from './sections/overview';
 import MangaChapters from './sections/mangachapters';
 import MangaComments from './sections/mangacomments';
 import LoginRequiredPortal from '../../components/loginRequiredPortal';
+import AvaliationPortal from '../../components/avaliationPortal';
 
 const viewedMangaGuard = new Set();
 
@@ -38,6 +40,7 @@ function Manga(){
     const [bookmarkProcessing, setBookmarkProcessing] = useState(false);
     const [bookmarkHover, setBookmarkHover] = useState(false);
     const [loginPromptOpen, setLoginPromptOpen] = useState(false);
+    const [avaliationOpen, setAvaliationOpen] = useState(false);
 
     const tagsFromBackend = Array.isArray(manga?.tags)
         ? manga.tags
@@ -73,11 +76,7 @@ function Manga(){
         // Pegar os dados do mangá usando o ID
         const fetchManga = async () => {
             try {
-                const response = await fetch(`${API_URL}/manga/manga?id=${mangaId}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch manga details');
-                }
-                const data = await response.json();
+                const data = await mangaAPI.getMangaById({ id: mangaId });
                 setManga(data.manga);
             } catch (error) {
                 notify.error('Erro ao carregar detalhes do mangá');
@@ -93,28 +92,16 @@ function Manga(){
             viewedMangaGuard.add(guardKey);
 
             try {
-                await fetch(`${API_URL}/manga/view`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mangaId })
-                });
+                await mangaAPI.addView({ id: mangaId });
             } catch (error) {
-                viewedMangaGuard.delete(guardKey);
-                return
+                return console.error('Erro ao incrementar visualizações do mangá');
             }
         };
         // Função para checar se o usúario ja deu bookmark nesse mangá
         const checkBookmark = async () => {
             try {
-                const response = await fetch(`${API_URL}/user/bookmark/check?mangaid=${mangaId}`, {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to check bookmark status');
-                }
-                const data = await response.json();
-                setBookmarked(data.bookmarked);
+                const data = await mangaAPI.checkBookmark({ id: mangaId });
+                setBookmarked(Boolean(data?.bookmarked));
             } catch (error) {
                 return
             }
@@ -134,16 +121,7 @@ function Manga(){
         try {
             setBookmarkHover(false);
             setBookmarkProcessing(true);
-            const response = await fetch(`${API_URL}/user/bookmark`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ mangaid: manga.id })
-            });
-            if (!response.ok) {
-                throw new Error('Failed to toggle bookmark');
-            }
-            const data = await response.json();
+            const data = await mangaAPI.toggleBookmark({ id: manga.id });
             setBookmarked((prev) => !prev);
             notify.success(data.message);
         } catch (error) {
@@ -152,6 +130,7 @@ function Manga(){
             setBookmarkProcessing(false);
         }
     };
+
     return(
         <main className='manga-content'>
             <div className="MangaBackgroundBanner"><img src={manga?.banner} alt={manga?.titulo} /></div>
@@ -161,13 +140,7 @@ function Manga(){
                 <div className="MangaHeaderInfo">
 
                     <div className="MangaHeaderInfoStatus">
-                        {manga?.status === 'completed'
-                            ? 'Completed Series'
-                            : manga?.status === 'hiatus'
-                                ? 'On Hiatus'
-                                : manga?.status === 'cancelled'
-                                    ? 'Cancelled Series'
-                                    : 'Ongoing Series'}
+                        {mangaFormatter.formatHeaderStatus(manga?.status)}
                     </div>
                     <h1 className="MangaHeaderInfoTitle">{manga?.titulo}</h1>
                 
@@ -228,7 +201,13 @@ function Manga(){
                             <img src={bookmarkProcessing ? loading : (bookmarked ? (bookmarkHover ? bookmarkremove : bookmarkadded) : bookmark)} alt="Bookmark" />
                             {bookmarkProcessing ? '' : (bookmarked ? (bookmarkHover ? 'Remover da lista' : 'Adicionado à lista') : 'Adicionar à lista')}
                         </button>
-                        <button className="MangaHeaderInfoAction">
+                        <button className="MangaHeaderInfoAction" onClick={() => {
+                            if(!usuario?.id){
+                                setLoginPromptOpen(true);
+                                return;
+                            }
+                            setAvaliationOpen(true);
+                        }}>
                             <img src={star} alt="Avaliar" />
                             Avaliar
                         </button>
@@ -267,6 +246,17 @@ function Manga(){
                 onConfirm={() => {
                     setLoginPromptOpen(false);
                     link('/login');
+                }}
+            />
+
+            <AvaliationPortal
+                isOpen={avaliationOpen}
+                title={manga?.titulo}
+                onCancel={() => setAvaliationOpen(false)}
+                onConfirm={(rating) => {
+                    setAvaliationOpen(false);
+                    mangaAPI.submitRating({ id: manga.id, usuario: usuario.id, rating })
+                    notify.success('Avaliação enviada com sucesso!');
                 }}
             />
 

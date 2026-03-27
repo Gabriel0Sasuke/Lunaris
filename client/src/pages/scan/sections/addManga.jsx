@@ -4,7 +4,8 @@ import Cropper from 'react-easy-crop';
 import { createPortal } from 'react-dom';
 import { notify } from '../../../services/notify';
 import { cropImage } from '../../../services/cropImage';
-import { API_URL } from '../../../services/api';
+import { mangaAPI } from '../../../services/mangaapi';
+import { tagAPI } from '../../../services/tagsapi';c 
 // Icons
 import photo from '../../../assets/ui/photo.svg';
 import panorama from '../../../assets/ui/panorama.svg';
@@ -74,13 +75,7 @@ function AddManga({ onManageTags }) {
         useEffect(() => {
             const fetchTags = async () => {
                 try {
-                    const resposta = await fetch(`${API_URL}/tag/list`, {
-                        credentials: 'include',
-                    });
-                if (!resposta.ok) {
-                    throw new Error('Erro ao buscar tags.');
-                }
-                const responseData = await resposta.json();
+                const responseData = await tagAPI.getTags();
                 const tagsArray = Array.isArray(responseData.tags)
                     ? responseData.tags
                     : Array.isArray(responseData?.tag)
@@ -181,7 +176,7 @@ function AddManga({ onManageTags }) {
                 : [...prev, value]
         );
     };
-
+    // A função handleDiscard é responsável (euacho)por limpar todos os campos do formulário e os estados relacionados às imagens, retornando o componente ao seu estado inicial. Ela também revoga os objetos URL criados para as imagens para evitar vazamento de memória.
     const handleDiscard = () => {
         setMangaTitle('');
         setMangaSynopsis('');
@@ -210,16 +205,19 @@ function AddManga({ onManageTags }) {
     const onCropComplete = (croppedArea, croppedAreaPixels) => {
         setCroppedAreaPixels(croppedAreaPixels);
     }
+    // A função handleCropConfirm é responsável por processar a imagem recortada usando a função cropImage, que retorna um blob da imagem recortada e uma URL de visualização. Dependendo se o usuário está recortando a capa ou o banner, a função cria um novo arquivo a partir do blob, atualiza o estado correspondente (mangaPhoto ou mangaBanner) e a URL de visualização. Após o processamento, ela limpa os estados relacionados ao crop para fechar o modal de recorte.
     const handleCropConfirm = async () => {
         try{
             const {blob, previewURL} = await cropImage(isCropping === 'cover' ? URLmangaPhoto : URLmangaBanner, croppedAreaPixels);
             if(isCropping === 'cover') {
-                const croppedFile = new File([blob], mangaPhoto.name, { type: blob.type });
+                const coverName = (mangaPhoto?.name || 'cover').replace(/\.[^.]+$/, '') || 'cover';
+                const croppedFile = new File([blob], `${coverName}.webp`, { type: blob.type });
                 URL.revokeObjectURL(URLmangaPhoto);
                 setMangaPhoto(croppedFile);
                 setURLMangaPhoto(previewURL);
             }else if(isCropping === 'banner') {
-                const croppedFile = new File([blob], mangaBanner.name, { type: blob.type });
+                const bannerName = (mangaBanner?.name || 'banner').replace(/\.[^.]+$/, '') || 'banner';
+                const croppedFile = new File([blob], `${bannerName}.webp`, { type: blob.type });
                 URL.revokeObjectURL(URLmangaBanner);
                 setMangaBanner(croppedFile);
                 setURLMangaBanner(previewURL);
@@ -231,7 +229,7 @@ function AddManga({ onManageTags }) {
             setIsCropping('');
         }
     }
-
+    // A função handleCropDiscard é responsável por descartar o processo de recorte. Se o usuário estava recortando a capa, ela limpa o estado mangaPhoto e URLmangaPhoto. Se estava recortando o banner, limpa mangaBanner e URLmangaBanner. Em ambos os casos, ela também limpa os estados relacionados ao crop para fechar o modal de recorte.
     const handleCropDiscard = () => {
         if(isCropping === 'cover') {
             setMangaPhoto(null);
@@ -244,6 +242,7 @@ function AddManga({ onManageTags }) {
         setIsCropping('');
     }
 
+    // O modal de crop é criado usando createPortal para garantir que ele seja renderizado no nível do body, permitindo que ele se sobreponha a outros elementos da página sem problemas de z-index ou overflow.
     const cropModal = isCropping ? createPortal(
         <div className="AddMangaModalCrop">
             <div className="CropModalCard">
@@ -273,6 +272,7 @@ function AddManga({ onManageTags }) {
             notify.error('Por favor, preencha todos os campos corretamente antes de enviar.');
             return;
         }
+        // Criar objeto FormData para enviar os dados do formulário, incluindo as imagens
         setIsLoading(true);
         const data = new FormData();
         data.append('title', mangaTitle.trim());
@@ -287,18 +287,13 @@ function AddManga({ onManageTags }) {
         data.append('cover', mangaPhoto);
         data.append('banner', mangaBanner);
 
+        // Enviar os dados para a API e lidar com a resposta
         try{
-            const resposta = await fetch(`${API_URL}/manga/create`, {
-                method: 'POST',
-                credentials: 'include',
-                body: data
-            });
-            const msg = await resposta.json();
-            if(!resposta.ok) return notify.error(msg.message);
-            notify.success(msg.message);
+            const response = await mangaAPI.createManga({ formData: data });
+            notify.success(response?.message || 'Mangá criado com sucesso.');
             handleDiscard();
         }catch(error) {
-            notify.error('Erro ao adicionar o mangá. Por favor, tente novamente.');
+            notify.error(error?.message || 'Erro ao adicionar o mangá. Por favor, tente novamente.');
         }finally{
             setIsLoading(false);
             handleCropDiscard();

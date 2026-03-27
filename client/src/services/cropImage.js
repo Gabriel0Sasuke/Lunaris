@@ -32,6 +32,6 @@ export const cropImage = async (fileURL, pixels) => {
             }
             const previewURL = URL.createObjectURL(blob);
             resolve({blob, previewURL});
-        }, 'image/jpeg', 0.9);
+        }, 'image/webp', 0.9);
     });
 }

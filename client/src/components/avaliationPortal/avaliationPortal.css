@@ -1,0 +1,92 @@
+.AvaliationOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.AvaliationCard {
+    width: min(460px, 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(12, 12, 12, 0.92);
+    box-shadow: 0 0 30px rgba(37, 99, 235, 0.35);
+    padding: 22px;
+    color: #fff;
+}
+
+.AvaliationCard h3 {
+    margin: 0;
+    font-family: Inter-ExtraBold, sans-serif;
+    font-size: 1.2rem;
+}
+
+.AvaliationStars {
+    width: min(220px, 100%);
+    margin: 14px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.AvaliationStar {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    cursor: pointer;
+    filter: brightness(0) saturate(100%) invert(87%) sepia(54%) saturate(2388%) hue-rotate(358deg) brightness(107%) contrast(101%);
+}
+
+.AvaliationActions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.AvaliationButton {
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    padding: 9px 14px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-family: Inter-Bold, sans-serif;
+    cursor: pointer;
+}
+
+.AvaliationButton.cancel {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.AvaliationButton.confirm {
+    background: rgba(37, 99, 235, 0.7);
+    border-color: rgba(37, 99, 235, 0.9);
+}
+
+@media (max-width: 600px) {
+    .AvaliationCard {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .AvaliationStars {
+        gap: 8px;
+    }
+
+    .AvaliationActions {
+        justify-content: stretch;
+    }
+
+    .AvaliationButton {
+        flex: 1;
+        text-align: center;
+    }
+}
