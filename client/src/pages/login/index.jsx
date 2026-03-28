@@ -1,11 +1,11 @@
 //React
-import { useNavigate } from 'react-router-dom';
+import { useNavigateTo } from '../../utils/navigateTo';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 // Serviços
 import { notify } from '../../services/notify';
-import { API_URL } from '../../services/api';
+import { userAPI } from '../../services/userapi';
 
 //CSS
 import './login.css';
@@ -17,9 +17,9 @@ import { useGoogleLogin } from '@react-oauth/google';
 
 function Login() {
     // Navegação
-    const navigate = useNavigate();
+    const navigateTo = useNavigateTo();
     function link(link){
-        navigate(link);
+        navigateTo(link);
     }
     const [loadingState, setLoadingState] = useState(false);
     // Dados
@@ -39,32 +39,16 @@ function Login() {
         e.preventDefault();
         setLoadingState(true);
 
-        const loginData = {
-            email,
-            password,
-        };
-
         try {
-            const resposta = await fetch(`${API_URL}/auth/login`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(loginData),
+            const data = await userAPI.login({
+                email,
+                password
             });
-
-            if (resposta.ok) {
-                const data = await resposta.json();
-                notify.success(data.message);
-                await verificarUsuario();
-                link('/');
-            } else {
-                const data = await resposta.json();
-                notify.error(data.message);
-            }
+            notify.success(data.message);
+            await verificarUsuario();
+            link('/');
         } catch (error) {
-            notify.error('Não foi possível conectar ao servidor.');
+            notify.error(error.message || 'Não foi possível conectar ao servidor.');
         } finally {
             setLoadingState(false);
         }
@@ -73,26 +57,14 @@ function Login() {
     const googleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             try {
-                const resposta = await fetch(`${API_URL}/auth/google`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ token: tokenResponse.access_token }),
+                const data = await userAPI.googleLogin({
+                    token: tokenResponse.access_token
                 });
-
-                if (resposta.ok) {
-                    const data = await resposta.json();
-                    notify.success(data.message);
-                    await verificarUsuario();
-                    link('/');
-                } else {
-                    const data = await resposta.json();
-                    notify.error(data.message);
-                }
+                notify.success(data.message);
+                await verificarUsuario();
+                link('/');
             } catch (error) {
-                notify.error('Não foi possível conectar ao servidor.');
+                notify.error(error.message || 'Não foi possível conectar ao servidor.');
             } finally {
                 setLoadingState(false);
             }

@@ -9,16 +9,21 @@ import bookmarkadded from '../../assets/ui/bookmarkadded.svg';
 import bookmarkremove from '../../assets/ui/bookmarkremove.svg';
 import share from '../../assets/ui/share.svg';
 import loading from '../../assets/ui/loading.svg';
+import more from '../../assets/ui/more.svg';
+import trash from '../../assets/ui/trash.svg';
+import edit from '../../assets/ui/edit.svg';
 
 // React
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNavigateTo } from '../../utils/navigateTo';
 import { useAuth } from '../../context/AuthContext';
 
 //Services
 import { notify } from '../../services/notify';
 import { mangaFormatter } from '../../utils/mangaFormatter';
 import { mangaAPI } from '../../services/mangaapi';
+import ConfirmationPortal from '../../components/confirmationPortal';
 
 //Sections
 import Overview from './sections/overview';
@@ -33,7 +38,7 @@ function Manga(){
     const { usuario } = useAuth();
     const [activeSection, setActiveSection] = useState('overview');
     const { id } = useParams();
-    const navigate = useNavigate();
+    const navigateTo = useNavigateTo();
     const [manga, setManga] = useState(null);
     const MAX_VISIBLE_TAGS = 5;
     const [bookmarked, setBookmarked] = useState(false);
@@ -41,6 +46,8 @@ function Manga(){
     const [bookmarkHover, setBookmarkHover] = useState(false);
     const [loginPromptOpen, setLoginPromptOpen] = useState(false);
     const [avaliationOpen, setAvaliationOpen] = useState(false);
+    const [moreOpen, setMoreOpen] = useState(false);
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
 
     const tagsFromBackend = Array.isArray(manga?.tags)
         ? manga.tags
@@ -62,7 +69,7 @@ function Manga(){
     const remainingTags = Math.max(allTags.length - MAX_VISIBLE_TAGS, 0);
 
     const link = (path) => {
-        navigate(path);
+        navigateTo(path);
     }
 
     // Efeito para carregar os detalhes do mangá quando o componente é montado ou quando o ID muda
@@ -128,6 +135,17 @@ function Manga(){
             notify.error('Erro ao atualizar bookmark');
         }finally{
             setBookmarkProcessing(false);
+        }
+    };
+
+    const handleDeleteManga = async () => {
+        try {
+            setConfirmationOpen(false);
+            await mangaAPI.deleteManga({ id: manga.id });
+            notify.success('Mangá deletado com sucesso!');
+            link('/');
+        } catch (error) {
+            notify.error('Erro ao deletar mangá');
         }
     };
 
@@ -214,7 +232,23 @@ function Manga(){
                         <button className="MangaHeaderInfoAction">
                             <img src={share} alt="Share" />
                         </button>
-
+                        {(usuario?.account_type === 'admin' || usuario?.account_type === 'scan') && (
+                            <button className="MangaHeaderInfoAction" onClick={() => setMoreOpen(!moreOpen)}>
+                                <img src={more} alt="Mais" />
+                            </button>
+                        )}
+                        {moreOpen && (
+                            <div className="MangaHeaderInfoMore">
+                                <button className="MangaHeaderInfoMoreItem">
+                                    <img src={edit} alt="Editar" />
+                                    Editar
+                                </button>
+                                <button className="MangaHeaderInfoMoreItem" onClick={() => { setMoreOpen(false); setConfirmationOpen(true); }}>
+                                    <img src={trash} alt="Deletar" />
+                                    Deletar
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                 </div>
@@ -260,6 +294,14 @@ function Manga(){
                 }}
             />
 
+            <ConfirmationPortal
+                isOpen={confirmationOpen}
+                title={`Deletar ${manga?.titulo}`}
+                message={`Tem certeza que deseja deletar o mangá "${manga?.titulo}"? Essa ação não pode ser desfeita.`}
+                confirmLabel="Deletar"
+                onConfirm={handleDeleteManga}
+                onCancel={() => setConfirmationOpen(false)}
+            />
         </main>
     )
 }

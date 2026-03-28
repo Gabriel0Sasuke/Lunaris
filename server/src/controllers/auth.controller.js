@@ -2,6 +2,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../database/sql');
+const r2 = require('../database/bucket');
+const { PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const crypto = require('crypto');
 
 //Cadastro
 const cadastro = async (req, res) => {
@@ -58,7 +61,7 @@ const login = async (req, res) => {
 // Verificação
 const verificacao = async (req, res) => {
   const userId = req.user.id;
-  const query = "SELECT id, email, username, xp, titulo, foto, account_type, last_seen, created_at, scan_afiliada, ativa FROM usuario WHERE id = $1";
+  const query = "SELECT u.id, u.email, u.username, u.xp, t.nome AS titulo, u.titulo AS titulo_id, u.foto, u.account_type, u.last_seen, u.created_at, u.scan_afiliada, u.bio, u.ativa FROM usuario u LEFT JOIN titles t ON u.titulo = t.id WHERE u.id = $1";
   const updateLastSeenQuery = "UPDATE usuario SET last_seen = NOW() WHERE id = $1";
   try {
     const { rows } = await pool.query(query, [userId]);
@@ -165,11 +168,200 @@ const online = async (req, res) => {
     return res.status(500).json({ message: 'Erro ao atualizar Status' });
   }
 }
+
+const normalizeNullableText = (value) => {
+  if (value === undefined || value === null) return null;
+  const normalized = String(value).trim();
+  if (!normalized || normalized.toLowerCase() === 'null') return null;
+  return normalized;
+};
+
+const checkUpdateAvailability = async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(400).json({ message: 'ID do usuário é obrigatório' });
+
+  const username = normalizeNullableText(req.query.username);
+  const emailRaw = normalizeNullableText(req.query.email);
+  const email = emailRaw ? emailRaw.toLowerCase() : null;
+
+  try {
+    let usernameAvailable = true;
+    let emailAvailable = true;
+
+    if (username) {
+      const usernameQuery = 'SELECT id FROM usuario WHERE username = $1 AND id != $2 LIMIT 1';
+      const { rowCount } = await pool.query(usernameQuery, [username, userId]);
+      usernameAvailable = rowCount === 0;
+    }
+
+    if (email) {
+      const emailQuery = 'SELECT id FROM usuario WHERE email = $1 AND id != $2 LIMIT 1';
+      const { rowCount } = await pool.query(emailQuery, [email, userId]);
+      emailAvailable = rowCount === 0;
+    }
+
+    return res.status(200).json({ usernameAvailable, emailAvailable });
+  } catch (error) {
+    return res.status(500).json({ message: 'Erro ao verificar disponibilidade de dados' });
+  }
+}
+
+const updateProfile = async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(400).json({ message: 'ID do usuário é obrigatório' });
+
+  const username = normalizeNullableText(req.body.username);
+  const emailRaw = normalizeNullableText(req.body.email);
+  const email = emailRaw ? emailRaw.toLowerCase() : null;
+  const bio = normalizeNullableText(req.body.bio);
+  const titleRaw = normalizeNullableText(req.body.title);
+  const title = titleRaw !== null ? parseInt(titleRaw, 10) : null;
+  const password = normalizeNullableText(req.body.password);
+  const removeProfileImage = String(req.body.removeProfileImage || '').toLowerCase() === 'true';
+  const profileFile = req.files?.profile?.[0] || null;
+  const profileImage = profileFile?.buffer || null;
+
+  const hasUsername = username !== null;
+  const hasEmail = email !== null;
+  const hasBio = bio !== null;
+  const hasTitle = title !== null;
+  const hasPassword = password !== null;
+  const hasProfileImage = profileImage !== null;
+  const hasRemoveProfileImage = removeProfileImage && !hasProfileImage;
+
+  if (hasUsername && (username.length < 3 || username.length > 25)) return res.status(400).json({ message: 'O nome de usuário deve ter entre 3 e 25 caracteres.' });
+  if (hasEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ message: 'E-mail inválido.' });
+  if (hasBio && bio.length > 2500) return res.status(400).json({ message: 'A biografia deve ter no máximo 2500 caracteres.' });
+  if (hasTitle && (isNaN(title) || title < 1)) return res.status(400).json({ message: 'Título inválido.' });
+  if (hasPassword && (password.length < 8 || password.length > 50 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[!@#$%^&*]/.test(password))) {
+    return res.status(400).json({ message: 'A senha deve ter entre 8 e 50 caracteres, com maiúscula, minúscula, número e símbolo.' });
+  }
+  if (hasProfileImage && profileFile.mimetype !== 'image/webp') return res.status(400).json({ message: 'Formato de imagem inválido. Apenas imagens no formato WebP são permitidas.' });
+  if (hasProfileImage && profileFile.size > 2 * 1024 * 1024) return res.status(400).json({ message: 'A imagem de perfil deve ter no máximo 2MB.' });
+
+  let profileImageUrl = null;
+  let profileImageKey = null;
+  let oldProfileImageUrl = null;
+  const bucketName = process.env.R2_BUCKET_NAME;
+  const r2BaseUrl = process.env.R2_BASE_URL || process.env.R2_PUBLIC_URL;
+
+  try {
+    if (hasUsername) {
+      const usernameQuery = 'SELECT id FROM usuario WHERE username = $1 AND id != $2';
+      const { rows: usernameRows } = await pool.query(usernameQuery, [username, userId]);
+      if (usernameRows.length > 0) return res.status(409).json({ message: 'Este nome de usuário já está em uso.' });
+    }
+
+    if (hasEmail) {
+      const emailQuery = 'SELECT id FROM usuario WHERE email = $1 AND id != $2';
+      const { rows: emailRows } = await pool.query(emailQuery, [email, userId]);
+      if (emailRows.length > 0) return res.status(409).json({ message: 'Este e-mail já está em uso.' });
+    }
+
+    let updateFields = [];
+    let updateValues = [];
+    let paramIndex = 1;
+
+    if (hasUsername) {
+      updateFields.push(`username = $${paramIndex++}`);
+      updateValues.push(username);
+    }
+    if (hasEmail) {
+      updateFields.push(`email = $${paramIndex++}`);
+      updateValues.push(email);
+    }
+    if (hasBio) {
+      updateFields.push(`bio = $${paramIndex++}`);
+      updateValues.push(bio);
+    }
+    if (hasTitle) {
+      updateFields.push(`titulo = $${paramIndex++}`);
+      updateValues.push(title);
+    }
+    if (hasPassword) {
+      const passwordHash = await bcrypt.hash(password, 10);
+      updateFields.push(`password = $${paramIndex++}`);
+      updateValues.push(passwordHash);
+    }
+
+    if (hasRemoveProfileImage) {
+      oldProfileImageUrl = await getCurrentProfileImageUrl(userId);
+      updateFields.push('foto = NULL');
+    }
+
+    if (hasProfileImage) {
+      if (!bucketName || !r2BaseUrl) {
+        return res.status(500).json({ message: 'Configuração de armazenamento ausente.' });
+      }
+
+      profileImageKey = `profiles/${userId}-${crypto.randomUUID()}.webp`;
+      oldProfileImageUrl = await getCurrentProfileImageUrl(userId);
+
+      await r2.send(new PutObjectCommand({
+        Bucket: bucketName,
+        Key: profileImageKey,
+        Body: profileImage,
+        ContentType: 'image/webp'
+      }));
+
+      profileImageUrl = buildObjectUrl(r2BaseUrl, profileImageKey);
+      updateFields.push(`foto = $${paramIndex++}`);
+      updateValues.push(profileImageUrl);
+    }
+
+    if (updateFields.length === 0) return res.status(400).json({ message: 'Nenhum campo para atualizar' });
+
+    const updateQuery = `UPDATE usuario SET ${updateFields.join(', ')} WHERE id = $${paramIndex}`;
+    updateValues.push(userId);
+    await pool.query(updateQuery, updateValues);
+
+    if ((hasProfileImage || hasRemoveProfileImage) && oldProfileImageUrl && bucketName && r2BaseUrl) {
+      const normalizedBaseUrl = r2BaseUrl.replace(/\/+$/, '');
+      const oldImageKey = oldProfileImageUrl.startsWith(normalizedBaseUrl)
+        ? oldProfileImageUrl.replace(normalizedBaseUrl, '').replace(/^\/+/, '')
+        : null;
+      if (oldImageKey) {
+        await r2.send(new DeleteObjectCommand({
+          Bucket: bucketName,
+          Key: oldImageKey
+        }));
+      }
+    }
+
+    return res.status(200).json({ message: 'Perfil atualizado com sucesso' });
+  } catch (error) {
+    if (hasProfileImage && profileImageKey && bucketName) {
+      try {
+        await r2.send(new DeleteObjectCommand({
+          Bucket: bucketName,
+          Key: profileImageKey
+        }));
+      } catch (_cleanupError) {
+        console.error('Erro ao limpar imagem de perfil após falha na atualização:', _cleanupError);
+      }
+    }
+    return res.status(500).json({ message: 'Erro ao atualizar perfil' });
+  }
+}
+
+// Funções Auxiliares
+const buildObjectUrl = (baseUrl, key) => {
+  return `${baseUrl.replace(/\/+$/, '')}/${key.replace(/^\/+/, '')}`;
+}
+const getCurrentProfileImageUrl = async (userId) => {
+  const query = "SELECT foto FROM usuario WHERE id = $1";
+  const { rows } = await pool.query(query, [userId]);
+  return rows[0]?.foto || null;
+};
+
+
 module.exports = {
   cadastro,
   login,
   verificacao,
   logout,
   google,
-  online
+  online,
+  checkUpdateAvailability,
+  updateProfile
 }

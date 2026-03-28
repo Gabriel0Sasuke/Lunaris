@@ -146,5 +146,30 @@ export const mangaAPI = {
             console.error('Erro ao criar manga');
             throw error;
         }
+    },
+    // Deleta um mangá (usado para administradores)
+    deleteManga: async ({ id }) => {
+        const baseURL = new URL(`${API_URL}/manga/delete`);
+
+        if (isInvalidMangaId(id)) {
+            throw new Error('ID do manga é obrigatório');
+        }
+
+        try{
+            const response = await fetch(baseURL, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mangaId: Number(id) })
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result?.message || 'Erro ao deletar manga');
+            }
+            return result;
+        } catch(error) {
+            console.error('Erro ao deletar manga');
+            throw error;
+        }
     }
 }

@@ -1,5 +1,4 @@
 const express = require('express');
-require('dotenv').config();
 const Router = express.Router();
 const authMiddleware = require('../middleware/auth.middleware');
 const userController = require('../controllers/user.controller');
@@ -11,5 +10,8 @@ Router.patch('/bookmark/toggle', authMiddleware, userController.bookmarkManga);
 
 // Rota para verificar se um mangá está nos bookmarks do usuário
 Router.get('/bookmark/check', authMiddleware, userController.checkBookmark);
+
+// Rota para obter todos os titulos disponiveis
+Router.get('/titles', userController.getTitles);
 
 module.exports = Router;

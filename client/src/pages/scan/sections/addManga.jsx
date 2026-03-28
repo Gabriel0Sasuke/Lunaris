@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { notify } from '../../../services/notify';
 import { cropImage } from '../../../services/cropImage';
 import { mangaAPI } from '../../../services/mangaapi';
-import { tagAPI } from '../../../services/tagsapi';c 
+import { tagAPI } from '../../../services/tagsapi';
 // Icons
 import photo from '../../../assets/ui/photo.svg';
 import panorama from '../../../assets/ui/panorama.svg';

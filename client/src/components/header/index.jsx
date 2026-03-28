@@ -1,5 +1,7 @@
 //React
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useNavigateTo } from '../../utils/navigateTo';
+import { useAuth } from '../../context/AuthContext';
 
 // CSS
 import './header.css';
@@ -12,12 +14,13 @@ import notification from '../../assets/ui/notifications.svg';
 import notificationFull from '../../assets/ui/notifications_full.svg';
 
 export function Header( { setIsSidebarOpen, setIsNotificationsOpen, isNotificationsOpen } ) {
-    const navigate = useNavigate();
+    const navigateTo = useNavigateTo();
     const location = useLocation();
+    const { usuario } = useAuth();
+    const profileImage = usuario?.foto || profileIcon;
 
-    
     function link(path) {
-        navigate(path);
+        navigateTo(path);
     }
 
     return (
@@ -35,7 +38,7 @@ export function Header( { setIsSidebarOpen, setIsNotificationsOpen, isNotificati
 
             <div className='navActions'>
                 <div className='notification' onClick={() => setIsNotificationsOpen(prev => !prev)}><img src={isNotificationsOpen ? notificationFull : notification} onContextMenu={(e) => e.preventDefault()} /></div>
-                <div className='profile' onClick={() => setIsSidebarOpen(true)}><img  src={profileIcon} onContextMenu={(e) => e.preventDefault()} /></div>
+                <div className='profile' onClick={() => setIsSidebarOpen(true)}><img src={profileImage} onError={(e) => { e.currentTarget.src = profileIcon; }} onContextMenu={(e) => e.preventDefault()} /></div>
             </div>
 
         </header>

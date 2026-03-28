@@ -197,7 +197,7 @@ const CreateManga = async (req, res) => {
     const r2BaseUrl = process.env.R2_BASE_URL || process.env.R2_PUBLIC_URL;
 
     if (!bucketName || !r2BaseUrl) {
-        return res.status(500).json({ message: 'Configuração do bucket incompleta (R2_BUCKET_NAME/R2_BASE_URL)' });
+        return res.status(500);
     }
 
     let client;
@@ -279,10 +279,52 @@ const IncrementViews = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+const DeleteManga = async (req, res) => {
+    const { mangaId } = req.body;
+    if (!mangaId || !Number.isInteger(Number(mangaId)) || Number(mangaId) <= 0) {
+        return res.status(400).json({ message: 'ID do mangá inválido. Deve ser um número inteiro maior que 0.' });
+    }
 
+    const bucketName = process.env.R2_BUCKET_NAME;
+    const r2BaseUrl = process.env.R2_BASE_URL || process.env.R2_PUBLIC_URL;
+
+    const extractKey = (url) => {
+        if (!url || !r2BaseUrl) return null;
+        if (url.startsWith(r2BaseUrl)) {
+            return url.slice(r2BaseUrl.length).replace(/^\/+/, '');
+        }
+        return null;
+    };
+
+    try {
+        const query = 'DELETE FROM manga WHERE id = $1 RETURNING banner, foto';
+        const values = [mangaId];
+        const { rows } = await pool.query(query, values);
+        if (!rows[0]) {
+            return res.status(404).json({ message: 'Mangá não encontrado' });
+        }
+        const bannerKey = extractKey(rows[0].banner);
+        const fotoKey = extractKey(rows[0].foto);
+        const deletePromises = [];
+        if (bannerKey) {
+            deletePromises.push(r2.send(new DeleteObjectCommand({ Bucket: bucketName, Key: bannerKey })));
+        }
+        if (fotoKey) {
+            deletePromises.push(r2.send(new DeleteObjectCommand({ Bucket: bucketName, Key: fotoKey })));
+        }
+        if (deletePromises.length > 0) {
+            await Promise.allSettled(deletePromises);
+        }
+        return res.status(200).json({ message: 'Mangá deletado com sucesso' });
+    } catch (error) {
+        console.error('Error deleting manga:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
 module.exports = {
     CreateManga,
     catchMangaById,
     ListMangas,
-    IncrementViews
+    IncrementViews,
+    DeleteManga
 }

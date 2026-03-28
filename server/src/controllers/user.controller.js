@@ -70,7 +70,18 @@ const checkBookmark = async (req, res) => {
         return res.status(500).json({ message: 'Erro interno do servidor' });
     }
 }
+const getTitles = async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT id, nome FROM titles');
+        return res.status(200).json({ titles: rows });
+    } catch (error) {
+        console.error('Erro ao obter títulos:', error);
+        return res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+};
+
 module.exports = {
     bookmarkManga,
-    checkBookmark
+    checkBookmark,
+    getTitles
 };

@@ -1,12 +1,12 @@
 //React
-import { useNavigate } from 'react-router-dom';
+import { useNavigateTo } from '../../utils/navigateTo';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 
 // Serviços
 import { notify } from '../../services/notify';
-import { API_URL } from '../../services/api';
+import { userAPI } from '../../services/userapi';
 
 //CSS
 import './cadastro.css';
@@ -17,9 +17,9 @@ import loading from '../../assets/ui/loading.svg';
 
 function Cadastro() {
     // Navegação
-    const navigate = useNavigate();
+    const navigateTo = useNavigateTo();
     function link(link){
-        navigate(link);
+        navigateTo(link);
     }
     const [loadingState, setLoadingState] = useState(false);
     // Dados
@@ -31,7 +31,7 @@ function Cadastro() {
     const { verificarUsuario } = useAuth();
         
     const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&  email.length <= 255;
-    const senhaForte = password.length >= 8 && password.length <= 100 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[!@#$%^&*]/.test(password);
+    const senhaForte = password.length >= 8 && password.length <= 50 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[!@#$%^&*]/.test(password);
     const senhasIguais = password === confirmPassword;
     const termosAceitos = termsAccepted;
     const usernameValido = username.trim().length >= 3 && username.trim().length <= 25;
@@ -41,34 +41,19 @@ function Cadastro() {
     // Envio do Formulário
     const handleSubmit = async (e) => {
         // 1. Impede o navegador de recarregar a página
-     e.preventDefault();
-     setLoadingState(true);
+    e.preventDefault();
+    setLoadingState(true);
 
-    // 2. Criação do pacote JSON
-    const cadastroData = {
-        email: email,
-        password: password,
-        username: username
-    };
-  
-        // Envio para o servidor
         try{
-            const resposta = await fetch(`${API_URL}/auth/cadastro`, {
-                method: 'POST',
-                headers:{
-                    'Content-Type' : 'application/json'
-                },body: JSON.stringify(cadastroData)});
-            if(resposta.ok){
-                const data = await resposta.json()
-                notify.success(data.message);
-            }else{
-                //O Servidor respondeu mas algo deu errado.
-                const data = await resposta.json();
-                notify.error(data.message);
-            }
+            const data = await userAPI.cadastro({
+                email,
+                password,
+                username
+            });
+            notify.success(data.message);
 
         }catch(error){
-            notify.error('Não foi possível conectar ao servidor.');
+            notify.error(error.message || 'Não foi possível conectar ao servidor.');
         }finally{
             setLoadingState(false);
         }
@@ -77,26 +62,14 @@ function Cadastro() {
     const googleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             try {
-                const resposta = await fetch(`${API_URL}/auth/google`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ token: tokenResponse.access_token }),
+                const data = await userAPI.googleLogin({
+                    token: tokenResponse.access_token
                 });
-
-                if (resposta.ok) {
-                    const data = await resposta.json();
-                    notify.success(data.message);
-                    await verificarUsuario();
-                    link('/');
-                } else {
-                    const data = await resposta.json();
-                    notify.error(data.message);
-                }
+                notify.success(data.message);
+                await verificarUsuario();
+                link('/');
             } catch (error) {
-                notify.error('Não foi possível conectar ao servidor.');
+                notify.error(error.message || 'Não foi possível conectar ao servidor.');
             } finally {
                 setLoadingState(false);
             }
@@ -153,9 +126,9 @@ function Cadastro() {
                     <button type="submit" className='authSubmit' disabled={!Valido || loadingState}>{loadingState ? <img src={loading} /> : "Cadastrar"}</button>
                     
                     <div id='OR'>
-                         <div className="line"></div>
-                         <span>OU</span>
-                         <div className="line"></div>
+                        <div className="line"></div>
+                        <span>OU</span>
+                        <div className="line"></div>
                     </div>
                     <div className='socialLoginRow'>
                         <button type="button" className='socialLogin' onClick={handleGoogleCadastro} disabled={loadingState}>{loadingState ? <img src={loading} /> : <><img src="/icon/google.svg"/>Google</>}</button>

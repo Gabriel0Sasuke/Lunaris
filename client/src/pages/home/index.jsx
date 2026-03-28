@@ -11,7 +11,7 @@ import LoginRequiredPortal from '../../components/loginRequiredPortal';
 
 //React
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigateTo } from '../../utils/navigateTo';
 import { useAuth } from '../../context/AuthContext';
 
 //Hooks
@@ -30,7 +30,7 @@ function Home() {
     const [recentMangasList, setRecentMangasList] = useState([]);
     const [topMangasList, setTopMangasList] = useState([]);
     const [loginPromptOpen, setLoginPromptOpen] = useState(false);
-    const navigate = useNavigate();
+    const navigateTo = useNavigateTo();
     const [isLoading, setIsLoading] = useState(true);
 
     const carouselItems = topMangasList.slice(0, 3);
@@ -128,7 +128,7 @@ function Home() {
         return () => { c1?.(); c2?.(); c3?.(); };
     }, []);
 
-    const link = (pagina) => navigate(pagina);
+    const link = (pagina) => navigateTo(pagina);
 
     // Helper para formatar os dados de manga card
     const toCardProps = (manga) => ({

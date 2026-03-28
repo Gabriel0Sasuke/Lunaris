@@ -12,7 +12,7 @@ import loading from '../../assets/ui/loading.svg';
 
 // React
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigateTo } from '../../utils/navigateTo';
 import { useAuth } from '../../context/AuthContext';
 
 // Services
@@ -22,7 +22,7 @@ import { mangaFormatter } from '../../utils/mangaFormatter';
 
 function HomeCarousel({ items = [], isLoading, onLoginRequired }) {
     const { usuario } = useAuth();
-    const navigate = useNavigate();
+    const navigateTo = useNavigateTo();
     const [activeIndex, setActiveIndex] = useState(0);
 
     // Bookmark state
@@ -193,7 +193,7 @@ function HomeCarousel({ items = [], isLoading, onLoginRequired }) {
                             {manga.sinopse || 'Confira um dos mangás mais populares do momento na plataforma.'}
                         </p>
                         <div className="carousel-buttons">
-                            <button className="carousel-btn carousel-btn-primary" onClick={() => navigate(`/manga/${manga.id}`)}>
+                            <button className="carousel-btn carousel-btn-primary" onClick={() => navigateTo(`/manga/${manga.id}`)}>
                                 <img src={openbook} alt="ler" /> Ler Agora
                             </button>
                             <button

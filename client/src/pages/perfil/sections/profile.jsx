@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 //Icons
 import bolt from '../../../assets/ui/bolt.svg';
+import profileIcon from '../../../assets/icons/profile.svg';
 
 // CSS
 import './profileSections.css'
@@ -13,6 +14,7 @@ import { calcularProgressoXp } from '../../../services/nivelUser';
 function ViewProfile({ usuario }) {
     const progressoXp = calcularProgressoXp(usuario?.xp ?? 0);
     const formatoNumero = new Intl.NumberFormat('pt-BR');
+    const profileImage = usuario?.foto || profileIcon;
 
     function formatarCargo(accountType) {
         switch (accountType) {
@@ -63,7 +65,7 @@ function ViewProfile({ usuario }) {
         <div className="viewProfile">
             <div className="profileInfo">
                 <div className="profileIcon">
-                    <img src="/example/lunaChan.png" alt="Sua foto de perfil" />
+                    <img src={profileImage} onError={(e) => { e.currentTarget.src = profileIcon; }} alt="Sua foto de perfil" />
                     <div className="profileLevel">LVL {progressoXp.nivel}</div>
                 </div>
                 <div className="profileName">
@@ -74,6 +76,10 @@ function ViewProfile({ usuario }) {
                     <div className="profileTag">Membro desde {usuario?.created_at ? new Date(usuario.created_at).toLocaleDateString('pt-BR') : 'Desconhecido'}</div>
                     <div className={`profileTag ${isOnline(usuario?.last_seen) ? 'online' : 'offline'}`}>{lastSeen(usuario?.last_seen)}</div>
                     <div className={usuario?.account_type === 'admin' ? 'profileTag admin' : 'profileTag'}>{formatarCargo(usuario?.account_type)}</div>
+                </div>
+                <div className="profileBio">
+                    <h3>Biografia</h3>
+                    <p>{usuario?.bio || 'Este usuário não possui uma bio.'}</p>
                 </div>
             </div>
 
