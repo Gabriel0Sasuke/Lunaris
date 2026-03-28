@@ -26,7 +26,18 @@ Router.post('/online', authMiddleware, authController.online);
 Router.get('/update/availability', authMiddleware, authController.checkUpdateAvailability);
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ 
+    storage, 
+    limits: { fileSize: 2 *1024 * 1024 }, 
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Tipo de arquivo não permitido'));
+        }
+    }
+});
 
 const uploadFields = upload.fields([
     { name: 'profile', maxCount: 1 }

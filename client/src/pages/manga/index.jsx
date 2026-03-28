@@ -237,16 +237,18 @@ function Manga(){
                                 <img src={more} alt="Mais" />
                             </button>
                         )}
-                        {moreOpen && (
+                        {(moreOpen && (usuario?.account_type === 'admin' || usuario?.account_type === 'scan')) && (
                             <div className="MangaHeaderInfoMore">
                                 <button className="MangaHeaderInfoMoreItem">
                                     <img src={edit} alt="Editar" />
                                     Editar
                                 </button>
-                                <button className="MangaHeaderInfoMoreItem" onClick={() => { setMoreOpen(false); setConfirmationOpen(true); }}>
-                                    <img src={trash} alt="Deletar" />
-                                    Deletar
-                                </button>
+                                {(usuario?.account_type === 'admin') && (
+                                    <button className="MangaHeaderInfoMoreItem" onClick={() => { setMoreOpen(false); setConfirmationOpen(true); }}>
+                                        <img src={trash} alt="Deletar" />
+                                        Deletar
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>

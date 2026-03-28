@@ -197,7 +197,7 @@ const CreateManga = async (req, res) => {
     const r2BaseUrl = process.env.R2_BASE_URL || process.env.R2_PUBLIC_URL;
 
     if (!bucketName || !r2BaseUrl) {
-        return res.status(500);
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 
     let client;
