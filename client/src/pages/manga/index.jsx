@@ -289,8 +289,12 @@ function Manga(){
                 onCancel={() => setAvaliationOpen(false)}
                 onConfirm={(rating) => {
                     setAvaliationOpen(false);
-                    mangaAPI.submitRating({ id: manga.id, usuario: usuario.id, rating })
-                    notify.success('Avaliação enviada com sucesso!');
+                    if (mangaAPI && typeof mangaAPI.submitRating === 'function') {
+                        mangaAPI.submitRating({ id: manga.id, usuario: usuario.id, rating });
+                        notify.success('Avaliação enviada com sucesso!');
+                    } else {
+                        console.error('mangaAPI.submitRating is not implemented.');
+                    }
                 }}
             />
 
