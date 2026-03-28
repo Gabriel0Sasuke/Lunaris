@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from 'react';
 
 //Icons
 import bolt from '../../../assets/ui/bolt.svg';
