@@ -9,21 +9,28 @@ import bookmarkadded from '../../assets/ui/bookmarkadded.svg';
 import bookmarkremove from '../../assets/ui/bookmarkremove.svg';
 import share from '../../assets/ui/share.svg';
 import loading from '../../assets/ui/loading.svg';
+import more from '../../assets/ui/more.svg';
+import trash from '../../assets/ui/trash.svg';
+import edit from '../../assets/ui/edit.svg';
 
 // React
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNavigateTo } from '../../utils/navigateTo';
 import { useAuth } from '../../context/AuthContext';
 
 //Services
 import { notify } from '../../services/notify';
-import { API_URL } from '../../services/api';
+import { mangaFormatter } from '../../utils/mangaFormatter';
+import { mangaAPI } from '../../services/mangaapi';
+import ConfirmationPortal from '../../components/confirmationPortal';
 
 //Sections
 import Overview from './sections/overview';
 import MangaChapters from './sections/mangachapters';
 import MangaComments from './sections/mangacomments';
 import LoginRequiredPortal from '../../components/loginRequiredPortal';
+import AvaliationPortal from '../../components/avaliationPortal';
 
 const viewedMangaGuard = new Set();
 
@@ -31,13 +38,16 @@ function Manga(){
     const { usuario } = useAuth();
     const [activeSection, setActiveSection] = useState('overview');
     const { id } = useParams();
-    const navigate = useNavigate();
+    const navigateTo = useNavigateTo();
     const [manga, setManga] = useState(null);
     const MAX_VISIBLE_TAGS = 5;
     const [bookmarked, setBookmarked] = useState(false);
     const [bookmarkProcessing, setBookmarkProcessing] = useState(false);
     const [bookmarkHover, setBookmarkHover] = useState(false);
     const [loginPromptOpen, setLoginPromptOpen] = useState(false);
+    const [avaliationOpen, setAvaliationOpen] = useState(false);
+    const [moreOpen, setMoreOpen] = useState(false);
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
 
     const tagsFromBackend = Array.isArray(manga?.tags)
         ? manga.tags
@@ -59,7 +69,7 @@ function Manga(){
     const remainingTags = Math.max(allTags.length - MAX_VISIBLE_TAGS, 0);
 
     const link = (path) => {
-        navigate(path);
+        navigateTo(path);
     }
 
     // Efeito para carregar os detalhes do mangá quando o componente é montado ou quando o ID muda
@@ -73,11 +83,7 @@ function Manga(){
         // Pegar os dados do mangá usando o ID
         const fetchManga = async () => {
             try {
-                const response = await fetch(`${API_URL}/manga/manga?id=${mangaId}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch manga details');
-                }
-                const data = await response.json();
+                const data = await mangaAPI.getMangaById({ id: mangaId });
                 setManga(data.manga);
             } catch (error) {
                 notify.error('Erro ao carregar detalhes do mangá');
@@ -93,28 +99,16 @@ function Manga(){
             viewedMangaGuard.add(guardKey);
 
             try {
-                await fetch(`${API_URL}/manga/view`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mangaId })
-                });
+                await mangaAPI.addView({ id: mangaId });
             } catch (error) {
-                viewedMangaGuard.delete(guardKey);
-                return
+                return console.error('Erro ao incrementar visualizações do mangá');
             }
         };
         // Função para checar se o usúario ja deu bookmark nesse mangá
         const checkBookmark = async () => {
             try {
-                const response = await fetch(`${API_URL}/user/bookmark/check?mangaid=${mangaId}`, {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to check bookmark status');
-                }
-                const data = await response.json();
-                setBookmarked(data.bookmarked);
+                const data = await mangaAPI.checkBookmark({ id: mangaId });
+                setBookmarked(Boolean(data?.bookmarked));
             } catch (error) {
                 return
             }
@@ -134,16 +128,7 @@ function Manga(){
         try {
             setBookmarkHover(false);
             setBookmarkProcessing(true);
-            const response = await fetch(`${API_URL}/user/bookmark`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ mangaid: manga.id })
-            });
-            if (!response.ok) {
-                throw new Error('Failed to toggle bookmark');
-            }
-            const data = await response.json();
+            const data = await mangaAPI.toggleBookmark({ id: manga.id });
             setBookmarked((prev) => !prev);
             notify.success(data.message);
         } catch (error) {
@@ -152,6 +137,18 @@ function Manga(){
             setBookmarkProcessing(false);
         }
     };
+
+    const handleDeleteManga = async () => {
+        try {
+            setConfirmationOpen(false);
+            await mangaAPI.deleteManga({ id: manga.id });
+            notify.success('Mangá deletado com sucesso!');
+            link('/');
+        } catch (error) {
+            notify.error('Erro ao deletar mangá');
+        }
+    };
+
     return(
         <main className='manga-content'>
             <div className="MangaBackgroundBanner"><img src={manga?.banner} alt={manga?.titulo} /></div>
@@ -161,13 +158,7 @@ function Manga(){
                 <div className="MangaHeaderInfo">
 
                     <div className="MangaHeaderInfoStatus">
-                        {manga?.status === 'completed'
-                            ? 'Completed Series'
-                            : manga?.status === 'hiatus'
-                                ? 'On Hiatus'
-                                : manga?.status === 'cancelled'
-                                    ? 'Cancelled Series'
-                                    : 'Ongoing Series'}
+                        {mangaFormatter.formatHeaderStatus(manga?.status)}
                     </div>
                     <h1 className="MangaHeaderInfoTitle">{manga?.titulo}</h1>
                 
@@ -228,14 +219,38 @@ function Manga(){
                             <img src={bookmarkProcessing ? loading : (bookmarked ? (bookmarkHover ? bookmarkremove : bookmarkadded) : bookmark)} alt="Bookmark" />
                             {bookmarkProcessing ? '' : (bookmarked ? (bookmarkHover ? 'Remover da lista' : 'Adicionado à lista') : 'Adicionar à lista')}
                         </button>
-                        <button className="MangaHeaderInfoAction">
+                        <button className="MangaHeaderInfoAction" onClick={() => {
+                            if(!usuario?.id){
+                                setLoginPromptOpen(true);
+                                return;
+                            }
+                            setAvaliationOpen(true);
+                        }}>
                             <img src={star} alt="Avaliar" />
                             Avaliar
                         </button>
                         <button className="MangaHeaderInfoAction">
                             <img src={share} alt="Share" />
                         </button>
-
+                        {(usuario?.account_type === 'admin' || usuario?.account_type === 'scan') && (
+                            <button className="MangaHeaderInfoAction" onClick={() => setMoreOpen(!moreOpen)}>
+                                <img src={more} alt="Mais" />
+                            </button>
+                        )}
+                        {(moreOpen && (usuario?.account_type === 'admin' || usuario?.account_type === 'scan')) && (
+                            <div className="MangaHeaderInfoMore">
+                                <button className="MangaHeaderInfoMoreItem">
+                                    <img src={edit} alt="Editar" />
+                                    Editar
+                                </button>
+                                {(usuario?.account_type === 'admin') && (
+                                    <button className="MangaHeaderInfoMoreItem" onClick={() => { setMoreOpen(false); setConfirmationOpen(true); }}>
+                                        <img src={trash} alt="Deletar" />
+                                        Deletar
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                 </div>
@@ -270,6 +285,29 @@ function Manga(){
                 }}
             />
 
+            <AvaliationPortal
+                isOpen={avaliationOpen}
+                title={manga?.titulo}
+                onCancel={() => setAvaliationOpen(false)}
+                onConfirm={(rating) => {
+                    setAvaliationOpen(false);
+                    if (mangaAPI && typeof mangaAPI.submitRating === 'function') {
+                        mangaAPI.submitRating({ id: manga.id, usuario: usuario.id, rating });
+                        notify.success('Avaliação enviada com sucesso!');
+                    } else {
+                        console.error('mangaAPI.submitRating is not implemented.');
+                    }
+                }}
+            />
+
+            <ConfirmationPortal
+                isOpen={confirmationOpen}
+                title={`Deletar ${manga?.titulo}`}
+                message={`Tem certeza que deseja deletar o mangá "${manga?.titulo}"? Essa ação não pode ser desfeita.`}
+                confirmLabel="Deletar"
+                onConfirm={handleDeleteManga}
+                onCancel={() => setConfirmationOpen(false)}
+            />
         </main>
     )
 }

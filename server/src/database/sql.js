@@ -1,5 +1,4 @@
 const { Pool } = require('pg');
-require('dotenv').config();
 
 const sslEnabled = String(process.env.DB_SSL || '').toLowerCase() === 'true';
 

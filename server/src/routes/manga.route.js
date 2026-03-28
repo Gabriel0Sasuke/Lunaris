@@ -2,6 +2,7 @@ const express = require('express');
 const Router = express.Router();
 const mangaController = require('../controllers/manga.controller');
 const ScanMiddleware = require('../middleware/scan.middleware');
+const AdminMiddleware = require('../middleware/admin.middleware');
 const multer = require('multer');
 const rateLimit = require('express-rate-limit');
 
@@ -25,9 +26,12 @@ Router.post('/view', mangaLimiter, mangaController.IncrementViews);
 Router.get('/list', mangaController.ListMangas);
 
 // Rota para obter detalhes de um mangá específico por ID
-Router.get('/manga', mangaController.catchMangaById);
+Router.get('/page', mangaController.catchMangaById);
 
 // Rota para criar um novo mangá
 Router.post('/create', mangaLimiter, ScanMiddleware, uploadFields, mangaController.CreateManga);
+
+// Rota para deletar um mangá, disponivel apenas para administradores
+Router.delete('/delete', AdminMiddleware, mangaController.DeleteManga);
 
 module.exports = Router;

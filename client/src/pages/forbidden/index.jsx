@@ -1,13 +1,13 @@
 import './forbidden.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigateTo } from '../../utils/navigateTo';
 
 import history from '../../assets/ui/history.svg';
 
 function Forbidden() {
-    const navigate = useNavigate();
+    const navigateTo = useNavigateTo();
 
     function goBack() {
-        navigate('/');
+        navigateTo('/');
     }
 
     return (

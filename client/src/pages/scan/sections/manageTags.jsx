@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './Scansections.css';
-import { API_URL } from '../../../services/api';
 import { notify } from '../../../services/notify';
+import { tagAPI } from '../../../services/tagsapi';
 import description from '../../../assets/ui/description.svg';
 
 function ManageTags() {
@@ -26,16 +26,7 @@ function ManageTags() {
 
     const fetchTags = async () => {
         try {
-            const response = await fetch(`${API_URL}/tag/list`, {
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.message || 'Erro ao carregar tags.');
-            }
-
-            const data = await response.json();
+            const data = await tagAPI.getTags();
             const tagsArray = Array.isArray(data?.tags)
                 ? data.tags
                 : (Array.isArray(data) ? data : []);
@@ -110,25 +101,11 @@ function ManageTags() {
 
         try {
             setIsSubmitting(true);
-            const response = await fetch(`${API_URL}/tag/add`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    name: normalizedName,
-                    slug: normalizedSlug,
-                    icon: tagIcon
-                })
+            const responseData = await tagAPI.createTag({
+                name: normalizedName,
+                slug: normalizedSlug,
+                icon: tagIcon
             });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.message || 'Erro ao adicionar tag.');
-            }
-
-            const responseData = await response.json();
             const createdTag = responseData?.tag || {
                 name: normalizedName,
                 slug: normalizedSlug,

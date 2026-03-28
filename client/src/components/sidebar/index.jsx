@@ -1,5 +1,5 @@
 // React
-import { useNavigate } from 'react-router-dom';
+import { useNavigateTo } from '../../utils/navigateTo';
 // CSS
 import './sidebar.css';
 
@@ -23,10 +23,11 @@ import { calcularXp } from '../../services/nivelUser';
 
 function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
     const { usuario, setUsuario } = useAuth();
-    const navigate = useNavigate();
+    const navigateTo = useNavigateTo();
+    const profileImage = usuario?.foto || profileIcon;
     
     function link(path) {
-        navigate(path);
+        navigateTo(path);
         setIsSidebarOpen(false);
     }
     const handleLogout = async () => {
@@ -56,7 +57,7 @@ function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
             
             <div className='profile_info'>
                 <div className='section'>
-                    <div className='profileZoom'><img  src={profileIcon} onContextMenu={(e) => e.preventDefault()} /></div>
+                    <div className='profileZoom'><img src={profileImage} onError={(e) => { e.currentTarget.src = profileIcon; }} onContextMenu={(e) => e.preventDefault()} /></div>
                     <div className='card'>Nv. {usuario ? calcularXp(usuario.xp) : 0}</div>
                 </div>
                 <h3>{usuario ? usuario.username : "Nome do Usuario"}</h3>

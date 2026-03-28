@@ -14,9 +14,12 @@ import add from '../../assets/ui/add.svg';
 import remove from '../../assets/ui/remove.svg';
 import filterIcon from '../../assets/ui/filter.svg';
 import filterOff from '../../assets/ui/filterOff.svg';
-import { API_URL } from '../../services/api';
+
+//Services
 import { notify } from '../../services/notify';
-import { formatRelativeTimeShort } from '../../services/CreatedManga';
+import { mangaAPI } from '../../services/mangaapi';
+import { tagAPI } from '../../services/tagsapi';
+import { mangaFormatter } from '../../utils/mangaFormatter';
 
 function Browser() {
     const [SelectedTag, setSelectedTag] = useState(0);
@@ -35,14 +38,15 @@ function Browser() {
             setIsLoading(true);
             const tagParam = SelectedTag > 0 ? encodeURIComponent(String(SelectedTag)) : '';
             try{
-                const response = await fetch(`${API_URL}/manga/list${tagParam ? `?tag=${tagParam}&` : '?'}orderby=${RankBy}&type=${Type}&status=${Status}&search=${encodeURIComponent(searchTerm.trim())}`, {
-                    credentials: 'include'
+                const MangasData = await mangaAPI.getManga({
+                    limit: 80,
+                    tag: tagParam,
+                    orderBy: RankBy,
+                    type: Type,
+                    status: Status,
+                    search: searchTerm.trim()
                 });
-                const MangasData = await response.json();
-                if (!response.ok) {
-                    notify.error(MangasData?.message || 'Erro ao carregar mangas');
-                    return;
-                }
+
                 setMangas(Array.isArray(MangasData.manga) ? MangasData.manga : []);
             } catch (error) {
                 notify.error('Erro ao carregar mangas');
@@ -70,15 +74,7 @@ function Browser() {
     useEffect(() => {
         const fetchBrowserTags = async () => {
             try {
-                const response = await fetch(`${API_URL}/tag/list`, {
-                    credentials: 'include'
-                });
-
-                if (!response.ok) {
-                    throw new Error('Erro ao carregar tags');
-                }
-
-                const data = await response.json();
+                const data = await tagAPI.getTags();
                 const sortedTags = (Array.isArray(data.tags) ? data.tags : [])
                     .map((tag) => ({
                         id: tag.id,
@@ -205,11 +201,11 @@ function Browser() {
                                 id: manga.id,
                                 title: manga.titulo,
                                 image: manga.foto,
-                                genre: manga.tipo,
-                                genre2: manga.demografia,
+                                genre: mangaFormatter.formatType(manga.tipo),
+                                genre2: mangaFormatter.formatDemographic(manga.demografia),
                                 rating: manga.rating || 'N/A',
                                 views: manga.views ?? 0,
-                                lastUpdate: formatRelativeTimeShort(manga.created_at)
+                                lastUpdate: mangaFormatter.formatDateLow(manga.created_at)
                             }}
                             isGrid
                         />

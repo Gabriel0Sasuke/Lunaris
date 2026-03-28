@@ -6,58 +6,25 @@ import label from '../../../assets/ui/label.svg';
 import description from '../../../assets/ui/description.svg';
 import info from '../../../assets/ui/info.svg';
 import star from '../../../assets/ui/star.svg';
+import { mangaFormatter } from '../../../utils/mangaFormatter';
 
 function Overview( { manga } ) {
+    const tagsFromBackend = Array.isArray(manga?.tags)
+        ? manga.tags
+            .map((tag) => ({
+                name: String(tag?.name || '').trim(),
+                icon: String(tag?.icon || '').trim()
+            }))
+            .filter((tag) => tag.name)
+        : [];
 
-    const formatarData = (dataString) => {
-        if (!dataString) return 'Data desconhecida';
-        const data = new Date(dataString);
-        if (isNaN(data)) return 'Data desconhecida';
-        return data.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-    };
+    const fallbackTags = (manga?.tag_names || '')
+        .split('||')
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+        .map((name) => ({ name, icon: '' }));
 
-    const formatarStatus = (status) => {
-        switch (status) {
-            case 'ongoing':
-                return 'Em andamento';
-            case 'completed':
-                return 'Completo';
-            case 'hiatus':
-                return 'Hiato';
-            case 'cancelled':
-                return 'Cancelado';
-            default:
-                return status || 'Status desconhecido';
-        }
-    };
-
-    const formatarTipo = (tipo) => {
-        switch (tipo) {
-            case 'manga':
-                return 'Mangá';
-            case 'manhwa':
-                return 'Manhwa';
-            case 'manhua':
-                return 'Manhua';
-            default:
-                return tipo || 'Tipo desconhecido';
-        }
-    };
-
-    const formatarDemografia = (demografia) => {
-        switch (demografia) {
-            case 'shounen':
-                return 'Shounen';
-            case 'shoujo':
-                return 'Shoujo';
-            case 'seinen':
-                return 'Seinen';
-            case 'josei':
-                return 'Josei';
-            default:
-                return demografia || 'Demografia desconhecida';
-        }
-    };
+    const tags = tagsFromBackend.length > 0 ? tagsFromBackend : fallbackTags;
 
     return(
         <div className='MangaSection'>
@@ -71,11 +38,11 @@ function Overview( { manga } ) {
                 <div className="MangaSynopseExtra">
                     <div className="MangaSynopseExtraItem">
                         <div className="MangaSynopseExtraItemLabel">Status</div>
-                        <div className="MangaSynopseExtraItemValue">{formatarStatus(manga?.status)}</div>
+                        <div className="MangaSynopseExtraItemValue">{mangaFormatter.formatStatus(manga?.status)}</div>
                     </div>
                     <div className="MangaSynopseExtraItem">
                         <div className="MangaSynopseExtraItemLabel">Lançamento</div>
-                        <div className="MangaSynopseExtraItemValue">{formatarData(manga?.releasedate)}</div>
+                        <div className="MangaSynopseExtraItemValue">{mangaFormatter.formatDateMonth(manga?.releasedate)}</div>
                     </div>
                     <div className="MangaSynopseExtraItem">
                         <div className="MangaSynopseExtraItemLabel">Autor</div>
@@ -94,11 +61,11 @@ function Overview( { manga } ) {
                 <div className="MangaInfoItems">
                     <div className="MangaInfoItem">
                         <div className="MangaInfoItemLabel">Tipo</div>
-                        <div className="MangaInfoItemValue">{formatarTipo(manga?.tipo)}</div>
+                        <div className="MangaInfoItemValue">{mangaFormatter.formatType(manga?.tipo)}</div>
                     </div>
                     <div className="MangaInfoItem">
                         <div className="MangaInfoItemLabel">Demografia</div>
-                        <div className="MangaInfoItemValue">{formatarDemografia(manga?.demografia)}</div>
+                        <div className="MangaInfoItemValue">{mangaFormatter.formatDemographic(manga?.demografia)}</div>
                     </div>
                 </div>
             </div>
@@ -106,8 +73,8 @@ function Overview( { manga } ) {
             <div className="MangaTags">
                 <h2><img src={label} alt="Tags" /> Tags</h2>
                 <div className="MangaTagsItems">
-                    {manga?.tags && manga.tags.length > 0 ? (
-                        manga.tags.map((tag, index) => (
+                    {tags.length > 0 ? (
+                        tags.map((tag, index) => (
                             <div className="MangaTag" key={`${tag?.name || 'tag'}-${index}`} title={tag?.name || 'Tag'}>
                                 {tag?.icon ? (
                                     <img

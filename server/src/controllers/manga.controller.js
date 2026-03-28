@@ -34,9 +34,9 @@ const parseTagInput = (value) => {
 const ListMangas = async (req, res) => {
     // Pegando Dados Brutos do Client
     const rawTag = req.query.tag;
-    const rawLimit = req.query.max ?? req.query.MAX;
+    const rawLimit = req.query.limit ?? req.query.max ?? req.query.MAX;
     const rawType = req.query.type;
-    const rawOrderBy = req.query.orderby;
+    const rawOrderBy = req.query.orderBy ?? req.query.orderby;
     const rawStatus = req.query.status;
     const rawSearch = req.query.search;
 
@@ -68,6 +68,7 @@ const ListMangas = async (req, res) => {
         'A-Z': 'J.titulo ASC',
         'Z-A': 'J.titulo DESC',
         views: 'J.views DESC',
+        top: 'J.views DESC',
         recent: 'J.created_at DESC'
     };
     const orderBy = orderByMap[rawOrderBy] || orderByMap['A-Z'];
@@ -153,7 +154,7 @@ const catchMangaById = async (req, res) => {
         const { rows } = await pool.query(query, values);
         if (!rows[0]) {
             return res.status(404).json({ message: 'Mangá não encontrado' });
-        }
+        } 
         return res.status(200).json({ manga: rows[0] });
     } catch (error) {
         console.error('Error fetching manga by ID:', error);
@@ -196,7 +197,7 @@ const CreateManga = async (req, res) => {
     const r2BaseUrl = process.env.R2_BASE_URL || process.env.R2_PUBLIC_URL;
 
     if (!bucketName || !r2BaseUrl) {
-        return res.status(500).json({ message: 'Configuração do bucket incompleta (R2_BUCKET_NAME/R2_BASE_URL)' });
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 
     let client;
@@ -278,10 +279,52 @@ const IncrementViews = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+const DeleteManga = async (req, res) => {
+    const { mangaId } = req.body;
+    if (!mangaId || !Number.isInteger(Number(mangaId)) || Number(mangaId) <= 0) {
+        return res.status(400).json({ message: 'ID do mangá inválido. Deve ser um número inteiro maior que 0.' });
+    }
 
+    const bucketName = process.env.R2_BUCKET_NAME;
+    const r2BaseUrl = process.env.R2_BASE_URL || process.env.R2_PUBLIC_URL;
+
+    const extractKey = (url) => {
+        if (!url || !r2BaseUrl) return null;
+        if (url.startsWith(r2BaseUrl)) {
+            return url.slice(r2BaseUrl.length).replace(/^\/+/, '');
+        }
+        return null;
+    };
+
+    try {
+        const query = 'DELETE FROM manga WHERE id = $1 RETURNING banner, foto';
+        const values = [mangaId];
+        const { rows } = await pool.query(query, values);
+        if (!rows[0]) {
+            return res.status(404).json({ message: 'Mangá não encontrado' });
+        }
+        const bannerKey = extractKey(rows[0].banner);
+        const fotoKey = extractKey(rows[0].foto);
+        const deletePromises = [];
+        if (bannerKey) {
+            deletePromises.push(r2.send(new DeleteObjectCommand({ Bucket: bucketName, Key: bannerKey })));
+        }
+        if (fotoKey) {
+            deletePromises.push(r2.send(new DeleteObjectCommand({ Bucket: bucketName, Key: fotoKey })));
+        }
+        if (deletePromises.length > 0) {
+            await Promise.allSettled(deletePromises);
+        }
+        return res.status(200).json({ message: 'Mangá deletado com sucesso' });
+    } catch (error) {
+        console.error('Error deleting manga:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
 module.exports = {
     CreateManga,
     catchMangaById,
     ListMangas,
-    IncrementViews
+    IncrementViews,
+    DeleteManga
 }
