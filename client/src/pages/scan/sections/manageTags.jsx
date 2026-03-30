@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './Scansections.css';
-import { notify } from '../../../services/notify';
-import { tagAPI } from '../../../services/tagsapi';
+import { notify } from '../../../utils/notify';
+import { tagAPI } from '../../../api/tagApi';
 import description from '../../../assets/ui/description.svg';
 
 function ManageTags() {

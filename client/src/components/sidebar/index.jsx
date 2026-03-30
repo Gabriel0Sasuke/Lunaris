@@ -1,5 +1,5 @@
 // React
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 // CSS
 import './sidebar.css';
 
@@ -16,10 +16,10 @@ import shield from '../../assets/ui/shield.svg';
 import profileIcon from '../../assets/icons/profile.svg';
 
 //Services
-import { notify } from '../../services/notify';
-import { API_URL } from '../../services/api';
+import { notify } from '../../utils/notify';
+import { API_URL } from '../../api/config';
 import { useAuth } from '../../context/AuthContext';
-import { calcularXp } from '../../services/nivelUser';
+import { calcularXp } from '../../utils/nivelUser';
 
 function Sidebar( { isSidebarOpen, setIsSidebarOpen } ) {
     const { usuario, setUsuario } = useAuth();

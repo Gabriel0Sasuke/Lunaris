@@ -1,6 +1,6 @@
 //React
 import { useLocation } from 'react-router-dom';
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 import { useAuth } from '../../context/AuthContext';
 
 // CSS

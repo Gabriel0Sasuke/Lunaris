@@ -1,4 +1,4 @@
-import { API_URL } from "./api"
+import { API_URL } from "./config"
 
 const isInvalidMangaId = (id) => {
     const numericId = Number(id);
@@ -120,6 +120,53 @@ export const mangaAPI = {
             return result;
         } catch(error) {
             console.error('Erro ao alternar bookmark');
+            throw error;
+        }
+    },
+    // Verifica se o usúario ja avaliou um mangá
+    checkRating : async ({ id }) => {
+        const baseURL = new URL(`${API_URL}/user/rating/check`);
+
+        if (isInvalidMangaId(id)) {
+            throw new Error('ID do manga é obrigatório');
+        } else {
+            baseURL.searchParams.append('mangaId', Number(id));
+        }
+
+        try{
+            const response = await fetch(baseURL, { method: 'GET', credentials: 'include' });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result?.message || 'Erro ao verificar avaliação');
+            }
+            return result;
+        } catch(error) {
+            console.error('Erro ao verificar avaliação');
+            throw error;
+        }
+    },
+    // Envia a avaliação de um mangá
+    submitRating : async ({ id, rating }) => {
+        const baseURL = new URL(`${API_URL}/user/rating`);
+
+        if (isInvalidMangaId(id)) {
+            throw new Error('ID do manga é obrigatório');
+        }
+
+        try{
+            const response = await fetch(baseURL, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mangaId: Number(id), rating: Number(rating) })
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result?.message || 'Erro ao enviar avaliação');
+            }
+            return result;
+        } catch(error) {
+            console.error('Erro ao enviar avaliação');
             throw error;
         }
     },

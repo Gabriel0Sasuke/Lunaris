@@ -11,16 +11,16 @@ import LoginRequiredPortal from '../../components/loginRequiredPortal';
 
 //React
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 import { useAuth } from '../../context/AuthContext';
 
 //Hooks
 import { useDragScroll } from '../../hooks/useDragScroll';
 
 //Services
-import { notify } from '../../services/notify';
-import { mangaAPI } from '../../services/mangaapi';
-import { tagAPI } from '../../services/tagsapi';
+import { notify } from '../../utils/notify';
+import { mangaAPI } from '../../api/mangaApi';
+import { tagAPI } from '../../api/tagApi';
 import { mangaFormatter } from '../../utils/mangaFormatter';
 
 function Home() {
@@ -137,7 +137,7 @@ function Home() {
         image: manga.foto,
         genre: mangaFormatter.formatType(manga.tipo),
         genre2: mangaFormatter.formatDemographic(manga.demografia),
-        rating: manga.rating || 'N/A',
+        rating: manga.avg_rating ?? 'N/A',
         views: manga.views ?? 0,
         lastUpdate: mangaFormatter.formatDateLow(manga.created_at)
     });

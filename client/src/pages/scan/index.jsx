@@ -13,7 +13,7 @@ import group from '../../assets/ui/group.svg';
 import description from '../../assets/ui/description.svg';
 
 // Services
-import CheckOnline from '../../services/serverOnline';
+import CheckOnline from '../../api/serverApi';
 
 // Context
 import { useAuth } from '../../context/AuthContext.jsx';

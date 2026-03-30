@@ -1,4 +1,4 @@
-import { API_URL } from './api';
+import { API_URL } from './config';
 
 const normalizeText = (value) => {
     if (value === undefined || value === null) return null;

@@ -3,6 +3,7 @@ import './manga.css';
 
 //Imagens
 import star from '../../assets/ui/star.svg';
+import starfull from '../../assets/ui/starfull.svg';
 import openBook from '../../assets/ui/openbook.svg';
 import bookmark from '../../assets/ui/bookmark.svg';
 import bookmarkadded from '../../assets/ui/bookmarkadded.svg';
@@ -16,13 +17,13 @@ import edit from '../../assets/ui/edit.svg';
 // React
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 import { useAuth } from '../../context/AuthContext';
 
 //Services
-import { notify } from '../../services/notify';
+import { notify } from '../../utils/notify';
 import { mangaFormatter } from '../../utils/mangaFormatter';
-import { mangaAPI } from '../../services/mangaapi';
+import { mangaAPI } from '../../api/mangaApi';
 import ConfirmationPortal from '../../components/confirmationPortal';
 
 //Sections
@@ -42,8 +43,10 @@ function Manga(){
     const [manga, setManga] = useState(null);
     const MAX_VISIBLE_TAGS = 5;
     const [bookmarked, setBookmarked] = useState(false);
+    const [userRating, setUserRating] = useState(0);
     const [bookmarkProcessing, setBookmarkProcessing] = useState(false);
     const [bookmarkHover, setBookmarkHover] = useState(false);
+    const [ratingHover, setRatingHover] = useState(false);
     const [loginPromptOpen, setLoginPromptOpen] = useState(false);
     const [avaliationOpen, setAvaliationOpen] = useState(false);
     const [moreOpen, setMoreOpen] = useState(false);
@@ -67,6 +70,10 @@ function Manga(){
     const allTags = tagsFromBackend.length > 0 ? tagsFromBackend : fallbackTags;
     const visibleTags = allTags.slice(0, MAX_VISIBLE_TAGS);
     const remainingTags = Math.max(allTags.length - MAX_VISIBLE_TAGS, 0);
+    const hasRating = userRating > 0;
+    const ratingLabel = hasRating
+        ? `${userRating} Estrela${userRating > 1 ? 's' : ''}`
+        : 'Avaliar';
 
     const link = (path) => {
         navigateTo(path);
@@ -113,10 +120,21 @@ function Manga(){
                 return
             }
         };
+        // Função para checar se o usúario ja deu Rating nesse mangá
+        const checkRating = async () => {
+            try {
+                const data = await mangaAPI.checkRating({ id: mangaId });
+                const ratingValue = Number(data?.rating);
+                setUserRating(Number.isFinite(ratingValue) && ratingValue > 0 ? ratingValue : 0);
+            } catch (error) {
+                return
+            }
+        };
                 
         fetchManga();
         incrementViews();
         checkBookmark();
+        checkRating();
     }, [id]);
 
     const bookmarkHandler = async () => {
@@ -146,6 +164,20 @@ function Manga(){
             link('/');
         } catch (error) {
             notify.error('Erro ao deletar mangá');
+        }
+    };
+
+    const handleRatingSubmit = async (ratingValue) => {
+        setAvaliationOpen(false);
+
+        if (!manga?.id) return;
+
+        try {
+            await mangaAPI.submitRating({ id: manga.id, rating: ratingValue });
+            setUserRating(Number(ratingValue));
+            notify.success('Avaliação enviada com sucesso!');
+        } catch (error) {
+            notify.error('Erro ao enviar avaliação');
         }
     };
 
@@ -181,8 +213,8 @@ function Manga(){
                         </div>
                         <div className="MangaHeaderInfoStatistic">
                             <span className="MangaHeaderInfoStatisticLabel">Rating</span>
-                            <span className="MangaHeaderInfoStatisticValue">4.5</span>
-                            <img src={star} alt="Star" />
+                            <span className="MangaHeaderInfoStatisticValue">{manga?.avg_rating ?? 'N/A'}</span>
+                            <img src={starfull} alt="Star" />
                         </div>
                         <div className="MangaHeaderInfoStatistic">
                             <span className="MangaHeaderInfoStatisticLabel">Views</span>
@@ -215,19 +247,19 @@ function Manga(){
                             <img src={openBook} alt="Open Book" />
                             Começar Leitura
                         </button>
-                        <button className="MangaHeaderInfoAction" onClick={bookmarkHandler} disabled={bookmarkProcessing || !manga?.id} onMouseEnter={() => !bookmarkProcessing && setBookmarkHover(true)} onMouseLeave={() => setBookmarkHover(false)}>
+                        <button className={`MangaHeaderInfoAction MangaHeaderInfoActionBookmark ${bookmarked ? 'is-bookmarked' : ''} ${bookmarkProcessing ? 'is-processing' : ''}`} onClick={bookmarkHandler} disabled={bookmarkProcessing || !manga?.id} onMouseEnter={() => !bookmarkProcessing && setBookmarkHover(true)} onMouseLeave={() => setBookmarkHover(false)}>
                             <img src={bookmarkProcessing ? loading : (bookmarked ? (bookmarkHover ? bookmarkremove : bookmarkadded) : bookmark)} alt="Bookmark" />
                             {bookmarkProcessing ? '' : (bookmarked ? (bookmarkHover ? 'Remover da lista' : 'Adicionado à lista') : 'Adicionar à lista')}
                         </button>
-                        <button className="MangaHeaderInfoAction" onClick={() => {
+                        <button className={`MangaHeaderInfoAction MangaHeaderInfoActionRating ${hasRating ? 'is-rated' : ''}`} onClick={() => {
                             if(!usuario?.id){
                                 setLoginPromptOpen(true);
                                 return;
                             }
                             setAvaliationOpen(true);
-                        }}>
-                            <img src={star} alt="Avaliar" />
-                            Avaliar
+                        }} onMouseEnter={() => setRatingHover(true)} onMouseLeave={() => setRatingHover(false)}>
+                            <img src={hasRating ? starfull : star} alt="Avaliar" />
+                            {hasRating ? (ratingHover ? 'Editar avaliação' : ratingLabel) : ratingLabel}
                         </button>
                         <button className="MangaHeaderInfoAction">
                             <img src={share} alt="Share" />
@@ -288,16 +320,9 @@ function Manga(){
             <AvaliationPortal
                 isOpen={avaliationOpen}
                 title={manga?.titulo}
+                initialRating={userRating}
                 onCancel={() => setAvaliationOpen(false)}
-                onConfirm={(rating) => {
-                    setAvaliationOpen(false);
-                    if (mangaAPI && typeof mangaAPI.submitRating === 'function') {
-                        mangaAPI.submitRating({ id: manga.id, usuario: usuario.id, rating });
-                        notify.success('Avaliação enviada com sucesso!');
-                    } else {
-                        console.error('mangaAPI.submitRating is not implemented.');
-                    }
-                }}
+                onConfirm={handleRatingSubmit}
             />
 
             <ConfirmationPortal

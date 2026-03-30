@@ -16,9 +16,9 @@ import filterIcon from '../../assets/ui/filter.svg';
 import filterOff from '../../assets/ui/filterOff.svg';
 
 //Services
-import { notify } from '../../services/notify';
-import { mangaAPI } from '../../services/mangaapi';
-import { tagAPI } from '../../services/tagsapi';
+import { notify } from '../../utils/notify';
+import { mangaAPI } from '../../api/mangaApi';
+import { tagAPI } from '../../api/tagApi';
 import { mangaFormatter } from '../../utils/mangaFormatter';
 
 function Browser() {
@@ -159,7 +159,7 @@ function Browser() {
                         <input type="radio" name="rank" id="rank2" value="views" checked={RankBy === 'views'} readOnly />
                         <label htmlFor="rank2" readOnly>Popularidade</label>
                     </div>
-                    <div className={`FilterRankOptions`} > {/* Avaliação desativada por enquanto */}
+                    <div className={`FilterRankOptions ${RankBy === 'rating' ? 'selected' : ''}`} onClick={() => setRankBy('rating')}>
                         <input type="radio" name="rank" id="rank3" value="rating" checked={RankBy === 'rating'} readOnly />
                         <label htmlFor="rank3" readOnly>Avaliação</label>
                     </div>
@@ -203,7 +203,7 @@ function Browser() {
                                 image: manga.foto,
                                 genre: mangaFormatter.formatType(manga.tipo),
                                 genre2: mangaFormatter.formatDemographic(manga.demografia),
-                                rating: manga.rating || 'N/A',
+                                rating: manga.avg_rating ?? 'N/A',
                                 views: manga.views ?? 0,
                                 lastUpdate: mangaFormatter.formatDateLow(manga.created_at)
                             }}

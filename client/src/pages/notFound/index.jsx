@@ -1,6 +1,6 @@
 import './notFound.css'
 
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 
 import history from '../../assets/ui/history.svg';
 function NotFound(){
