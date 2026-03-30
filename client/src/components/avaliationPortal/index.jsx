@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './avaliationPortal.css';
 
@@ -11,10 +11,17 @@ function avaliationPortal({
     title,
     confirmLabel = 'Enviar Avaliação',
     cancelLabel = 'Cancelar Avaliação',
+    initialRating = 0,
     onConfirm,
     onCancel
 }) {
     const [rating, setRating] = useState(0);
+
+    useEffect(() => {
+        if (isOpen) {
+            setRating(Number(initialRating) || 0);
+        }
+    }, [isOpen, initialRating]);
 
     if (!isOpen || typeof document === 'undefined') return null;
 

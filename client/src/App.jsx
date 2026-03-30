@@ -1,9 +1,9 @@
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { ToastContainer } from 'react-toastify';
-import { toastConfig } from './services/notify';
-import { API_URL } from './services/api';
-import { notify } from './services/notify'
+import { toastConfig } from './utils/notify';
+import { API_URL } from './api/config';
+import { notify } from './utils/notify'
 
 // Componentes
 import Header from './components/header'
@@ -11,8 +11,8 @@ import Sidebar from './components/sidebar'
 import Footer from './components/footer'
 import Notifications from './components/notifications'
 import { useAuth } from './context/AuthContext.jsx'; 
-import PrivateRoutes from './context/PrivateRoutes.jsx';
-import PublicRoutes from './context/PublicRoute.jsx';
+import PrivateRoutes from './routes/PrivateRoutes.jsx';
+import PublicRoutes from './routes/PublicRoute.jsx';
 // Páginas
 import Home from './pages/home'
 import Login from './pages/login'

@@ -1,7 +1,7 @@
 import './mangaCard.css';
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 //UI
-import star from '../../assets/ui/star.svg';
+import star from '../../assets/ui/starfull.svg';
 import eye from '../../assets/ui/eye.svg';
 import clock from '../../assets/ui/clock.svg'; 
 

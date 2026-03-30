@@ -1,6 +1,6 @@
 import './authRequired.css';
 import { Link } from 'react-router-dom';
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 
 import person from '../../assets/ui/person.svg';
 

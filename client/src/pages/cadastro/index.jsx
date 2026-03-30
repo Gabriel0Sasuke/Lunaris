@@ -1,12 +1,12 @@
 //React
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 
 // Serviços
-import { notify } from '../../services/notify';
-import { userAPI } from '../../services/userapi';
+import { notify } from '../../utils/notify';
+import { userAPI } from '../../api/userApi';
 
 //CSS
 import './cadastro.css';

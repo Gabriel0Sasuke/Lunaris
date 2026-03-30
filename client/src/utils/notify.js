@@ -1,4 +1,3 @@
-// src/services/notify.js
 import { toast, Bounce } from "react-toastify";
 
 export const toastConfig = {

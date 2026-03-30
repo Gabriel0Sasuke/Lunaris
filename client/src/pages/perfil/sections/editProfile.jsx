@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Cropper from 'react-easy-crop';
 import { createPortal } from 'react-dom';
-import { notify } from '../../../services/notify';
-import { cropImage } from '../../../services/cropImage';
-import { userAPI } from '../../../services/userapi';
+import { notify } from '../../../utils/notify';
+import { cropImage } from '../../../utils/cropImage';
+import { userAPI } from '../../../api/userApi';
 import { useAuth } from '../../../context/AuthContext';
 
 //Icons

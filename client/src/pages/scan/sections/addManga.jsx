@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import './Scansections.css';
 import Cropper from 'react-easy-crop';
 import { createPortal } from 'react-dom';
-import { notify } from '../../../services/notify';
-import { cropImage } from '../../../services/cropImage';
-import { mangaAPI } from '../../../services/mangaapi';
-import { tagAPI } from '../../../services/tagsapi';
+import { notify } from '../../../utils/notify';
+import { cropImage } from '../../../utils/cropImage';
+import { mangaAPI } from '../../../api/mangaApi';
+import { tagAPI } from '../../../api/tagApi';
 // Icons
 import photo from '../../../assets/ui/photo.svg';
 import panorama from '../../../assets/ui/panorama.svg';

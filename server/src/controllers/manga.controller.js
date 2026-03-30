@@ -6,10 +6,12 @@ const crypto = require('crypto');
 const buildObjectUrl = (baseUrl, key) => `${baseUrl}/${key.replace(/^\/+/, '')}`;
 
 const LIST_MANGAS_BASE_QUERY = `
-    SELECT J.*, COALESCE(STRING_AGG(DISTINCT TA.name, '||' ORDER BY TA.name), '') AS tag_names
+    SELECT J.*, COALESCE(STRING_AGG(DISTINCT TA.name, '||' ORDER BY TA.name), '') AS tag_names,
+    ROUND(AVG(R.rating)::numeric, 1) AS avg_rating
     FROM manga J
     LEFT JOIN manga_tags MT_ALL ON J.id = MT_ALL.manga_id
     LEFT JOIN tags TA ON MT_ALL.tag_id = TA.id
+    LEFT JOIN rating R ON J.id = R.manga_id
 `;
 
 const parseTagInput = (value) => {
@@ -69,7 +71,8 @@ const ListMangas = async (req, res) => {
         'Z-A': 'J.titulo DESC',
         views: 'J.views DESC',
         top: 'J.views DESC',
-        recent: 'J.created_at DESC'
+        recent: 'J.created_at DESC',
+        rating: 'avg_rating DESC NULLS LAST'
     };
     const orderBy = orderByMap[rawOrderBy] || orderByMap['A-Z'];
 
@@ -128,7 +131,7 @@ const catchMangaById = async (req, res) => {
             SELECT J.*, DENSE_RANK() OVER (ORDER BY J.views DESC NULLS LAST) AS rank_position
             FROM manga J
         )
-        SELECT RM.*, COALESCE(TAGS.tag_names, '') AS tag_names, COALESCE(TAGS.tags, '[]'::json) AS tags, COALESCE(BM.bookmarks, 0) AS bookmarks
+        SELECT RM.*, COALESCE(TAGS.tag_names, '') AS tag_names, COALESCE(TAGS.tags, '[]'::json) AS tags, COALESCE(BM.bookmarks, 0) AS bookmarks, RT.avg_rating
         FROM ranked_manga RM
         LEFT JOIN LATERAL (
             SELECT
@@ -147,6 +150,11 @@ const catchMangaById = async (req, res) => {
             FROM bookmark B
             WHERE B.manga_id = RM.id
         ) BM ON TRUE
+        LEFT JOIN LATERAL (
+            SELECT ROUND(AVG(R.rating)::numeric, 1) AS avg_rating
+            FROM rating R
+            WHERE R.manga_id = RM.id
+        ) RT ON TRUE
         WHERE RM.id = $1
     `;
     const values = [mangaId];

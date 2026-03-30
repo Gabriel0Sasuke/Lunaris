@@ -1,7 +1,7 @@
 import './homeCarousel.css';
 
 // UI
-import star from '../../assets/ui/star.svg';
+import star from '../../assets/ui/starfull.svg';
 import layer from '../../assets/ui/layer.svg';
 import history from '../../assets/ui/history.svg';
 import openbook from '../../assets/ui/openbook.svg';
@@ -12,12 +12,12 @@ import loading from '../../assets/ui/loading.svg';
 
 // React
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 import { useAuth } from '../../context/AuthContext';
 
 // Services
-import { notify } from '../../services/notify';
-import { mangaAPI } from '../../services/mangaapi';
+import { notify } from '../../utils/notify';
+import { mangaAPI } from '../../api/mangaApi';
 import { mangaFormatter } from '../../utils/mangaFormatter';
 
 function HomeCarousel({ items = [], isLoading, onLoginRequired }) {
@@ -178,7 +178,7 @@ function HomeCarousel({ items = [], isLoading, onLoginRequired }) {
                         <div className="carousel-tags">
                             <span className="carousel-tag tag-rank">EM ALTA #{idx + 1}</span>
                             <span className="carousel-tag tag-rating">
-                                <img src={star} alt="star" />{manga.rating || 'N/A'}
+                                <img src={star} alt="star" />{manga.avg_rating ?? 'N/A'}
                             </span>
                             <span className="carousel-tag">
                                 <img src={layer} alt="tipo" />
