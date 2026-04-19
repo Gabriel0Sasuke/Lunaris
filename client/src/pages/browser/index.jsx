@@ -1,5 +1,5 @@
 //React
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 //Componentes
 import MangaCard from '../../components/mangaCard';
@@ -34,8 +34,7 @@ function Browser() {
     const [isLoading, setIsLoading] = useState(true);
 
     // Pegar Os Mangás
-    const fetchMangas = async () => {
-            setIsLoading(true);
+    const fetchMangas = useCallback(async () => {
             const tagParam = SelectedTag > 0 ? encodeURIComponent(String(SelectedTag)) : '';
             try{
                 const MangasData = await mangaAPI.getManga({
@@ -48,27 +47,22 @@ function Browser() {
                 });
 
                 setMangas(Array.isArray(MangasData.manga) ? MangasData.manga : []);
-            } catch (error) {
+            } catch {
                 notify.error('Erro ao carregar mangas');
                 setMangas([]);
                 return;
             } finally {
                 setIsLoading(false);
             }
-        };
-    // useEffect pra quando pesquisa
+        }, [RankBy, SelectedTag, Status, Type, searchTerm]);
+    // Busca com debounce para pesquisa e filtros
     useEffect(()=> {
         const delayDebounceFn = setTimeout(() => {
             fetchMangas();
-        }, 500); // Aguarda 500ms Após o usuario parar de digitar pra pesquisar
+        }, 500);
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm]);
-
-    // useEffect pra quando troca o filtro ou a tag
-    useEffect(() => {
-        fetchMangas();
-    }, [SelectedTag, RankBy, Type, Status]);
+    }, [searchTerm, SelectedTag, RankBy, Type, Status, fetchMangas]);
 
     // Pegar as Tags para o filtro
     useEffect(() => {

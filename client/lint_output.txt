@@ -1,0 +1,230 @@
+
+> lunaris@0.0.0 lint
+> eslint .
+
+
+/home/gabriel/dev/lunaris/client/dev-dist/sw.js
+  34:13  error  'importScripts' is not defined  no-undef
+  70:1   error  'define' is not defined         no-undef
+
+/home/gabriel/dev/lunaris/client/dev-dist/workbox-5a5d9309.js
+     1:1   error    'define' is not defined                                                         no-undef
+     5:37  error    '_' is not defined                                                              no-undef
+     6:14  error    'e' is defined but never used                                                   no-unused-vars
+     6:17  error    Empty block statement                                                           no-empty
+    69:7   error    Definition for rule '@typescript-eslint/ban-types' was not found                @typescript-eslint/ban-types
+   436:5   error    Definition for rule '@typescript-eslint/ban-types' was not found                @typescript-eslint/ban-types
+   452:5   warning  Unused eslint-disable directive (no problems were reported)
+   475:40  error    '_' is not defined                                                              no-undef
+   476:14  error    'e' is defined but never used                                                   no-unused-vars
+   476:17  error    Empty block statement                                                           no-empty
+   769:11  error    Definition for rule '@typescript-eslint/no-unsafe-member-access' was not found  @typescript-eslint/no-unsafe-member-access
+   771:13  error    Definition for rule '@typescript-eslint/no-unsafe-assignment' was not found     @typescript-eslint/no-unsafe-assignment
+   965:11  error    Definition for rule '@typescript-eslint/no-unsafe-assignment' was not found     @typescript-eslint/no-unsafe-assignment
+   981:13  error    Definition for rule '@typescript-eslint/no-unsafe-assignment' was not found     @typescript-eslint/no-unsafe-assignment
+   987:13  warning  Unused eslint-disable directive (no problems were reported)
+  1214:53  error    'registration' is not defined                                                   no-undef
+  1272:43  error    '_' is not defined                                                              no-undef
+  1273:14  error    'e' is defined but never used                                                   no-unused-vars
+  1273:17  error    Empty block statement                                                           no-empty
+  1406:11  warning  Unused eslint-disable directive (no problems were reported)
+  1521:20  error    'error' is defined but never used                                               no-unused-vars
+  1665:5   error    Definition for rule '@typescript-eslint/ban-types' was not found                @typescript-eslint/ban-types
+  1717:43  error    '_' is not defined                                                              no-undef
+  1718:14  error    'e' is defined but never used                                                   no-unused-vars
+  1718:17  error    Empty block statement                                                           no-empty
+  1796:56  error    'ExtendableEvent' is not defined                                                no-undef
+  1835:61  error    'FetchEvent' is not defined                                                     no-undef
+  1870:15  error    Unexpected constant condition                                                   no-constant-condition
+  2062:35  warning  Unused eslint-disable directive (no problems were reported)
+  2336:32  error    'FetchEvent' is not defined                                                     no-undef
+  2404:18  error    'error' is defined but never used                                               no-unused-vars
+  2793:9   error    Definition for rule '@typescript-eslint/no-unsafe-return' was not found         @typescript-eslint/no-unsafe-return
+  2840:9   error    Definition for rule '@typescript-eslint/no-unsafe-return' was not found         @typescript-eslint/no-unsafe-return
+
+/home/gabriel/dev/lunaris/client/dev-dist/workbox-7a5e81cd.js
+     1:1   error    'define' is not defined                                                         no-undef
+     5:37  error    '_' is not defined                                                              no-undef
+     6:14  error    'e' is defined but never used                                                   no-unused-vars
+     6:17  error    Empty block statement                                                           no-empty
+    52:7   error    Definition for rule '@typescript-eslint/ban-types' was not found                @typescript-eslint/ban-types
+   419:5   error    Definition for rule '@typescript-eslint/ban-types' was not found                @typescript-eslint/ban-types
+   435:5   warning  Unused eslint-disable directive (no problems were reported)
+   458:40  error    '_' is not defined                                                              no-undef
+   459:14  error    'e' is defined but never used                                                   no-unused-vars
+   459:17  error    Empty block statement                                                           no-empty
+   752:11  error    Definition for rule '@typescript-eslint/no-unsafe-member-access' was not found  @typescript-eslint/no-unsafe-member-access
+   754:13  error    Definition for rule '@typescript-eslint/no-unsafe-assignment' was not found     @typescript-eslint/no-unsafe-assignment
+   948:11  error    Definition for rule '@typescript-eslint/no-unsafe-assignment' was not found     @typescript-eslint/no-unsafe-assignment
+   964:13  error    Definition for rule '@typescript-eslint/no-unsafe-assignment' was not found     @typescript-eslint/no-unsafe-assignment
+   970:13  warning  Unused eslint-disable directive (no problems were reported)
+  1197:53  error    'registration' is not defined                                                   no-undef
+  1255:43  error    '_' is not defined                                                              no-undef
+  1256:14  error    'e' is defined but never used                                                   no-unused-vars
+  1256:17  error    Empty block statement                                                           no-empty
+  1389:11  warning  Unused eslint-disable directive (no problems were reported)
+  1504:20  error    'error' is defined but never used                                               no-unused-vars
+  1648:5   error    Definition for rule '@typescript-eslint/ban-types' was not found                @typescript-eslint/ban-types
+  1700:43  error    '_' is not defined                                                              no-undef
+  1701:14  error    'e' is defined but never used                                                   no-unused-vars
+  1701:17  error    Empty block statement                                                           no-empty
+  1779:56  error    'ExtendableEvent' is not defined                                                no-undef
+  1818:61  error    'FetchEvent' is not defined                                                     no-undef
+  1853:15  error    Unexpected constant condition                                                   no-constant-condition
+  2045:35  warning  Unused eslint-disable directive (no problems were reported)
+  2319:32  error    'FetchEvent' is not defined                                                     no-undef
+  2387:18  error    'error' is defined but never used                                               no-unused-vars
+  2776:9   error    Definition for rule '@typescript-eslint/no-unsafe-return' was not found         @typescript-eslint/no-unsafe-return
+  2823:9   error    Definition for rule '@typescript-eslint/no-unsafe-return' was not found         @typescript-eslint/no-unsafe-return
+
+/home/gabriel/dev/lunaris/client/src/api/serverApi.js
+  11:12  error  'e' is defined but never used  no-unused-vars
+
+/home/gabriel/dev/lunaris/client/src/components/avaliationPortal/index.jsx
+  18:33  error  React Hook "useState" is called in function "avaliationPortal" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"   react-hooks/rules-of-hooks
+  20:5   error  React Hook "useEffect" is called in function "avaliationPortal" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"  react-hooks/rules-of-hooks
+
+/home/gabriel/dev/lunaris/client/src/components/homeCarousel/index.jsx
+  48:35  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  46 |     // Corrige index se a lista mudar
+  47 |     useEffect(() => {
+> 48 |         if (items.length === 0) { setActiveIndex(0); return; }
+     |                                   ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |         if (activeIndex >= items.length) setActiveIndex(0);
+  50 |     }, [items.length, activeIndex]);
+  51 |  react-hooks/set-state-in-effect
+
+/home/gabriel/dev/lunaris/client/src/context/AuthContext.jsx
+  27:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  25 |
+  26 |   useEffect(() => {
+> 27 |     verificarUsuario();
+     |     ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  28 |   }, []);
+  29 |
+  30 |   return (  react-hooks/set-state-in-effect
+  37:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-refresh/only-export-components
+
+/home/gabriel/dev/lunaris/client/src/main.jsx
+  14:10  error  Fast refresh only works when a file has exports. Move your component(s) to a separate file  react-refresh/only-export-components
+
+/home/gabriel/dev/lunaris/client/src/pages/browser/index.jsx
+  69:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  67 |     // useEffect pra quando troca o filtro ou a tag
+  68 |     useEffect(() => {
+> 69 |         fetchMangas();
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  70 |     }, [SelectedTag, RankBy, Type, Status, fetchMangas]);
+  71 |
+  72 |     // Pegar as Tags para o filtro  react-hooks/set-state-in-effect
+
+/home/gabriel/dev/lunaris/client/src/pages/home/index.jsx
+   68:22  error  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            no-unused-vars
+  178:76  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  176 |             {/* Capitulos Recém-Lançados */}
+  177 |             <div className="SectionInfo"><div className='Bar' /><span className='SectionTitle'>Capitulos Recém-Lançados</span></div>
+> 178 |             <div className="mangaRow" ref={combineRefs(newChaptersDragRef, newChaptersWheelRef)}>
+      |                                                                            ^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  179 |                 <div className="mangaEmptyState mangaEmptyStateRow">
+  180 |                     <div className="mangaEmptyIcon">{'(>_<)'}</div>
+  181 |                     <h3>Em breve</h3>  react-hooks/refs
+  188:74  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  186 |             {/* Mangás em Alta */}
+  187 |             <div className="SectionInfo"><div className='Bar' /><span className='SectionTitle'>Mangás em Alta</span></div>
+> 188 |             <div className="mangaRow" ref={combineRefs(topMangasDragRef, topMangasWheelRef)}>
+      |                                                                          ^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  189 |                 {isLoading ? (
+  190 |                     Array.from({ length: 8 }).map((_, i) => <MangaCard key={i} isLoading />)
+  191 |                 ) : topMangasList.length > 0 ? (                                react-hooks/refs
+  198:74  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  196 |             {/* Novos Mangás */}
+  197 |             <div className="SectionInfo"><div className='Bar' /><span className='SectionTitle'>Novos Mangás</span></div>
+> 198 |             <div className="mangaRow" ref={combineRefs(newMangasDragRef, newMangasWheelRef)}>
+      |                                                                          ^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  199 |                 {isLoading ? (
+  200 |                     Array.from({ length: 8 }).map((_, i) => <MangaCard key={i} isLoading />)
+  201 |                 ) : recentMangasList.length > 0 ? (                                 react-hooks/refs
+
+/home/gabriel/dev/lunaris/client/src/pages/perfil/sections/editProfile.jsx
+   70:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  68 |
+  69 |     useEffect(() => {
+> 70 |         setUsername(usuario?.username || '');
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  71 |         setEmail(usuario?.email || '');
+  72 |         setBio(usuario?.bio || '');
+  73 |         setTitle(String(usuario?.titulo_id ?? ''));  react-hooks/set-state-in-effect
+  147:18  error  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-unused-vars
+  194:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  192 |     useEffect(() => {
+  193 |         if (!usernameChanged || !usernameValido) {
+> 194 |             setUsernameTaken(false);
+      |             ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  195 |             return;
+  196 |         }
+  197 |                                          react-hooks/set-state-in-effect
+  203:22  error  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-unused-vars
+  215:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  213 |     useEffect(() => {
+  214 |         if (!emailChanged || !emailValido) {
+> 215 |             setEmailTaken(false);
+      |             ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  216 |             return;
+  217 |         }
+  218 |                                                      react-hooks/set-state-in-effect
+  224:22  error  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-unused-vars
+
+✖ 86 problems (78 errors, 8 warnings)
+  0 errors and 8 warnings potentially fixable with the `--fix` option.
+

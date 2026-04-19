@@ -88,7 +88,7 @@ function AddManga({ onManageTags }) {
                 }));
 
                 setTAG_OPTIONS(normalizedTags);
-                } catch (error) {
+                } catch {
                     notify.error('Erro ao buscar tags.');
                     setTAG_OPTIONS([]);
                 }
@@ -222,7 +222,7 @@ function AddManga({ onManageTags }) {
                 setMangaBanner(croppedFile);
                 setURLMangaBanner(previewURL);
             }
-        } catch (error) {
+        } catch {
             notify.error('Erro ao recortar a imagem.');
         }finally{
             setCroppedAreaPixels(null);

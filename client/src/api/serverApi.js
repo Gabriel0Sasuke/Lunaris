@@ -8,7 +8,7 @@ async function CheckOnline() {
     }else{
         return false;
     }
-    }catch(e){
+    }catch{
         return false;
     }
 }

@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { ToastContainer } from 'react-toastify';
 import { toastConfig } from './utils/notify';
 import { API_URL } from './api/config';
-import { notify } from './utils/notify'
 
 // Componentes
 import Header from './components/header'
@@ -30,7 +29,71 @@ import Admin from './pages/admin'
 import Scan from './pages/scan'
 import Community from './pages/community'
 
+// Páginas de Erro ou Loading Global
+import BootScreen from './pages/bootScreen/bootScreen.jsx';
+import ServerOrInternetError from './pages/serverOrInternetError/serverOrInternetError.jsx';
+
 function App() {
+  // Verificar se o client tem conexão com o servidor
+  const [serverIsLoading, setServerIsLoading] = useState(true);
+  const [serverIsOnline, setServerIsOnline] = useState(false);
+
+  useEffect(() => {
+    const retryDelays = [0, 3000, 10000];
+    let cancelled = false;
+
+    const wait = (ms) => new Promise((resolve) => {
+      const timer = setTimeout(resolve, ms);
+      if (cancelled) {
+        clearTimeout(timer);
+      }
+    });
+
+    const checkServerConnection = async () => {
+      for (const delay of retryDelays) {
+        if (cancelled) return;
+
+        if (delay > 0) {
+          await wait(delay);
+          if (cancelled) return;
+        }
+
+        const abortController = new AbortController();
+        const requestTimeout = setTimeout(() => abortController.abort(), 6000);
+
+        try {
+          const response = await fetch(`${API_URL}/system/online`, {
+            method: 'GET',
+            credentials: 'include',
+            signal: abortController.signal,
+          });
+
+          if (response.ok) {
+            if (cancelled) return;
+            setServerIsOnline(true);
+            setServerIsLoading(false);
+            return;
+          }
+        } catch {
+          // Tenta novamente até acabar as 3 tentativas.
+        } finally {
+          clearTimeout(requestTimeout);
+        }
+      }
+
+      if (!cancelled) {
+        setServerIsOnline(false);
+        setServerIsLoading(false);
+      }
+    };
+
+    checkServerConnection();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Controlar Abertura do Sidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   //Controlar Abertura do Notifications
@@ -39,40 +102,37 @@ function App() {
   // O AuthContext agora gerencia o usuário!
   const { usuario } = useAuth();
   
-  //Função pra atualizar o estado online do usuario
-  const atualizarOnline = async () => {
+  useEffect(() => {
+    // Se estiver logado, atualiza o status online.
     if (!usuario?.id) return;
 
-    try {
-      const resposta = await fetch(`${API_URL}/auth/online`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      let data = null;
+    const atualizarOnline = async () => {
       try {
-        data = await resposta.json();
-      } catch {}
+        const resposta = await fetch(`${API_URL}/auth/online`, {
+          method: 'POST',
+          credentials: 'include',
+        });
 
-      if (!resposta.ok) {
-        console.error(data?.message || 'Erro ao atualizar status online.');
-        return;
+        const data = await resposta.json();
+
+        if (!resposta.ok) {
+          console.error(data?.message || 'Erro ao atualizar status online.');
+          return;
+        }
+
+        console.log(data?.message || 'Status atualizado.');
+      } catch (error) {
+        console.error('Falha ao atualizar status online:', error);
       }
+    };
 
-      console.log(data?.message || 'Status atualizado.');
-    } catch (error) {
-      console.error('Falha ao atualizar status online:', error);
-    }
-  }
-  useEffect(() => {
-    // Se Estiver logado, atualizar seu status
-    if(usuario != null){
-      atualizarOnline();
-    }else{
-      return
-    }
+    atualizarOnline();
   }, [usuario]);
   return (
-    <BrowserRouter>
+    serverIsLoading ? (
+      <BootScreen />
+    ) : serverIsOnline ? (
+      <BrowserRouter>
       <Header setIsSidebarOpen={setIsSidebarOpen} setIsNotificationsOpen={setIsNotificationsOpen} isNotificationsOpen={isNotificationsOpen} />
       <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
       <Notifications isNotificationsOpen={isNotificationsOpen} />
@@ -115,6 +175,9 @@ function App() {
       <Footer />
       <ToastContainer {...toastConfig} />
     </BrowserRouter>
+    ) : (
+      <ServerOrInternetError />
+    )
   )
 }
 export default App

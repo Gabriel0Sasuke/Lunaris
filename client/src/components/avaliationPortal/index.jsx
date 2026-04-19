@@ -6,7 +6,23 @@ import './avaliationPortal.css';
 import star from '../../assets/ui/star.svg';
 import starfull from '../../assets/ui/starfull.svg';
 
-function avaliationPortal({
+function Stars({ rating, onChange }) {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+        stars.push(
+            <img
+                key={i}
+                src={i <= rating ? starfull : star}
+                alt={`${i} estrela${i > 1 ? 's' : ''}`}
+                onClick={() => onChange(i)}
+                className="AvaliationStar"
+            />
+        );
+    }
+    return <div className="AvaliationStars">{stars}</div>;
+}
+
+function AvaliationPortal({
     isOpen,
     title,
     confirmLabel = 'Enviar Avaliação',
@@ -19,7 +35,11 @@ function avaliationPortal({
 
     useEffect(() => {
         if (isOpen) {
-            setRating(Number(initialRating) || 0);
+            const timer = setTimeout(() => {
+                setRating(Number(initialRating) || 0);
+            }, 0);
+
+            return () => clearTimeout(timer);
         }
     }, [isOpen, initialRating]);
 
@@ -30,22 +50,6 @@ function avaliationPortal({
             onCancel?.();
         }
     };
-    function Stars({ rating, onChange }) {
-        const stars = [];
-        for (let i = 1; i <= 5; i++) {
-            stars.push(
-                <img
-                    key={i}
-                    src={i <= rating ? starfull : star}
-                    alt={`${i} estrela${i > 1 ? 's' : ''}`}
-                    onClick={() => onChange(i)}
-                    className="AvaliationStar"
-                />
-            );
-        }
-        return <div className="AvaliationStars">{stars}</div>;
-    }
-
     return createPortal(
         <div className="AvaliationOverlay" onClick={handleBackdropClick} role="presentation">
             <div className="AvaliationCard" role="dialog" aria-modal="true" aria-label={title}>
@@ -65,4 +69,4 @@ function avaliationPortal({
     );
 }
 
-export default avaliationPortal;
+export default AvaliationPortal;

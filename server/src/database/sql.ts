@@ -1,4 +1,4 @@
-const { Pool } = require('pg');
+import { Pool } from 'pg';
 
 const sslEnabled = String(process.env.DB_SSL || '').toLowerCase() === 'true';
 
@@ -9,7 +9,7 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   port: Number(process.env.DB_PORT) || 5432,
   max: 10,
-  ssl: sslEnabled ? { rejectUnauthorized: false } : false
+  ssl: sslEnabled ? { rejectUnauthorized: false } : false,
 });
 
-module.exports = pool;
+export default pool;

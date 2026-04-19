@@ -13,7 +13,7 @@ Lunaris é um site de mangás desenvolvido por diversão, focado em oferecer uma
 
 ### Backend
 - **Express 5**: Framework web para Node.js.
-- **MySQL2**: Driver para conexão e manipulação do banco de dados MySQL.
+- **PostgreSQL**: Driver para conexão e manipulação do banco de dados MySQL.
 - **JWT (JSON Web Token)**: Autenticação segura de usuários.
 - **Bcrypt**: Hash de senhas para segurança robusta.
 - **Cookie-parser & CORS**: Middleware para gerenciamento de cookies e permissões de acesso.
@@ -60,12 +60,5 @@ O repositório está dividido em duas partes principais:
    ```bash
    npm run dev
    ```
-
-## 📌 Funcionalidades em Desenvolvimento
-- [ ] Sistema de Login e Cadastro (JWT + Bcrypt)
-- [ ] Autenticação com Google (OAuth2)
-- [ ] Listagem e visualização de mangás
-- [ ] Sistema de favoritos
-
 ---
 *Este projeto está sendo desenvolvido puramente por diversão e aprendizado.*

@@ -24,20 +24,20 @@ function ManageTags() {
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
 
-    const fetchTags = async () => {
-        try {
-            const data = await tagAPI.getTags();
-            const tagsArray = Array.isArray(data?.tags)
-                ? data.tags
-                : (Array.isArray(data) ? data : []);
-            setTags(tagsArray);
-        } catch (error) {
-            notify.error(error.message || 'Erro ao carregar tags.');
-            setTags([]);
-        }
-    };
-
     useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const data = await tagAPI.getTags();
+                const tagsArray = Array.isArray(data?.tags)
+                    ? data.tags
+                    : (Array.isArray(data) ? data : []);
+                setTags(tagsArray);
+            } catch (error) {
+                notify.error(error.message || 'Erro ao carregar tags.');
+                setTags([]);
+            }
+        };
+
         fetchTags();
     }, []);
 

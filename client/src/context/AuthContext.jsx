@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useEffect, useContext } from 'react';
 import { API_URL } from '../api/config';
 
@@ -24,7 +25,11 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    verificarUsuario();
+    const timer = setTimeout(() => {
+      verificarUsuario();
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (

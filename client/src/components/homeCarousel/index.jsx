@@ -43,11 +43,7 @@ function HomeCarousel({ items = [], isLoading, onLoginRequired }) {
         return () => clearInterval(timer);
     }, [items.length]);
 
-    // Corrige index se a lista mudar
-    useEffect(() => {
-        if (items.length === 0) { setActiveIndex(0); return; }
-        if (activeIndex >= items.length) setActiveIndex(0);
-    }, [items.length, activeIndex]);
+    const currentIndex = items.length > 0 ? activeIndex % items.length : 0;
 
     // ── Navegação ──
     const go = useCallback((dir) => {
@@ -166,7 +162,7 @@ function HomeCarousel({ items = [], isLoading, onLoginRequired }) {
             onMouseLeave={onMouseLeave}
         >
             {items.map((manga, idx) => (
-                <div key={manga.id || `slide-${idx}`} className={`carousel-slide ${activeIndex === idx ? 'active' : ''}`}>
+                <div key={manga.id || `slide-${idx}`} className={`carousel-slide ${currentIndex === idx ? 'active' : ''}`}>
                     <img
                         className="carousel-slide-image"
                         src={manga.banner || manga.foto || '/banner/sololeveling.png'}
@@ -216,7 +212,7 @@ function HomeCarousel({ items = [], isLoading, onLoginRequired }) {
                     {items.map((_, i) => (
                         <button
                             key={i}
-                            className={`carousel-dot ${activeIndex === i ? 'active' : ''}`}
+                            className={`carousel-dot ${currentIndex === i ? 'active' : ''}`}
                             onClick={() => setActiveIndex(i)}
                             aria-label={`Slide ${i + 1}`}
                         />

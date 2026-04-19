@@ -36,6 +36,7 @@ import AvaliationPortal from '../../components/avaliationPortal';
 const viewedMangaGuard = new Set();
 
 function Manga(){
+    const [pageIsLoading, setPageIsLoading] = useState(true);
     const { usuario } = useAuth();
     const [activeSection, setActiveSection] = useState('overview');
     const { id } = useParams();
@@ -75,26 +76,25 @@ function Manga(){
         ? `${userRating} Estrela${userRating > 1 ? 's' : ''}`
         : 'Avaliar';
 
-    const link = (path) => {
-        navigateTo(path);
-    }
-
     // Efeito para carregar os detalhes do mangá quando o componente é montado ou quando o ID muda
     useEffect(() => {
         //Tratamento do ID
         const mangaId = parseInt(id);
-        if(!mangaId) return link('/404');
-        if(mangaId < 0) return link('/404');
-        if(!Number.isInteger(mangaId)) return link('/404');
+        if(!mangaId) return navigateTo('/404');
+        if(mangaId < 0) return navigateTo('/404');
+        if(!Number.isInteger(mangaId)) return navigateTo('/404');
 
         // Pegar os dados do mangá usando o ID
         const fetchManga = async () => {
             try {
+                setPageIsLoading(true);
                 const data = await mangaAPI.getMangaById({ id: mangaId });
                 setManga(data.manga);
-            } catch (error) {
+            } catch {
                 notify.error('Erro ao carregar detalhes do mangá');
-                return link('/404');
+                return navigateTo('/404');
+            }finally{
+                setPageIsLoading(false);
             }
         };
         // Função para aumentar a contagem de views do mangá
@@ -107,7 +107,7 @@ function Manga(){
 
             try {
                 await mangaAPI.addView({ id: mangaId });
-            } catch (error) {
+            } catch {
                 return console.error('Erro ao incrementar visualizações do mangá');
             }
         };
@@ -116,7 +116,7 @@ function Manga(){
             try {
                 const data = await mangaAPI.checkBookmark({ id: mangaId });
                 setBookmarked(Boolean(data?.bookmarked));
-            } catch (error) {
+            } catch {
                 return
             }
         };
@@ -126,7 +126,7 @@ function Manga(){
                 const data = await mangaAPI.checkRating({ id: mangaId });
                 const ratingValue = Number(data?.rating);
                 setUserRating(Number.isFinite(ratingValue) && ratingValue > 0 ? ratingValue : 0);
-            } catch (error) {
+            } catch {
                 return
             }
         };
@@ -135,7 +135,7 @@ function Manga(){
         incrementViews();
         checkBookmark();
         checkRating();
-    }, [id]);
+    }, [id, navigateTo]);
 
     const bookmarkHandler = async () => {
         if (bookmarkProcessing || !manga?.id) return;
@@ -149,7 +149,7 @@ function Manga(){
             const data = await mangaAPI.toggleBookmark({ id: manga.id });
             setBookmarked((prev) => !prev);
             notify.success(data.message);
-        } catch (error) {
+        } catch {
             notify.error('Erro ao atualizar bookmark');
         }finally{
             setBookmarkProcessing(false);
@@ -161,8 +161,8 @@ function Manga(){
             setConfirmationOpen(false);
             await mangaAPI.deleteManga({ id: manga.id });
             notify.success('Mangá deletado com sucesso!');
-            link('/');
-        } catch (error) {
+            navigateTo('/');
+        } catch {
             notify.error('Erro ao deletar mangá');
         }
     };
@@ -176,13 +176,19 @@ function Manga(){
             await mangaAPI.submitRating({ id: manga.id, rating: ratingValue });
             setUserRating(Number(ratingValue));
             notify.success('Avaliação enviada com sucesso!');
-        } catch (error) {
+        } catch {
             notify.error('Erro ao enviar avaliação');
         }
     };
 
     return(
-        <main className='manga-content'>
+        // |Enquanto a página estiver carregando, exibe um indicador de carregamento. Caso contrário, exibe o conteúdo do mangá.
+        pageIsLoading ? (
+            <div className='manga-page-loading'>
+                <img src={loading} alt='Carregando...' />
+            </div>
+        ) : (
+            <main className='manga-content'>
             <div className="MangaBackgroundBanner"><img src={manga?.banner} alt={manga?.titulo} /></div>
 
             <div className="MangaHeader">
@@ -313,7 +319,7 @@ function Manga(){
                 onCancel={() => setLoginPromptOpen(false)}
                 onConfirm={() => {
                     setLoginPromptOpen(false);
-                    link('/login');
+                    navigateTo('/login');
                 }}
             />
 
@@ -334,6 +340,7 @@ function Manga(){
                 onCancel={() => setConfirmationOpen(false)}
             />
         </main>
+        )
     )
 }
 export default Manga;
