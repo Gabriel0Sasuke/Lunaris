@@ -3,6 +3,7 @@ import './manga.css';
 
 //Imagens
 import star from '../../assets/ui/star.svg';
+import starfull from '../../assets/ui/starfull.svg';
 import openBook from '../../assets/ui/openbook.svg';
 import bookmark from '../../assets/ui/bookmark.svg';
 import bookmarkadded from '../../assets/ui/bookmarkadded.svg';
@@ -16,13 +17,13 @@ import edit from '../../assets/ui/edit.svg';
 // React
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useNavigateTo } from '../../utils/navigateTo';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 import { useAuth } from '../../context/AuthContext';
 
 //Services
-import { notify } from '../../services/notify';
+import { notify } from '../../utils/notify';
 import { mangaFormatter } from '../../utils/mangaFormatter';
-import { mangaAPI } from '../../services/mangaapi';
+import { mangaAPI } from '../../api/mangaApi';
 import ConfirmationPortal from '../../components/confirmationPortal';
 
 //Sections
@@ -35,6 +36,7 @@ import AvaliationPortal from '../../components/avaliationPortal';
 const viewedMangaGuard = new Set();
 
 function Manga(){
+    const [pageIsLoading, setPageIsLoading] = useState(true);
     const { usuario } = useAuth();
     const [activeSection, setActiveSection] = useState('overview');
     const { id } = useParams();
@@ -42,8 +44,10 @@ function Manga(){
     const [manga, setManga] = useState(null);
     const MAX_VISIBLE_TAGS = 5;
     const [bookmarked, setBookmarked] = useState(false);
+    const [userRating, setUserRating] = useState(0);
     const [bookmarkProcessing, setBookmarkProcessing] = useState(false);
     const [bookmarkHover, setBookmarkHover] = useState(false);
+    const [ratingHover, setRatingHover] = useState(false);
     const [loginPromptOpen, setLoginPromptOpen] = useState(false);
     const [avaliationOpen, setAvaliationOpen] = useState(false);
     const [moreOpen, setMoreOpen] = useState(false);
@@ -67,27 +71,30 @@ function Manga(){
     const allTags = tagsFromBackend.length > 0 ? tagsFromBackend : fallbackTags;
     const visibleTags = allTags.slice(0, MAX_VISIBLE_TAGS);
     const remainingTags = Math.max(allTags.length - MAX_VISIBLE_TAGS, 0);
-
-    const link = (path) => {
-        navigateTo(path);
-    }
+    const hasRating = userRating > 0;
+    const ratingLabel = hasRating
+        ? `${userRating} Estrela${userRating > 1 ? 's' : ''}`
+        : 'Avaliar';
 
     // Efeito para carregar os detalhes do mangá quando o componente é montado ou quando o ID muda
     useEffect(() => {
         //Tratamento do ID
         const mangaId = parseInt(id);
-        if(!mangaId) return link('/404');
-        if(mangaId < 0) return link('/404');
-        if(!Number.isInteger(mangaId)) return link('/404');
+        if(!mangaId) return navigateTo('/404');
+        if(mangaId < 0) return navigateTo('/404');
+        if(!Number.isInteger(mangaId)) return navigateTo('/404');
 
         // Pegar os dados do mangá usando o ID
         const fetchManga = async () => {
             try {
+                setPageIsLoading(true);
                 const data = await mangaAPI.getMangaById({ id: mangaId });
                 setManga(data.manga);
-            } catch (error) {
+            } catch {
                 notify.error('Erro ao carregar detalhes do mangá');
-                return link('/404');
+                return navigateTo('/404');
+            }finally{
+                setPageIsLoading(false);
             }
         };
         // Função para aumentar a contagem de views do mangá
@@ -100,7 +107,7 @@ function Manga(){
 
             try {
                 await mangaAPI.addView({ id: mangaId });
-            } catch (error) {
+            } catch {
                 return console.error('Erro ao incrementar visualizações do mangá');
             }
         };
@@ -109,7 +116,17 @@ function Manga(){
             try {
                 const data = await mangaAPI.checkBookmark({ id: mangaId });
                 setBookmarked(Boolean(data?.bookmarked));
-            } catch (error) {
+            } catch {
+                return
+            }
+        };
+        // Função para checar se o usúario ja deu Rating nesse mangá
+        const checkRating = async () => {
+            try {
+                const data = await mangaAPI.checkRating({ id: mangaId });
+                const ratingValue = Number(data?.rating);
+                setUserRating(Number.isFinite(ratingValue) && ratingValue > 0 ? ratingValue : 0);
+            } catch {
                 return
             }
         };
@@ -117,7 +134,8 @@ function Manga(){
         fetchManga();
         incrementViews();
         checkBookmark();
-    }, [id]);
+        checkRating();
+    }, [id, navigateTo]);
 
     const bookmarkHandler = async () => {
         if (bookmarkProcessing || !manga?.id) return;
@@ -131,7 +149,7 @@ function Manga(){
             const data = await mangaAPI.toggleBookmark({ id: manga.id });
             setBookmarked((prev) => !prev);
             notify.success(data.message);
-        } catch (error) {
+        } catch {
             notify.error('Erro ao atualizar bookmark');
         }finally{
             setBookmarkProcessing(false);
@@ -143,14 +161,34 @@ function Manga(){
             setConfirmationOpen(false);
             await mangaAPI.deleteManga({ id: manga.id });
             notify.success('Mangá deletado com sucesso!');
-            link('/');
-        } catch (error) {
+            navigateTo('/');
+        } catch {
             notify.error('Erro ao deletar mangá');
         }
     };
 
+    const handleRatingSubmit = async (ratingValue) => {
+        setAvaliationOpen(false);
+
+        if (!manga?.id) return;
+
+        try {
+            await mangaAPI.submitRating({ id: manga.id, rating: ratingValue });
+            setUserRating(Number(ratingValue));
+            notify.success('Avaliação enviada com sucesso!');
+        } catch {
+            notify.error('Erro ao enviar avaliação');
+        }
+    };
+
     return(
-        <main className='manga-content'>
+        // |Enquanto a página estiver carregando, exibe um indicador de carregamento. Caso contrário, exibe o conteúdo do mangá.
+        pageIsLoading ? (
+            <div className='manga-page-loading'>
+                <img src={loading} alt='Carregando...' />
+            </div>
+        ) : (
+            <main className='manga-content'>
             <div className="MangaBackgroundBanner"><img src={manga?.banner} alt={manga?.titulo} /></div>
 
             <div className="MangaHeader">
@@ -181,8 +219,8 @@ function Manga(){
                         </div>
                         <div className="MangaHeaderInfoStatistic">
                             <span className="MangaHeaderInfoStatisticLabel">Rating</span>
-                            <span className="MangaHeaderInfoStatisticValue">4.5</span>
-                            <img src={star} alt="Star" />
+                            <span className="MangaHeaderInfoStatisticValue">{manga?.avg_rating ?? 'N/A'}</span>
+                            <img src={starfull} alt="Star" />
                         </div>
                         <div className="MangaHeaderInfoStatistic">
                             <span className="MangaHeaderInfoStatisticLabel">Views</span>
@@ -215,19 +253,19 @@ function Manga(){
                             <img src={openBook} alt="Open Book" />
                             Começar Leitura
                         </button>
-                        <button className="MangaHeaderInfoAction" onClick={bookmarkHandler} disabled={bookmarkProcessing || !manga?.id} onMouseEnter={() => !bookmarkProcessing && setBookmarkHover(true)} onMouseLeave={() => setBookmarkHover(false)}>
+                        <button className={`MangaHeaderInfoAction MangaHeaderInfoActionBookmark ${bookmarked ? 'is-bookmarked' : ''} ${bookmarkProcessing ? 'is-processing' : ''}`} onClick={bookmarkHandler} disabled={bookmarkProcessing || !manga?.id} onMouseEnter={() => !bookmarkProcessing && setBookmarkHover(true)} onMouseLeave={() => setBookmarkHover(false)}>
                             <img src={bookmarkProcessing ? loading : (bookmarked ? (bookmarkHover ? bookmarkremove : bookmarkadded) : bookmark)} alt="Bookmark" />
                             {bookmarkProcessing ? '' : (bookmarked ? (bookmarkHover ? 'Remover da lista' : 'Adicionado à lista') : 'Adicionar à lista')}
                         </button>
-                        <button className="MangaHeaderInfoAction" onClick={() => {
+                        <button className={`MangaHeaderInfoAction MangaHeaderInfoActionRating ${hasRating ? 'is-rated' : ''}`} onClick={() => {
                             if(!usuario?.id){
                                 setLoginPromptOpen(true);
                                 return;
                             }
                             setAvaliationOpen(true);
-                        }}>
-                            <img src={star} alt="Avaliar" />
-                            Avaliar
+                        }} onMouseEnter={() => setRatingHover(true)} onMouseLeave={() => setRatingHover(false)}>
+                            <img src={hasRating ? starfull : star} alt="Avaliar" />
+                            {hasRating ? (ratingHover ? 'Editar avaliação' : ratingLabel) : ratingLabel}
                         </button>
                         <button className="MangaHeaderInfoAction">
                             <img src={share} alt="Share" />
@@ -281,23 +319,16 @@ function Manga(){
                 onCancel={() => setLoginPromptOpen(false)}
                 onConfirm={() => {
                     setLoginPromptOpen(false);
-                    link('/login');
+                    navigateTo('/login');
                 }}
             />
 
             <AvaliationPortal
                 isOpen={avaliationOpen}
                 title={manga?.titulo}
+                initialRating={userRating}
                 onCancel={() => setAvaliationOpen(false)}
-                onConfirm={(rating) => {
-                    setAvaliationOpen(false);
-                    if (mangaAPI && typeof mangaAPI.submitRating === 'function') {
-                        mangaAPI.submitRating({ id: manga.id, usuario: usuario.id, rating });
-                        notify.success('Avaliação enviada com sucesso!');
-                    } else {
-                        console.error('mangaAPI.submitRating is not implemented.');
-                    }
-                }}
+                onConfirm={handleRatingSubmit}
             />
 
             <ConfirmationPortal
@@ -309,6 +340,7 @@ function Manga(){
                 onCancel={() => setConfirmationOpen(false)}
             />
         </main>
+        )
     )
 }
 export default Manga;

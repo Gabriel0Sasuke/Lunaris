@@ -10,17 +10,16 @@ import HomeCarousel from '../../components/homeCarousel';
 import LoginRequiredPortal from '../../components/loginRequiredPortal';
 
 //React
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigateTo } from '../../utils/navigateTo';
-import { useAuth } from '../../context/AuthContext';
+import { useState, useEffect } from 'react';
+import { useNavigateTo } from '../../hooks/useNavigateTo';
 
 //Hooks
 import { useDragScroll } from '../../hooks/useDragScroll';
 
 //Services
-import { notify } from '../../services/notify';
-import { mangaAPI } from '../../services/mangaapi';
-import { tagAPI } from '../../services/tagsapi';
+import { notify } from '../../utils/notify';
+import { mangaAPI } from '../../api/mangaApi';
+import { tagAPI } from '../../api/tagApi';
 import { mangaFormatter } from '../../utils/mangaFormatter';
 
 function Home() {
@@ -40,20 +39,8 @@ function Home() {
     const topMangasDragRef = useDragScroll();
     const newMangasDragRef = useDragScroll();
 
-    // Refs para wheel horizontal
-    const newChaptersWheelRef = useRef(null);
-    const topMangasWheelRef = useRef(null);
-    const newMangasWheelRef = useRef(null);
-
-    // Combina drag ref + wheel ref numa callback ref
-    const combineRefs = useCallback((dragRef, wheelRef) => (el) => {
-        dragRef.current = el;
-        wheelRef.current = el;
-    }, []);
-
     // Pegar Os Mangás
     useEffect(() => {
-        setIsLoading(true);
         const fetchMangas = async () => {
             const MAX_MANGAS_GRID = 24;
             const MAX_MANGAS_ROWS = 16;
@@ -67,7 +54,7 @@ function Home() {
                 setMangasList(Array.isArray(mangasData.manga) ? mangasData.manga : []);
                 setRecentMangasList(Array.isArray(recentMangasData.manga) ? recentMangasData.manga : []);
                 setTopMangasList(Array.isArray(topMangasData.manga) ? topMangasData.manga : []);
-            } catch (error) {
+            } catch {
                 notify.error('Erro ao carregar mangas');
                 setMangasList([]);
                 setRecentMangasList([]);
@@ -122,11 +109,11 @@ function Home() {
             return () => el.removeEventListener('wheel', handler);
         };
 
-        const c1 = setupWheel(newChaptersWheelRef);
-        const c2 = setupWheel(topMangasWheelRef);
-        const c3 = setupWheel(newMangasWheelRef);
+        const c1 = setupWheel(newChaptersDragRef);
+        const c2 = setupWheel(topMangasDragRef);
+        const c3 = setupWheel(newMangasDragRef);
         return () => { c1?.(); c2?.(); c3?.(); };
-    }, []);
+    }, [newChaptersDragRef, topMangasDragRef, newMangasDragRef]);
 
     const link = (pagina) => navigateTo(pagina);
 
@@ -137,7 +124,7 @@ function Home() {
         image: manga.foto,
         genre: mangaFormatter.formatType(manga.tipo),
         genre2: mangaFormatter.formatDemographic(manga.demografia),
-        rating: manga.rating || 'N/A',
+        rating: manga.avg_rating ?? 'N/A',
         views: manga.views ?? 0,
         lastUpdate: mangaFormatter.formatDateLow(manga.created_at)
     });
@@ -177,7 +164,7 @@ function Home() {
 
             {/* Capitulos Recém-Lançados */}
             <div className="SectionInfo"><div className='Bar' /><span className='SectionTitle'>Capitulos Recém-Lançados</span></div>
-            <div className="mangaRow" ref={combineRefs(newChaptersDragRef, newChaptersWheelRef)}>
+            <div className="mangaRow" ref={newChaptersDragRef}>
                 <div className="mangaEmptyState mangaEmptyStateRow">
                     <div className="mangaEmptyIcon">{'(>_<)'}</div>
                     <h3>Em breve</h3>
@@ -187,7 +174,7 @@ function Home() {
 
             {/* Mangás em Alta */}
             <div className="SectionInfo"><div className='Bar' /><span className='SectionTitle'>Mangás em Alta</span></div>
-            <div className="mangaRow" ref={combineRefs(topMangasDragRef, topMangasWheelRef)}>
+            <div className="mangaRow" ref={topMangasDragRef}>
                 {isLoading ? (
                     Array.from({ length: 8 }).map((_, i) => <MangaCard key={i} isLoading />)
                 ) : topMangasList.length > 0 ? (
@@ -197,7 +184,7 @@ function Home() {
 
             {/* Novos Mangás */}
             <div className="SectionInfo"><div className='Bar' /><span className='SectionTitle'>Novos Mangás</span></div>
-            <div className="mangaRow" ref={combineRefs(newMangasDragRef, newMangasWheelRef)}>
+            <div className="mangaRow" ref={newMangasDragRef}>
                 {isLoading ? (
                     Array.from({ length: 8 }).map((_, i) => <MangaCard key={i} isLoading />)
                 ) : recentMangasList.length > 0 ? (

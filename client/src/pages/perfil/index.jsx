@@ -6,7 +6,6 @@ import { useAuth } from '../../context/AuthContext';
 // Icons
 import profile from '../../assets/ui/person.svg';
 import edit from '../../assets/ui/edit.svg';
-import bolt from '../../assets/ui/bolt.svg';
 
 // Sections
 import ViewProfile from './sections/profile';

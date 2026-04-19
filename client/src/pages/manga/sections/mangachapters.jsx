@@ -1,10 +1,7 @@
 // CSS
 import './mangasection.css'
 
-//React 
-import { useState } from 'react';
-
-function MangaChapters( { manga } ) {
+function MangaChapters() {
 
     return(
         <div className='MangaSection'>

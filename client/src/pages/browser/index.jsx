@@ -1,5 +1,5 @@
 //React
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 //Componentes
 import MangaCard from '../../components/mangaCard';
@@ -16,9 +16,9 @@ import filterIcon from '../../assets/ui/filter.svg';
 import filterOff from '../../assets/ui/filterOff.svg';
 
 //Services
-import { notify } from '../../services/notify';
-import { mangaAPI } from '../../services/mangaapi';
-import { tagAPI } from '../../services/tagsapi';
+import { notify } from '../../utils/notify';
+import { mangaAPI } from '../../api/mangaApi';
+import { tagAPI } from '../../api/tagApi';
 import { mangaFormatter } from '../../utils/mangaFormatter';
 
 function Browser() {
@@ -34,8 +34,7 @@ function Browser() {
     const [isLoading, setIsLoading] = useState(true);
 
     // Pegar Os Mangás
-    const fetchMangas = async () => {
-            setIsLoading(true);
+    const fetchMangas = useCallback(async () => {
             const tagParam = SelectedTag > 0 ? encodeURIComponent(String(SelectedTag)) : '';
             try{
                 const MangasData = await mangaAPI.getManga({
@@ -48,27 +47,22 @@ function Browser() {
                 });
 
                 setMangas(Array.isArray(MangasData.manga) ? MangasData.manga : []);
-            } catch (error) {
+            } catch {
                 notify.error('Erro ao carregar mangas');
                 setMangas([]);
                 return;
             } finally {
                 setIsLoading(false);
             }
-        };
-    // useEffect pra quando pesquisa
+        }, [RankBy, SelectedTag, Status, Type, searchTerm]);
+    // Busca com debounce para pesquisa e filtros
     useEffect(()=> {
         const delayDebounceFn = setTimeout(() => {
             fetchMangas();
-        }, 500); // Aguarda 500ms Após o usuario parar de digitar pra pesquisar
+        }, 500);
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm]);
-
-    // useEffect pra quando troca o filtro ou a tag
-    useEffect(() => {
-        fetchMangas();
-    }, [SelectedTag, RankBy, Type, Status]);
+    }, [searchTerm, SelectedTag, RankBy, Type, Status, fetchMangas]);
 
     // Pegar as Tags para o filtro
     useEffect(() => {
@@ -159,7 +153,7 @@ function Browser() {
                         <input type="radio" name="rank" id="rank2" value="views" checked={RankBy === 'views'} readOnly />
                         <label htmlFor="rank2" readOnly>Popularidade</label>
                     </div>
-                    <div className={`FilterRankOptions`} > {/* Avaliação desativada por enquanto */}
+                    <div className={`FilterRankOptions ${RankBy === 'rating' ? 'selected' : ''}`} onClick={() => setRankBy('rating')}>
                         <input type="radio" name="rank" id="rank3" value="rating" checked={RankBy === 'rating'} readOnly />
                         <label htmlFor="rank3" readOnly>Avaliação</label>
                     </div>
@@ -203,7 +197,7 @@ function Browser() {
                                 image: manga.foto,
                                 genre: mangaFormatter.formatType(manga.tipo),
                                 genre2: mangaFormatter.formatDemographic(manga.demografia),
-                                rating: manga.rating || 'N/A',
+                                rating: manga.avg_rating ?? 'N/A',
                                 views: manga.views ?? 0,
                                 lastUpdate: mangaFormatter.formatDateLow(manga.created_at)
                             }}

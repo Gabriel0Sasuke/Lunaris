@@ -8,7 +8,7 @@ import profileIcon from '../../../assets/icons/profile.svg';
 import './profileSections.css'
 
 // Services
-import { calcularProgressoXp } from '../../../services/nivelUser';
+import { calcularProgressoXp } from '../../../utils/nivelUser';
 
 function ViewProfile({ usuario }) {
     const progressoXp = calcularProgressoXp(usuario?.xp ?? 0);

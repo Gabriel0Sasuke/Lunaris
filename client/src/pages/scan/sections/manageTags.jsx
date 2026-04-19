@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './Scansections.css';
-import { notify } from '../../../services/notify';
-import { tagAPI } from '../../../services/tagsapi';
+import { notify } from '../../../utils/notify';
+import { tagAPI } from '../../../api/tagApi';
 import description from '../../../assets/ui/description.svg';
 
 function ManageTags() {
@@ -24,20 +24,20 @@ function ManageTags() {
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
 
-    const fetchTags = async () => {
-        try {
-            const data = await tagAPI.getTags();
-            const tagsArray = Array.isArray(data?.tags)
-                ? data.tags
-                : (Array.isArray(data) ? data : []);
-            setTags(tagsArray);
-        } catch (error) {
-            notify.error(error.message || 'Erro ao carregar tags.');
-            setTags([]);
-        }
-    };
-
     useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const data = await tagAPI.getTags();
+                const tagsArray = Array.isArray(data?.tags)
+                    ? data.tags
+                    : (Array.isArray(data) ? data : []);
+                setTags(tagsArray);
+            } catch (error) {
+                notify.error(error.message || 'Erro ao carregar tags.');
+                setTags([]);
+            }
+        };
+
         fetchTags();
     }, []);
 

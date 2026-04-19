@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Cropper from 'react-easy-crop';
 import { createPortal } from 'react-dom';
-import { notify } from '../../../services/notify';
-import { cropImage } from '../../../services/cropImage';
-import { userAPI } from '../../../services/userapi';
+import { notify } from '../../../utils/notify';
+import { cropImage } from '../../../utils/cropImage';
+import { userAPI } from '../../../api/userApi';
 import { useAuth } from '../../../context/AuthContext';
 
 //Icons
@@ -61,27 +61,31 @@ function EditProfile({ usuario }) {
     const hasProfileImage = Boolean(profileImage);
     const hasAnyChanges = usernameChanged || emailChanged || bioChanged || titleChanged || hasPasswordInput || hasProfileImage || removeProfileImage;
 
-    const usernameComErro = (username.length > 0 && !usernameValido) || (usernameChanged && usernameTaken);
-    const emailComErro = (email.length > 0 && !emailValido) || (emailChanged && emailTaken);
+    const usernameTakenEffective = usernameChanged ? usernameTaken : false;
+    const emailTakenEffective = emailChanged ? emailTaken : false;
 
-    const formularioValido = usernameValido && emailValido && bioValida && senhaValidaParaSalvar && !usernameTaken && !emailTaken;
+    const usernameComErro = (username.length > 0 && !usernameValido) || usernameTakenEffective;
+    const emailComErro = (email.length > 0 && !emailValido) || emailTakenEffective;
 
-    useEffect(() => {
-        setProfileImagePreview(defaultProfileImage);
-        setProfileImage(null);
-    }, [defaultProfileImage]);
+    const formularioValido = usernameValido && emailValido && bioValida && senhaValidaParaSalvar && !usernameTakenEffective && !emailTakenEffective;
 
     useEffect(() => {
-        setUsername(usuario?.username || '');
-        setEmail(usuario?.email || '');
-        setBio(usuario?.bio || '');
-        setTitle(String(usuario?.titulo_id ?? ''));
-        setPassword('');
-        setConfirmPassword('');
-        setUsernameTaken(false);
-        setEmailTaken(false);
-        setRemoveProfileImage(false);
-    }, [usuario?.username, usuario?.email, usuario?.bio, usuario?.titulo_id]);
+        const syncTimer = setTimeout(() => {
+            setUsername(usuario?.username || '');
+            setEmail(usuario?.email || '');
+            setBio(usuario?.bio || '');
+            setTitle(String(usuario?.titulo_id ?? ''));
+            setProfileImagePreview(defaultProfileImage);
+            setProfileImage(null);
+            setPassword('');
+            setConfirmPassword('');
+            setUsernameTaken(false);
+            setEmailTaken(false);
+            setRemoveProfileImage(false);
+        }, 0);
+
+        return () => clearTimeout(syncTimer);
+    }, [usuario?.username, usuario?.email, usuario?.bio, usuario?.titulo_id, defaultProfileImage]);
 
     useEffect(() => {
         return () => {
@@ -147,7 +151,7 @@ function EditProfile({ usuario }) {
             setRemoveProfileImage(false);
             setProfileImagePreview(previewURL);
             setProfileImageURL('');
-        } catch (error) {
+        } catch {
             notify.error('Erro ao recortar a imagem de perfil.');
         } finally {
             setCroppedAreaPixels(null);
@@ -194,7 +198,6 @@ function EditProfile({ usuario }) {
 
     useEffect(() => {
         if (!usernameChanged || !usernameValido) {
-            setUsernameTaken(false);
             return;
         }
 
@@ -203,7 +206,7 @@ function EditProfile({ usuario }) {
                 setCheckingUsername(true);
                 const result = await userAPI.checkUpdateAvailability({ username });
                 setUsernameTaken(!result.usernameAvailable);
-            } catch (error) {
+            } catch {
                 setUsernameTaken(false);
             } finally {
                 setCheckingUsername(false);
@@ -215,7 +218,6 @@ function EditProfile({ usuario }) {
 
     useEffect(() => {
         if (!emailChanged || !emailValido) {
-            setEmailTaken(false);
             return;
         }
 
@@ -224,7 +226,7 @@ function EditProfile({ usuario }) {
                 setCheckingEmail(true);
                 const result = await userAPI.checkUpdateAvailability({ email });
                 setEmailTaken(!result.emailAvailable);
-            } catch (error) {
+            } catch {
                 setEmailTaken(false);
             } finally {
                 setCheckingEmail(false);
